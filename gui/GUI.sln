@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gui", "gui\gui.csproj", "{9658AA66-E6B2-42DD-A71A-726C9848989B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "gui\GUI.csproj", "{9658AA66-E6B2-42DD-A71A-726C9848989B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{03A781A4-3535-4CF2-BFB4-B5D53841D969}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "test\Test.csproj", "{03A781A4-3535-4CF2-BFB4-B5D53841D969}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
