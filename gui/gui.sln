@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gui", "gui\gui.csproj", "{9658AA66-E6B2-42DD-A71A-726C9848989B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{03A781A4-3535-4CF2-BFB4-B5D53841D969}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03A781A4-3535-4CF2-BFB4-B5D53841D969}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{03A781A4-3535-4CF2-BFB4-B5D53841D969}.Debug|x86.Build.0 = Debug|Any CPU
+		{03A781A4-3535-4CF2-BFB4-B5D53841D969}.Release|x86.ActiveCfg = Release|Any CPU
+		{03A781A4-3535-4CF2-BFB4-B5D53841D969}.Release|x86.Build.0 = Release|Any CPU
+		{9658AA66-E6B2-42DD-A71A-726C9848989B}.Debug|x86.ActiveCfg = Debug|x86
+		{9658AA66-E6B2-42DD-A71A-726C9848989B}.Debug|x86.Build.0 = Debug|x86
+		{9658AA66-E6B2-42DD-A71A-726C9848989B}.Release|x86.ActiveCfg = Release|x86
+		{9658AA66-E6B2-42DD-A71A-726C9848989B}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
