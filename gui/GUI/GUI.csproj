@@ -74,7 +74,7 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
-        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" BuildTargetName="gui" SyncReferences="True" IsAutotoolsProject="True" RelativeConfigureInPath="..">
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="True" RelativeMakefileName="Makefile.am" BuildTargetName="" SyncReferences="True" IsAutotoolsProject="True" RelativeConfigureInPath="..">
           <BuildFilesVar Sync="True" Name="FILES" />
           <DeployFilesVar />
           <ResourcesVar Sync="True" Name="RESOURCES" />
