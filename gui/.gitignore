@@ -14,3 +14,6 @@
 
 #Nuget Packages
 **/packages/
+
+#Generated shell files
+*.in

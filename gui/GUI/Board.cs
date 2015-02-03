@@ -18,7 +18,7 @@ namespace GUI
 	/**
 	 * @brief Representation of a single piece.
 	 * 
-	 * Note that it contains no default constructor as there is no "base" piece.
+	 * @fn Note that it contains no default constructor as there is no "base" piece.
 	 */
 	public class Piece
 	{
@@ -51,7 +51,7 @@ namespace GUI
 		/**
 		 * @brief Tests whether a piece is equal to another.
 		 * 
-		 * Override of @c Object.Equals. First tests whether @c obj is null, then attempts to cast to
+		 * @fn Override of @c Object.Equals. First tests whether @c obj is null, then attempts to cast to
 		 * Piece. If it is still not null, it compares the @c PieceType and @c PieceColour properties.
 		 * 
 		 * @param obj	the object to compare to.
@@ -118,6 +118,57 @@ namespace GUI
 		public override int GetHashCode ()
 		{
 			return (int)Colour + (int)Type;
+		}
+	}
+
+	/**
+	 * @brief A representation of a single square.
+	 * 
+	 * @class A representation of a single square which can hold a Piece object or be empty.
+	 */
+	public class Square
+	{
+		public Piece Piece { get; set; }
+
+		/**
+		 * @brief Default constructor creates an empty square.
+		 */
+		public Square()
+		{
+			Piece = null;
+		}
+
+		/**
+		 * @brief Constructor which initialises to hold a piece.
+		 * 
+		 * @param piece		the piece to hold in the square.
+		 */
+		public Square(Piece piece)
+		{
+			Piece = piece;
+		}
+
+		/**
+		 * @brief Copy constructor.
+		 * 
+		 * @param other		a square to copy the piece from.
+		 */
+		public Square(Square other)
+		{
+			Piece = other.Piece;
+		}
+
+		public override string ToString ()
+		{
+			if (Piece == null)
+				return "_";
+			else
+				return Piece.ToString ();
+		}
+
+		public bool isEmpty()
+		{
+			return Piece == null;
 		}
 	}
 }
