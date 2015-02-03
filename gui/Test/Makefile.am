@@ -15,7 +15,6 @@ BUILD_DIR = bin/Debug
 
 TEST_DLL_MDB_SOURCE=bin/Debug/test.dll.mdb
 TEST_DLL_MDB=$(BUILD_DIR)/test.dll.mdb
-NUNIT_FRAMEWORK_DLL_SOURCE=../packages/NUnit.2.6.4/lib/nunit.framework.dll
 GUI_EXE_SOURCE=../GUI/bin/Debug/gui.exe
 GUI_EXE_MDB_SOURCE=../GUI/bin/Debug/gui.exe.mdb
 
@@ -32,7 +31,6 @@ PROJECT_REFERENCES =  \
 BUILD_DIR = bin/Release
 
 TEST_DLL_MDB=
-NUNIT_FRAMEWORK_DLL_SOURCE=../packages/NUnit.2.6.4/lib/nunit.framework.dll
 GUI_EXE_SOURCE=../GUI/bin/Debug/gui.exe
 GUI_EXE_MDB_SOURCE=../GUI/bin/Debug/gui.exe.mdb
 
@@ -43,7 +41,6 @@ SATELLITE_ASSEMBLY_NAME=$(notdir $(basename $(ASSEMBLY))).resources.dll
 
 PROGRAMFILES = \
 	$(TEST_DLL_MDB) \
-	$(NUNIT_FRAMEWORK_DLL) \
 	$(GUI_EXE) \
 	$(GUI_EXE_MDB)  
 
@@ -67,22 +64,19 @@ EXTRAS = \
 
 REFERENCES =  \
 	../GUI/bin/Debug/gui.exe \
-	nunit.framework \
+	-pkg:nunit \
 	System
 
-DLL_REFERENCES =  \
-	../../../../../nunit.framework
+DLL_REFERENCES = 
 
 CLEANFILES = $(PROGRAMFILES) $(LINUX_PKGCONFIG) 
 
 include $(top_srcdir)/Makefile.include
 
-NUNIT_FRAMEWORK_DLL = $(BUILD_DIR)/nunit.framework.dll
 GUI_EXE = $(BUILD_DIR)/gui.exe
 GUI_EXE_MDB = $(BUILD_DIR)/gui.exe.mdb
 TEST_PC = $(BUILD_DIR)/test.pc
 
-$(eval $(call emit-deploy-target,NUNIT_FRAMEWORK_DLL))
 $(eval $(call emit-deploy-target,GUI_EXE))
 $(eval $(call emit-deploy-target,GUI_EXE_MDB))
 $(eval $(call emit-deploy-wrapper,TEST_PC,test.pc))
