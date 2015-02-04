@@ -9,7 +9,6 @@
 
 #Compiled files
 **/bin/
-**/gtk-gui/
 **/obj/
 
 #Nuget Packages
