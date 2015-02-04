@@ -4,6 +4,19 @@ using GUI;
 
 namespace Test
 {
+	[TestFixture()]
+	public class BoardTest
+	{
+		[Test()]
+		public void BoardCopyAndComparisonTest()
+		{
+			Board board = new Board ();
+			Board otherBoard = new Board (board);
+
+			Assert.AreEqual (board.ToString(), otherBoard.ToString());
+		}
+	}
+
 	[TestFixture ()]
 	public class PieceTest
 	{

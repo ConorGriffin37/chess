@@ -10,8 +10,71 @@ namespace GUI
 	 */
 	public class Board
 	{
+		public Square[] Squares { get; private set; }
+
+		/**
+		 * @brief Default constructor.
+		 * 
+		 * Creates a board laid out in the standard chess starting position.
+		 */
 		public Board ()
 		{
+			Squares = new Square[64];
+			// Initialise empty squares
+			for (int i = 0; i < 64; i++) {
+				Squares [i] = new Square ();
+			}
+
+			// Add pieces for black.
+			Squares [0].Piece = new Piece (PieceColour.Black, PieceType.Rook);
+			Squares [1].Piece = new Piece (PieceColour.Black, PieceType.Knight);
+			Squares [2].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
+			Squares [3].Piece = new Piece (PieceColour.Black, PieceType.Queen);
+			Squares [4].Piece = new Piece (PieceColour.Black, PieceType.King);
+			Squares [5].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
+			Squares [6].Piece = new Piece (PieceColour.Black, PieceType.Knight);
+			Squares [7].Piece = new Piece (PieceColour.Black, PieceType.Rook);
+			for (int i = 8; i <= 15; i++) {
+				Squares [i].Piece = new Piece (PieceColour.Black, PieceType.Pawn);
+			}
+
+			// Add pieces for white.
+			for (int i = 48; i <= 55; i++) {
+				Squares [i].Piece = new Piece (PieceColour.White, PieceType.Pawn);
+			}
+			Squares [56].Piece = new Piece (PieceColour.White, PieceType.Rook);
+			Squares [57].Piece = new Piece (PieceColour.White, PieceType.Knight);
+			Squares [58].Piece = new Piece (PieceColour.White, PieceType.Bishop);
+			Squares [59].Piece = new Piece (PieceColour.White, PieceType.Queen);
+			Squares [60].Piece = new Piece (PieceColour.White, PieceType.King);
+			Squares [61].Piece = new Piece (PieceColour.White, PieceType.Bishop);
+			Squares [62].Piece = new Piece (PieceColour.White, PieceType.Knight);
+			Squares [63].Piece = new Piece (PieceColour.White, PieceType.Rook);
+		}
+
+		/**
+		 * @brief Copy constructor.
+		 * 
+		 * Copies the list of pieces from one board to another.
+		 */
+		public Board(Board other)
+		{
+			Squares = new Square[64];
+			Array.Copy (other.Squares, Squares, 64);
+		}
+
+		public override string ToString ()
+		{
+			string output = "";
+
+			for (int i = 0; i < 64; i++) {
+				output += (Squares [i].ToString () + " ");
+				// If i is in column 7, start a new line
+				if (i % 8 == 7)
+					output += "\n";
+			}
+
+			return output;
 		}
 	}
 
