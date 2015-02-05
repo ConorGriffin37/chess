@@ -36,8 +36,8 @@ namespace Test
             Piece queen = new Piece (PieceColour.White, PieceType.Queen);
             Piece blackKnight = new Piece (PieceColour.Black, PieceType.Knight);
 
-            Assert.AreEqual ("q", queen.ToString());
-            Assert.AreEqual ("N", blackKnight.ToString ());
+            Assert.AreEqual ("Q", queen.ToString());
+            Assert.AreEqual ("n", blackKnight.ToString ());
         }
     }
 
@@ -52,7 +52,7 @@ namespace Test
             Square alsoEmpty = new Square (empty);
 
             Assert.AreEqual ("_", empty.ToString ());
-            Assert.AreEqual ("N", containsBlackKnight.ToString ());
+            Assert.AreEqual ("n", containsBlackKnight.ToString ());
             Assert.AreEqual ("_", alsoEmpty.ToString ());
         }
     }

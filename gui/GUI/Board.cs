@@ -17,39 +17,47 @@ namespace GUI
          * 
          * Creates a board laid out in the standard chess starting position.
          */
-        public Board ()
+        public Board (bool empty = false)
         {
-            Squares = new Square[64];
-            // Initialise empty squares
-            for (int i = 0; i < 64; i++) {
-                Squares [i] = new Square ();
-            }
+            if (empty) {
+                Squares = new Square[64];
+                // Initialise empty squares
+                for (int i = 0; i < 64; i++) {
+                    Squares [i] = new Square ();
+                }
+            } else {
+                Squares = new Square[64];
+                // Initialise empty squares
+                for (int i = 0; i < 64; i++) {
+                    Squares [i] = new Square ();
+                }
 
-            // Add pieces for black.
-            Squares [0].Piece = new Piece (PieceColour.Black, PieceType.Rook);
-            Squares [1].Piece = new Piece (PieceColour.Black, PieceType.Knight);
-            Squares [2].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
-            Squares [3].Piece = new Piece (PieceColour.Black, PieceType.Queen);
-            Squares [4].Piece = new Piece (PieceColour.Black, PieceType.King);
-            Squares [5].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
-            Squares [6].Piece = new Piece (PieceColour.Black, PieceType.Knight);
-            Squares [7].Piece = new Piece (PieceColour.Black, PieceType.Rook);
-            for (int i = 8; i <= 15; i++) {
-                Squares [i].Piece = new Piece (PieceColour.Black, PieceType.Pawn);
-            }
+                // Add pieces for black.
+                Squares [0].Piece = new Piece (PieceColour.Black, PieceType.Rook);
+                Squares [1].Piece = new Piece (PieceColour.Black, PieceType.Knight);
+                Squares [2].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
+                Squares [3].Piece = new Piece (PieceColour.Black, PieceType.Queen);
+                Squares [4].Piece = new Piece (PieceColour.Black, PieceType.King);
+                Squares [5].Piece = new Piece (PieceColour.Black, PieceType.Bishop);
+                Squares [6].Piece = new Piece (PieceColour.Black, PieceType.Knight);
+                Squares [7].Piece = new Piece (PieceColour.Black, PieceType.Rook);
+                for (int i = 8; i <= 15; i++) {
+                    Squares [i].Piece = new Piece (PieceColour.Black, PieceType.Pawn);
+                }
 
-            // Add pieces for white.
-            for (int i = 48; i <= 55; i++) {
-                Squares [i].Piece = new Piece (PieceColour.White, PieceType.Pawn);
+                // Add pieces for white.
+                for (int i = 48; i <= 55; i++) {
+                    Squares [i].Piece = new Piece (PieceColour.White, PieceType.Pawn);
+                }
+                Squares [56].Piece = new Piece (PieceColour.White, PieceType.Rook);
+                Squares [57].Piece = new Piece (PieceColour.White, PieceType.Knight);
+                Squares [58].Piece = new Piece (PieceColour.White, PieceType.Bishop);
+                Squares [59].Piece = new Piece (PieceColour.White, PieceType.Queen);
+                Squares [60].Piece = new Piece (PieceColour.White, PieceType.King);
+                Squares [61].Piece = new Piece (PieceColour.White, PieceType.Bishop);
+                Squares [62].Piece = new Piece (PieceColour.White, PieceType.Knight);
+                Squares [63].Piece = new Piece (PieceColour.White, PieceType.Rook);
             }
-            Squares [56].Piece = new Piece (PieceColour.White, PieceType.Rook);
-            Squares [57].Piece = new Piece (PieceColour.White, PieceType.Knight);
-            Squares [58].Piece = new Piece (PieceColour.White, PieceType.Bishop);
-            Squares [59].Piece = new Piece (PieceColour.White, PieceType.Queen);
-            Squares [60].Piece = new Piece (PieceColour.White, PieceType.King);
-            Squares [61].Piece = new Piece (PieceColour.White, PieceType.Bishop);
-            Squares [62].Piece = new Piece (PieceColour.White, PieceType.Knight);
-            Squares [63].Piece = new Piece (PieceColour.White, PieceType.Rook);
         }
 
         /**
@@ -63,6 +71,18 @@ namespace GUI
             Array.Copy (other.Squares, Squares, 64);
         }
 
+        public void AddPiece(PieceColour colour, PieceType type, int position)
+        {
+            if (position >= 64)
+                throw new ArgumentOutOfRangeException ("position",
+                    "Position index for the chessboard must be less than 64.");
+
+            if (Squares [position].Piece != null)
+                throw new ArgumentException ("That square is already occupied.", "position");
+                    
+            Squares[position].Piece = new Piece(colour, type);
+        }
+
         public override string ToString ()
         {
             string output = "";
@@ -71,10 +91,25 @@ namespace GUI
                 output += (Squares [i].ToString () + " ");
                 // If i is in column 7, start a new line
                 if (i % 8 == 7)
-                    output += "\n";
+                    output += Environment.NewLine;
             }
 
             return output;
+        }
+
+        public override bool Equals (object obj)
+        {
+            if (obj == null)
+                return false;
+
+            Board otherBoard = (Board)obj;
+            if (otherBoard == null)
+                return false;
+
+            if (ToString () == otherBoard.ToString ())
+                return true;
+            else
+                return false;
         }
     }
 
@@ -166,7 +201,7 @@ namespace GUI
                     break;
             }
 
-            if (Colour == PieceColour.Black)
+            if (Colour == PieceColour.White)
                 output = output.ToUpper ();
 
             return output;

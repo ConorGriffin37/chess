@@ -52,7 +52,9 @@ RESGEN=resgen2
 	
 all: $(ASSEMBLY) $(PROGRAMFILES) $(LINUX_PKGCONFIG) 
 
-FILES = BoardTest.cs 
+FILES =  \
+	BoardTest.cs \
+	FENParserTest.cs 
 
 DATA_FILES = 
 
