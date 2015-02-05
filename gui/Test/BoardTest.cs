@@ -4,57 +4,57 @@ using GUI;
 
 namespace Test
 {
-	[TestFixture()]
-	public class BoardTest
-	{
-		[Test()]
-		public void BoardCopyAndComparisonTest()
-		{
-			Board board = new Board ();
-			Board otherBoard = new Board (board);
+    [TestFixture()]
+    public class BoardTest
+    {
+        [Test()]
+        public void BoardCopyAndComparisonTest()
+        {
+            Board board = new Board ();
+            Board otherBoard = new Board (board);
 
-			Assert.AreEqual (board.ToString(), otherBoard.ToString());
-		}
-	}
+            Assert.AreEqual (board.ToString(), otherBoard.ToString());
+        }
+    }
 
-	[TestFixture ()]
-	public class PieceTest
-	{
-		[Test ()]
-		public void PieceCopyAndComparisonTest ()
-		{
-			Piece queen = new Piece (PieceColour.White, PieceType.Queen);
-			Piece newQueen = new Piece (queen);
+    [TestFixture ()]
+    public class PieceTest
+    {
+        [Test ()]
+        public void PieceCopyAndComparisonTest ()
+        {
+            Piece queen = new Piece (PieceColour.White, PieceType.Queen);
+            Piece newQueen = new Piece (queen);
 
-			Assert.AreEqual (queen, newQueen);
-			Assert.AreEqual (queen.GetHashCode(), newQueen.GetHashCode());
-		}
+            Assert.AreEqual (queen, newQueen);
+            Assert.AreEqual (queen.GetHashCode(), newQueen.GetHashCode());
+        }
 
-		[Test()]
-		public void PieceToStringTest()
-		{
-			Piece queen = new Piece (PieceColour.White, PieceType.Queen);
-			Piece blackKnight = new Piece (PieceColour.Black, PieceType.Knight);
+        [Test()]
+        public void PieceToStringTest()
+        {
+            Piece queen = new Piece (PieceColour.White, PieceType.Queen);
+            Piece blackKnight = new Piece (PieceColour.Black, PieceType.Knight);
 
-			Assert.AreEqual ("q", queen.ToString());
-			Assert.AreEqual ("N", blackKnight.ToString ());
-		}
-	}
+            Assert.AreEqual ("q", queen.ToString());
+            Assert.AreEqual ("N", blackKnight.ToString ());
+        }
+    }
 
-	[TestFixture()]
-	public class SquareTest
-	{
-		[Test()]
-		public void SquareCopyAndToStringTest()
-		{
-			Square empty = new Square ();
-			Square containsBlackKnight = new Square (new Piece (PieceColour.Black, PieceType.Knight));
-			Square alsoEmpty = new Square (empty);
+    [TestFixture()]
+    public class SquareTest
+    {
+        [Test()]
+        public void SquareCopyAndToStringTest()
+        {
+            Square empty = new Square ();
+            Square containsBlackKnight = new Square (new Piece (PieceColour.Black, PieceType.Knight));
+            Square alsoEmpty = new Square (empty);
 
-			Assert.AreEqual ("_", empty.ToString ());
-			Assert.AreEqual ("N", containsBlackKnight.ToString ());
-			Assert.AreEqual ("_", alsoEmpty.ToString ());
-		}
-	}
+            Assert.AreEqual ("_", empty.ToString ());
+            Assert.AreEqual ("N", containsBlackKnight.ToString ());
+            Assert.AreEqual ("_", alsoEmpty.ToString ());
+        }
+    }
 }
 
