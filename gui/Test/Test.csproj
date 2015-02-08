@@ -80,6 +80,7 @@
     <ProjectReference Include="..\GUI\GUI.csproj">
       <Project>{9658AA66-E6B2-42DD-A71A-726C9848989B}</Project>
       <Name>GUI</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>
