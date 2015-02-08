@@ -54,12 +54,6 @@
     <Compile Include="PieceValidMovesTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\GUI\GUI.csproj">
-      <Project>{9658AA66-E6B2-42DD-A71A-726C9848989B}</Project>
-      <Name>GUI</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -81,5 +75,11 @@
   </ProjectExtensions>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GUI\GUI.csproj">
+      <Project>{9658AA66-E6B2-42DD-A71A-726C9848989B}</Project>
+      <Name>GUI</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
