@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GUI
 {
@@ -11,6 +12,11 @@ namespace GUI
     public class Board
     {
         public Square[] Squares { get; private set; }
+        public bool BlackCheck { get; set; }
+        public bool WhiteCheck { get; set; }
+        public bool BlackCastled { get; set; }
+        public bool WhiteCastled { get; set; }
+        public PieceColour PlayerToMove { get; set; }
 
         /**
          * @brief Default constructor.
@@ -19,6 +25,13 @@ namespace GUI
          */
         public Board (bool empty = false)
         {
+            BlackCheck = false;
+            WhiteCheck = false;
+            // For castling, default to true and change based on position
+            BlackCastled = true;
+            WhiteCastled = true;
+            PlayerToMove = PieceColour.White;
+
             if (empty) {
                 Squares = new Square[64];
                 // Initialise empty squares
@@ -26,6 +39,9 @@ namespace GUI
                     Squares [i] = new Square ();
                 }
             } else {
+                BlackCastled = false;
+                WhiteCastled = false;
+
                 Squares = new Square[64];
                 // Initialise empty squares
                 for (int i = 0; i < 64; i++) {
@@ -83,6 +99,24 @@ namespace GUI
             Squares[position].Piece = new Piece(colour, type);
         }
 
+        public bool IsMoveValid(byte source, byte destination)
+        {
+            Piece movingPiece = Squares [source].Piece;
+
+            if (movingPiece == null)
+                return false;
+
+            if (movingPiece.ValidMoves.Contains (destination))
+                return true;
+
+            return false;
+        }
+
+        public Piece PieceAt(int square)
+        {
+            return Squares [square].Piece;
+        }
+
         public override string ToString ()
         {
             string output = "";
@@ -122,6 +156,10 @@ namespace GUI
     {
         public PieceColour Colour { get; private set; }
         public PieceType Type { get; private set; }
+        public List<byte> ValidMoves { get; set; }
+        public byte TimesAttacked { get; set; }
+        public byte TimesDefended { get; set; }
+        public bool HasMoved { get; set; } /**< We need this to know if we can castle, for example. */
 
         /**
          * @brief Constructor for a Piece.

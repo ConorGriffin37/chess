@@ -50,6 +50,8 @@ FILES =  \
 	gtk-gui/generated.cs \
 	gtk-gui/MainWindow.cs \
 	MainWindow.cs \
+	PieceMoves.cs \
+	PieceValidMoves.cs \
 	Program.cs \
 	Properties/AssemblyInfo.cs 
 

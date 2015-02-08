@@ -54,7 +54,8 @@ all: $(ASSEMBLY) $(PROGRAMFILES) $(LINUX_PKGCONFIG)
 
 FILES =  \
 	BoardTest.cs \
-	FENParserTest.cs 
+	FENParserTest.cs \
+	PieceValidMovesTest.cs 
 
 DATA_FILES = 
 

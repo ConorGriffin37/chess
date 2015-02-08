@@ -53,6 +53,35 @@ namespace GUI
         {
             int position = 0;
             Board output = new Board (true);
+
+            switch (colourToMove) {
+                case 'w':
+                    output.PlayerToMove = PieceColour.White;
+                    break;
+                case 'b':
+                    output.PlayerToMove = PieceColour.Black;
+                    break;
+                default:
+                    throw new ArgumentException ("Bad FEN field: Colour to move.", "fen");
+            }
+
+            if (castlingPossibilities.Length == 4) {
+                output.BlackCastled = false;
+                output.WhiteCastled = false;
+            } else if (castlingPossibilities.Length < 4) {
+                foreach (char c in castlingPossibilities) {
+                    if (Char.IsLower (c)) {
+                        output.BlackCastled = false;
+                    } else {
+                        output.WhiteCastled = false;
+                    }
+                }
+            } else if (castlingPossibilities == "-") {
+                output.BlackCastled = true;
+                output.WhiteCastled = true;
+            } else
+                throw new ArgumentException ("Bad FEN field: Castling possibilities.", "fen");
+
             foreach (char c in piecePlacement) {
                 if (Char.IsNumber (c)) {
                     int number = (int)Char.GetNumericValue (c);
@@ -119,7 +148,7 @@ namespace GUI
                                 break;
                         }
                     } catch(Exception) {
-                        throw new ArgumentException("Invalid piece placement token in FEN.", "fen");
+                        throw new ArgumentException("Bad FEN field: Piece placement.", "fen");
                     }
                 }
             }
