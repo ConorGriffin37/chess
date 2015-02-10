@@ -27,3 +27,14 @@ Scrum Log - Sprint 1
 	* Started working on FEN parser.
 * Darragh:
 	* Started working on UCI protocol.
+
+**2015-2-10:**
+* Terry:
+	* Wrote a wrapper for C#'s builtin Process class for interfacing with the engine.
+* Conor:
+	* Finished basic FEN parser.
+	* Finished board representation.
+	* Began move generation.
+* Darragh:
+	* Implemented basic UCI.
+	* Implemented basic search.
