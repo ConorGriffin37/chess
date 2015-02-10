@@ -46,6 +46,7 @@ all: $(ASSEMBLY) $(PROGRAMFILES) $(BINARIES)
 
 FILES =  \
 	Board.cs \
+	Engine.cs \
 	FENParser.cs \
 	gtk-gui/generated.cs \
 	gtk-gui/MainWindow.cs \

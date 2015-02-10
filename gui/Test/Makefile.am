@@ -54,6 +54,7 @@ all: $(ASSEMBLY) $(PROGRAMFILES) $(LINUX_PKGCONFIG)
 
 FILES =  \
 	BoardTest.cs \
+	EngineTest.cs \
 	FENParserTest.cs \
 	PieceValidMovesTest.cs 
 
@@ -66,7 +67,7 @@ EXTRAS = \
 	test.pc.in 
 
 REFERENCES =  \
-	../GUI/bin/Debug/gui.exe \
+	../GUI/bin/Debug/GUI.exe \
 	-pkg:nunit \
 	System
 
