@@ -54,7 +54,8 @@ FILES =  \
 	PieceMoves.cs \
 	PieceValidMoves.cs \
 	Program.cs \
-	Properties/AssemblyInfo.cs 
+	Properties/AssemblyInfo.cs \
+	UCITransceiver.cs 
 
 DATA_FILES = 
 

@@ -73,6 +73,7 @@
     <Compile Include="PieceMoves.cs" />
     <Compile Include="PieceValidMoves.cs" />
     <Compile Include="Engine.cs" />
+    <Compile Include="UCITransceiver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

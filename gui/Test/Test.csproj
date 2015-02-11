@@ -58,6 +58,7 @@
     <Compile Include="FENParserTest.cs" />
     <Compile Include="PieceValidMovesTest.cs" />
     <Compile Include="EngineTest.cs" />
+    <Compile Include="UCITransceiverTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -56,7 +56,8 @@ FILES =  \
 	BoardTest.cs \
 	EngineTest.cs \
 	FENParserTest.cs \
-	PieceValidMovesTest.cs 
+	PieceValidMovesTest.cs \
+	UCITransceiverTest.cs 
 
 DATA_FILES = 
 

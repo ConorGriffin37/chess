@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace GUI
 {
@@ -11,7 +12,11 @@ namespace GUI
         public Engine (string filename)
         {
             childProcess = new Process ();
-            this.filename = filename;
+            if (File.Exists (filename)) {
+                this.filename = filename;
+            } else {
+                throw new FileNotFoundException ("Engine file does not exist.", filename);
+            }
         }
 
         public void Start()
