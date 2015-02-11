@@ -15,6 +15,13 @@ namespace Test
 
             Assert.AreEqual (board.ToString(), otherBoard.ToString());
         }
+
+        [Test()]
+        public void BoardToFENTest()
+        {
+            Board board = new Board ();
+            Assert.AreEqual ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFEN ());
+        }
     }
 
     [TestFixture ()]

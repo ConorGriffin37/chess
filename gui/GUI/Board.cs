@@ -117,6 +117,104 @@ namespace GUI
             return Squares [square].Piece;
         }
 
+        public string ToFEN()
+        {
+            string fen = String.Empty;
+            // Board configuration
+            int blankCounter = 0;
+            for (int i = 0; i < 64; i++) {
+                Square sq = Squares[i];
+                if (sq.Piece == null)
+                    blankCounter++;
+                else if (sq.Piece != null && blankCounter > 0) {
+                    fen += blankCounter.ToString ();
+                    blankCounter = 0;
+                } else {
+                    switch (sq.Piece.Type) {
+                        case PieceType.Pawn:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'p';
+                            else
+                                fen += 'P';
+                            break;
+                        case PieceType.Rook:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'r';
+                            else
+                                fen += 'R';
+                            break;
+                        case PieceType.Knight:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'n';
+                            else
+                                fen += 'N';
+                            break;
+                        case PieceType.Bishop:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'b';
+                            else
+                                fen += 'B';
+                            break;
+                        case PieceType.Queen:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'q';
+                            else
+                                fen += 'Q';
+                            break;
+                        case PieceType.King:
+                            if (sq.Piece.Colour == PieceColour.Black)
+                                fen += 'k';
+                            else
+                                fen += 'K';
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                // If at end of row (but not the last one), append '/'.
+                // Also append the blank square count if not 0
+                if (i != 63 && i % 8 == 7) {
+                    if (blankCounter > 0) {
+                        fen += blankCounter.ToString ();
+                        blankCounter = 0;
+                    }
+                    fen += '/';
+                }
+            }
+            fen += ' ';
+
+            // Active colour
+            if (PlayerToMove == PieceColour.White)
+                fen += 'w';
+            else
+                fen += 'b';
+            fen += ' ';
+
+            // Castling availability
+            if (!WhiteCastled)
+                fen += "KQ";
+            if (!BlackCastled)
+                fen += "kq";
+            if (WhiteCastled && BlackCastled)
+                fen += '-';
+            fen += ' ';
+
+            // En passant target
+            // NOT IMPLEMENTED
+            fen += "- ";
+
+            // Halfmove clock
+            // NOT IMPLEMENTED
+            fen += "0 ";
+
+            // Fullmove count
+            // NOT IMPLEMENTED
+            fen += "1";
+
+            return fen;
+        }
+
         public override string ToString ()
         {
             string output = "";
