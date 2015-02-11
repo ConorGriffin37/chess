@@ -124,11 +124,12 @@ namespace GUI
             int blankCounter = 0;
             for (int i = 0; i < 64; i++) {
                 Square sq = Squares[i];
-                if (sq.Piece == null)
-                    blankCounter++;
-                else if (sq.Piece != null && blankCounter > 0) {
+                if (sq.Piece != null && blankCounter > 0) {
                     fen += blankCounter.ToString ();
                     blankCounter = 0;
+                }
+                if (sq.Piece == null) {
+                    blankCounter++;
                 } else {
                     switch (sq.Piece.Type) {
                         case PieceType.Pawn:

@@ -19,8 +19,14 @@ namespace Test
         [Test()]
         public void BoardToFENTest()
         {
-            Board board = new Board ();
-            Assert.AreEqual ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFEN ());
+            Board startBoard = new Board ();
+            FENParser fen = new FENParser ("rn2kbnr/ppq2pp1/2p1p2p/7P/3P4/3Q1NN1/PPP2PP1/R1B1K2R w KQkq - 0 11");
+
+            Assert.AreEqual ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", startBoard.ToFEN ());
+            // Note that in the following comparison the expected FEN string has a fullmove
+            // counter of 1 instead of the 11 we gave to the FEN parser. This is because move
+            // history has not yet been implemented. There is no error in the code.
+            Assert.AreEqual ("rn2kbnr/ppq2pp1/2p1p2p/7P/3P4/3Q1NN1/PPP2PP1/R1B1K2R w KQkq - 0 1", fen.GetBoard ().ToFEN ());
         }
     }
 
