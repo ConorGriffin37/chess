@@ -52,7 +52,12 @@ namespace GUI
          */
         public void SendPosition(string position, string moves = null)
         {
-            string output = "position " + position;
+            string output;
+            if (position == "startpos") {
+                output = "position startpos";
+            } else {
+                output = "position fen " + position;
+            }
             if (moves != null) {
                 output += " moves " + moves;
             }

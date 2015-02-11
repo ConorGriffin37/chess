@@ -20,7 +20,7 @@ namespace GUI
             uci.Init ();
             Console.WriteLine (uci.EngineName);
             Console.WriteLine (uci.EngineAuthor);
-            uci.SendPosition ("startpos", "e2e4 e7e5");
+            uci.SendPosition ("rn2kbnr/ppq2pp1/2p1p2p/7P/3P4/3Q1NN1/PPP2PP1/R1B1K2R w KQkq - 0 11");
             uci.Go ();
             Thread.Sleep (5000);
             Console.WriteLine (uci.StopAndGetBestMove ());
