@@ -59,6 +59,7 @@ namespace GUI
             if (chooser.Run() == (int)ResponseType.Accept) {
                 try {
                     MainClass.CurrentEngine = new UCITransceiver(chooser.Filename);
+                    MainClass.CurrentEngine.Init();
                 } catch(Exception ex) {
                     Console.Error.WriteLine ("(EE) Error opening engine file: " + ex.Message);
                     MessageDialog errorDialog = new MessageDialog (

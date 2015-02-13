@@ -25,6 +25,7 @@ namespace GUI
             string response;
             do {
                 response = engine.Read();
+                Console.WriteLine(response);
                 if(response.StartsWith("id name ")) {
                     EngineName = response.Substring(8);
                 } else if(response.StartsWith("id author ")) {
@@ -37,6 +38,7 @@ namespace GUI
             engine.Write ("isready");
             do {
                 response = engine.Read ();
+                Console.WriteLine(response);
                 if (response == "readyok") {
                     return;
                 }
@@ -74,6 +76,7 @@ namespace GUI
             string response;
             do {
                 response = engine.Read ();
+                Console.WriteLine(response);
                 if (response.StartsWith ("bestmove")) {
                     return response.Substring (9, 4);
                 }
@@ -87,6 +90,7 @@ namespace GUI
             string response;
             do {
                 response = engine.Read ();
+                Console.WriteLine(response);
                 if (response == "readyok") {
                     return;
                 }
