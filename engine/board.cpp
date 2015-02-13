@@ -985,7 +985,6 @@ std::vector<Board> Board::getMoves(int position, int code, int colorcode)
                 }
             }
             if (checkbit(getCastleOrEnpasent(), 63)) {
-                std::cout << "Castle maybe" << std::endl;
                 if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
                     if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
                         boards.push_back(test3);
