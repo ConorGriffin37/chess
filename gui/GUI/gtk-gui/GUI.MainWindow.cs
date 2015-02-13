@@ -62,6 +62,8 @@ namespace GUI
 			w1.Add (this.AboutAction, "<Primary><Mod2>a");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
+			this.WidthRequest = 600;
+			this.HeightRequest = 615;
 			this.Name = "GUI.MainWindow";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Gandalf Chess GUI");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -100,13 +102,14 @@ namespace GUI
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 457;
-			this.DefaultHeight = 300;
+			this.DefaultWidth = 600;
+			this.DefaultHeight = 615;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
 			this.LoadFENAction.Activated += new global::System.EventHandler (this.OnLoadFEN);
 			this.LoadEngineAction.Activated += new global::System.EventHandler (this.OnLoadEngine);
+			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
 		}
 	}

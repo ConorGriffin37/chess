@@ -6,27 +6,12 @@ namespace GUI
 {
     public partial class MainWindow: Gtk.Window
     {
+        ImageSurface boardBackground;
+
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
+            boardBackground = new ImageSurface ("img/board.png");
             Build ();
-            InitBoard ();
-        }
-
-        private void InitBoard()
-        {
-            int height = BoardArea.Allocation.Height;
-            int width = BoardArea.Allocation.Width;
-
-            Gdk.Pixbuf boardPixbuf = new Gdk.Pixbuf ("img/board.png");
-            Cairo.Context cr = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
-            cr.Translate (0, 0);
-            boardPixbuf.RenderToDrawable (BoardArea.GdkWindow,
-                BoardArea.Style.BackgroundGC (StateType.Normal),
-                0, 0,
-                0, 0,
-                -1, -1,
-                Gdk.RgbDither.None,
-                0, 0);
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -92,6 +77,15 @@ namespace GUI
         protected void OnMoveEntry (object sender, EventArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        protected void OnBoardExpose (object o, ExposeEventArgs args)
+        {
+            Cairo.Context cr = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
+            double transx = Math.Abs((this.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
+            cr.Translate (transx, 0);
+            cr.Scale (0.75, 0.75);
+            boardBackground.Show (cr, 0, 0);
         }
     }
 }
