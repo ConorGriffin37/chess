@@ -6,14 +6,16 @@ namespace GUI
 {
     class MainClass
     {
+        public static Board CurrentBoard { get; set; }
+        public static UCITransceiver CurrentEngine { get; set; }
+
         public static void Main (string[] args)
         {
-            /*
+            CurrentBoard = new Board ();
             Application.Init ();
             MainWindow win = new MainWindow ();
             win.Show ();
             Application.Run ();
-            */
 
             /*
             UCITransceiver uci = new UCITransceiver ("./stockfish_6_x64");

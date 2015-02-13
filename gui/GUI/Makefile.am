@@ -49,7 +49,9 @@ FILES =  \
 	Engine.cs \
 	FENParser.cs \
 	gtk-gui/generated.cs \
-	gtk-gui/MainWindow.cs \
+	gtk-gui/GUI.LoadFENDialog.cs \
+	gtk-gui/GUI.MainWindow.cs \
+	LoadFENDialog.cs \
 	MainWindow.cs \
 	PieceMoves.cs \
 	PieceValidMoves.cs \
