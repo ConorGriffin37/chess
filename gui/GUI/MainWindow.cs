@@ -1,5 +1,6 @@
 ﻿using System;
 using Gtk;
+using Cairo;
 
 namespace GUI
 {
@@ -8,6 +9,24 @@ namespace GUI
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
             Build ();
+            InitBoard ();
+        }
+
+        private void InitBoard()
+        {
+            int height = BoardArea.Allocation.Height;
+            int width = BoardArea.Allocation.Width;
+
+            Gdk.Pixbuf boardPixbuf = new Gdk.Pixbuf ("img/board.png");
+            Cairo.Context cr = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
+            cr.Translate (0, 0);
+            boardPixbuf.RenderToDrawable (BoardArea.GdkWindow,
+                BoardArea.Style.BackgroundGC (StateType.Normal),
+                0, 0,
+                0, 0,
+                -1, -1,
+                Gdk.RgbDither.None,
+                0, 0);
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -68,6 +87,11 @@ namespace GUI
                 }
             }
             chooser.Destroy ();
+        }
+
+        protected void OnMoveEntry (object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

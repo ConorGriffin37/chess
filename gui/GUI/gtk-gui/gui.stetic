@@ -96,7 +96,7 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.DrawingArea" id="drawingarea1">
+          <widget class="Gtk.DrawingArea" id="BoardArea">
             <property name="MemberName" />
           </widget>
           <packing>
@@ -111,6 +111,7 @@
             <property name="IsEditable">True</property>
             <property name="MaxLength">5</property>
             <property name="InvisibleChar">•</property>
+            <signal name="Activated" handler="OnMoveEntry" />
           </widget>
           <packing>
             <property name="Position">2</property>

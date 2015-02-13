@@ -12,6 +12,9 @@ namespace GUI
         public static void Main (string[] args)
         {
             CurrentBoard = new Board ();
+            PieceMoves.InitiateChessPieceMoves ();
+            PieceValidMoves.GenerateValidMoves (CurrentBoard);
+
             Application.Init ();
             MainWindow win = new MainWindow ();
             win.Show ();

@@ -26,7 +26,7 @@ namespace GUI
 		
 		private global::Gtk.MenuBar MenuBar;
 		
-		private global::Gtk.DrawingArea drawingarea1;
+		private global::Gtk.DrawingArea BoardArea;
 		
 		private global::Gtk.Entry MoveEntry;
 
@@ -79,10 +79,10 @@ namespace GUI
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.drawingarea1 = new global::Gtk.DrawingArea ();
-			this.drawingarea1.Name = "drawingarea1";
-			this.vbox1.Add (this.drawingarea1);
-			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.drawingarea1]));
+			this.BoardArea = new global::Gtk.DrawingArea ();
+			this.BoardArea.Name = "BoardArea";
+			this.vbox1.Add (this.BoardArea);
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.BoardArea]));
 			w3.Position = 1;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.MoveEntry = new global::Gtk.Entry ();
@@ -107,6 +107,7 @@ namespace GUI
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
 			this.LoadFENAction.Activated += new global::System.EventHandler (this.OnLoadFEN);
 			this.LoadEngineAction.Activated += new global::System.EventHandler (this.OnLoadEngine);
+			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
 		}
 	}
 }

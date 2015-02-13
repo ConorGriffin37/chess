@@ -67,6 +67,7 @@ EXTRAS = \
 	gui.in 
 
 REFERENCES =  \
+	Mono.Cairo \
 	Mono.Posix \
 	-pkg:glade-sharp-2.0 \
 	-pkg:glib-sharp-2.0 \
