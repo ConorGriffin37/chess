@@ -19,12 +19,12 @@ bool UCI::waitForInput()
     } else if (command == "isready"){
         cout << "readyok" << endl;
     } else if (command == "quit"){
-        UCI::quit = true;
+        quit = true;
     } else if (command == "position"){
         sentPosition(input);
     } else if (command == "ucinewgame"){
-        UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        UCI::currentColor = 1;
+        currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        currentColor = 1;
     } else if (command == "go"){
         startCalculating(input);
     } else if (command == "stop"){
@@ -44,16 +44,9 @@ bool UCI::waitForInput()
     return true;
 }
 
-bool UCI::outputBestMove(string moveString)
+void UCI::outputBestMove(string moveString)
 {
     cout << "bestmove " << moveString << endl;
-    /*pair<int, int> startPosition = make_pair(moveString[0] - 'a', moveString[1] - '1');
-    pair<int, int> endPosition = make_pair(moveString[2] - 'a', moveString[3] - '1');
-    if (UCI::currentBoard.makemove(startPosition, endPosition) == false){
-        return false;
-    }
-    UCI::currentColor = UCI::currentColor*-1; */
-    return true;
 }
 
 void UCI::identification()
@@ -81,16 +74,16 @@ bool UCI::sentPosition(string input)
                 return 0;
             }
             if (tempFen == "w"){
-                UCI::currentColor = 1;
+                currentColor = 1;
             } else if (tempFen == "b"){
-                UCI::currentColor = -1;
+                currentColor = -1;
             }
             fen = fen + " " + tempFen;
         }
-        UCI::currentBoard = Board(fen);
+        currentBoard = Board(fen);
     } else {
-        UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        UCI::currentColor = 1;
+        currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        currentColor = 1;
     }
     getline(ss, moves, ' ');
     if (moves == "moves"){
@@ -101,10 +94,12 @@ bool UCI::sentPosition(string input)
             if (moveIn.length() == 5){
                 promote = moveIn[4];
             }
-            if (UCI::currentBoard.simpleMakeMove(startPosition, endPosition, promote) == false){
+            bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
+            //outbitboard(currentBoard.getPieces());
+            if (moveMade == false){ //move not valid
                 return false;
             }
-            UCI::currentColor = UCI::currentColor*-1;
+            currentColor = currentColor*-1;
         }
     } else {
         return false;
@@ -179,9 +174,7 @@ bool UCI::startCalculating(string input)
     Search searchClass;
 
     string bestMove = searchClass.RootAlphaBeta(currentBoard, currentColor, depth);
-    if (outputBestMove(bestMove) == false){
-        return false;
-    }
+    outputBestMove(bestMove);
     return true;
 }
 

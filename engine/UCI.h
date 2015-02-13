@@ -2,7 +2,7 @@
 #define UCI_H
 
 #include <string>
-#include "board.hpp"
+#include "Board.h"
 
 using namespace std;
 
@@ -14,7 +14,7 @@ class UCI
     public:
         bool quit = 0;
         bool waitForInput();
-        bool outputBestMove(string moveString); //string like e2e4
+        void outputBestMove(string moveString); //string like e2e4
         void identification();
         bool sentPosition(string input);
         bool startCalculating(string input);
