@@ -2,7 +2,7 @@
 #define UCI_H
 
 #include <string>
-#include "Board.h"
+#include "board.hpp"
 
 using namespace std;
 
