@@ -66,7 +66,8 @@ bool UCI::sentPosition(string input)
     getline(ss, command, ' ');
     getline(ss, fen, ' ');
     if (fen != "startpos"){
-        for (int i = 0; i < 5; i++){
+        fen = "";
+        for (int i = 0; i < 6; i++){
             string tempFen;
             getline(ss, tempFen, ' ');
             if ((tempFen == "moves") or (tempFen == "")){
