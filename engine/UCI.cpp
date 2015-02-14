@@ -67,7 +67,8 @@ bool UCI::sentPosition(string input)
     getline(ss, fen, ' ');
     if (fen != "startpos"){
         fen = "";
-        for (int i = 0; i < 6; i++){
+        getline(ss, fen, ' ');
+        for (int i = 0; i < 5; i++){
             string tempFen;
             getline(ss, tempFen, ' ');
             if ((tempFen == "moves") or (tempFen == "")){
@@ -107,6 +108,7 @@ bool UCI::sentPosition(string input)
     }
     return true;
 }
+
 
 bool UCI::startCalculating(string input)
 {
