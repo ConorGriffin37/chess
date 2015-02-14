@@ -1268,11 +1268,9 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
             setCastleorenpas(unsetbit(getCastleOrEnpasent(), 63));
         }
         if (abs(from.first - to.first) > 1) { //castling
-            std::cout << "Castling : " << std::endl;
             if (to.first == 6) { //"e1g1" or "e8g8"
                 makemove(pcode, colorcode, from, to);
                 makemove(1, colorcode, std::make_pair(7, from.second), std::make_pair(5, from.second));
-                outbitboard(getPieces());
                 return true;
             } else { //"e1c1" or "e8c8"
                 makemove(pcode, colorcode, from, to);
