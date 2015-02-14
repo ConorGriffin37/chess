@@ -109,7 +109,6 @@ bool UCI::sentPosition(string input)
     return true;
 }
 
-
 bool UCI::startCalculating(string input)
 {
     vector<string> searchMoves; //a restricted list of moves to search
@@ -119,7 +118,7 @@ bool UCI::startCalculating(string input)
     int winc = -1; //whites increment per move in mseconds
     int binc = -1; //blacks increment per move in mseconds
     int movestogo = -1; //number of moves left until the next time control
-    int depth = 8; //search only to a certain depth
+    int depth = 4; //search only to a certain depth
     int nodes = -1; //number of nodes to search
     int mate = -1; //search for a mate in x moves
     int movetime = -1; //time allowed for the move in mseconds
@@ -175,7 +174,6 @@ bool UCI::startCalculating(string input)
     }
     //send information to engine for calculation at the current position
     Search searchClass;
-
     string bestMove = searchClass.RootAlphaBeta(currentBoard, currentColor, depth);
     outputBestMove(bestMove);
     return true;
