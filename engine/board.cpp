@@ -691,7 +691,7 @@ std::vector<Board> Board::getMoves(int position, int code, int colorcode)
                 boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1));
             }
         }
-        if (x > 7) {
+        if (x < 7) {
             if (checkbit(whiteocc, getpos(x + 1, y - 1))) {
                 boards.push_back(test);
                 if (y - 1 > 0) {
