@@ -307,11 +307,11 @@ int Board::evalutateBoard()
             if (getPiece(x) & bittest) {
                 if (colorboard & bittest) {
                     whitescore = whitescore + scores[x];
-                    whitescore = whitescore + positionalScores[0][x][i];
+                    whitescore = whitescore + positionalScores[0][x][63 - i];
                     break;
                 } else {
                     blackscore = blackscore + scores[x];
-                    whitescore = whitescore + positionalScores[1][x][i];
+                    blackscore = blackscore + positionalScores[1][x][63 - i];
                     break;
                 }
             }
