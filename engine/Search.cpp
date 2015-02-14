@@ -10,30 +10,29 @@ string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDept
     Board curBestMove = possibleMoves[0];
     int maxScore = -1000000;
     int score;
-    for (unsigned int i = 0; i < possibleMoves.size(); i++) {
-        score = -AlphaBeta(possibleMoves[i], -1000000, 1000000, remainingDepth - 1, playerColor*-1);
+    for (unsigned int i = 0; i < possibleMoves.size(); i++){
+        score = -AlphaBeta(possibleMoves[i], -1000000, 1000000, remainingDepth, playerColor*-1);
         if (score > maxScore){
             maxScore = score;
             curBestMove = possibleMoves[i];
         }
     }
-    //outbitboard(curBestMove.getPieces());
     return gameBoard.getmove(curBestMove);
 }
 
-int Search::AlphaBeta(Board board, int alpha, int beta, int remainingDepth, int playerColor)
+int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
 {
     if (remainingDepth == 0){
-        return board.evalutateBoard()*playerColor;
+        return gameBoard.evalutateBoard()*playerColor;
     }
-    vector<Board> possibleMoves = board.getBoards(playerColor);
     int score;
+    vector<Board> possibleMoves = gameBoard.getBoards(playerColor);
     if (possibleMoves.size() == 0){
         int colorCode = 6;
         if (playerColor == -1){
             colorCode = 7;
         }
-        if (board.inCheck(colorCode) == true){
+        if (gameBoard.inCheck(colorCode) == true){
             //checkmate
             return 1000000*playerColor;
         } else {
@@ -42,9 +41,9 @@ int Search::AlphaBeta(Board board, int alpha, int beta, int remainingDepth, int 
         }
     }
     for (unsigned int i = 0; i < possibleMoves.size(); i++){
-        score = -AlphaBeta(board, -beta, -alpha, remainingDepth - 1, playerColor*-1);
+        score = -AlphaBeta(possibleMoves[i], -beta, -alpha, remainingDepth - 1, playerColor*-1);
         if (score >= beta){
-            return beta; // fail-hard beta cut off
+            return beta;
         }
         if (score > alpha){
             alpha = score;
@@ -52,6 +51,7 @@ int Search::AlphaBeta(Board board, int alpha, int beta, int remainingDepth, int 
     }
     return alpha;
 }
+
 
 
 
