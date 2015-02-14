@@ -34,7 +34,7 @@ int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, 
         }
         if (gameBoard.inCheck(colorCode) == true){
             //checkmate
-            return 1000000*playerColor;
+            return (-1000000 - remainingDepth)*playerColor;
         } else {
             //stale mate
             return 0;
