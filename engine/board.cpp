@@ -1252,7 +1252,7 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
         colorcode = 7;
     }
     if (pcode == 0 and from.first != to.first) {
-        if (checkbit(getPieces(), getpos(to.first, to.second) == false)) { //enpasent
+        if (checkbit(getPieces(), getpos(to.first, to.second)) == false) { //enpasent
             takepiece(std::make_pair(to.first, from.second));
             makemove(pcode, colorcode, from, to);
             return true;
