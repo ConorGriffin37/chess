@@ -1280,7 +1280,7 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
         }
     }
     if (pcode == 1) { //rook moving = no castle
-        if (from.second == 0) {
+        if (from.second == 0 or from.second == 7) {
             setCastleorenpas(unsetbit(getCastleOrEnpasent(), getpos(from.first, from.second)));
         }
     }
