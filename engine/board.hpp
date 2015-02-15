@@ -36,7 +36,7 @@ class Board
         std::string getmove(Board nextboard); //gets the move code (eg. e4e5) from a given finishing position
         void promotepawn(int colorcode, std::pair <int, int> from, std::pair <int, int> to, int code); //color of pawn, column, what to promote it to
         void takepiece(std::pair<int, int> position); //removes the unknown piece from the position
-        int evalutateBoard();  //simple evaluation function based on piece values
+        int evaluateBoard();  //simple evaluation function based on piece values
         std::vector<Board> getBoards(int colorcode); //gets all legal boards from a given board
         std::vector<Board> getMoves(int positon, int code, int colorcode); //makes all moves with a certain piece (does not check for king in check)
         bool inCheck(int colorcode); //checks if the piece of a given color is in check
