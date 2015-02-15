@@ -53,6 +53,7 @@ FILES =  \
 	gtk-gui/GUI.MainWindow.cs \
 	LoadFENDialog.cs \
 	MainWindow.cs \
+	PieceDisplay.cs \
 	PieceMoves.cs \
 	PieceValidMoves.cs \
 	Program.cs \

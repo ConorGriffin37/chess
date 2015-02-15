@@ -8,9 +8,12 @@ namespace GUI
     {
         ImageSurface boardBackground;
 
+        Cairo.Context boardContext;
+
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
             boardBackground = new ImageSurface ("img/board.png");
+            PieceDisplay.Init ();
             Build ();
         }
 
@@ -32,6 +35,7 @@ namespace GUI
                 try {
                     FENParser parser = new FENParser(fen.FENString);
                     MainClass.CurrentBoard = parser.GetBoard();
+                    RedrawBoard();
                 } catch(ArgumentException ex) {
                     Console.Error.WriteLine ("Error parsing FEN string: " + ex.Message);
                     MessageDialog errorDialog = new MessageDialog (
@@ -82,11 +86,17 @@ namespace GUI
 
         protected void OnBoardExpose (object o, ExposeEventArgs args)
         {
-            Cairo.Context cr = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
+            RedrawBoard ();
+        }
+
+        void RedrawBoard()
+        {
+            boardContext = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
             double transx = Math.Abs((this.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
-            cr.Translate (transx, 0);
-            cr.Scale (0.75, 0.75);
-            boardBackground.Show (cr, 0, 0);
+            boardContext.Translate (transx, 0);
+            boardContext.Scale (0.75, 0.75);
+            boardBackground.Show (boardContext, 0, 0);
+            PieceDisplay.DrawPieces (boardContext);
         }
     }
 }
