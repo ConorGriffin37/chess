@@ -297,7 +297,7 @@ int positionalScores[2][5][64] =  {
                                     -20,-10,-10, -5, -5,-10,-10,-20,
                                 }}};
 
-int Board::evalutateBoard()
+int Board::evaluateBoard()
 {
     int whitescore = 0;
     int blackscore = 0;
