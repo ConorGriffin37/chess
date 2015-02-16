@@ -4,7 +4,7 @@
 using namespace std;
 
 #include <string>
-#include "board.hpp"
+#include "Board.hpp"
 
 class Search
 {
