@@ -5,6 +5,8 @@ namespace GUI
 {
     public enum PieceColour { White, Black };
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
+    public enum GameStatus { Unfinished, Stalemate, WhiteCheckmate,
+        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate };
 
     /**
      * @brief Representation of the board as a whole.
@@ -84,7 +86,17 @@ namespace GUI
         public Board(Board other)
         {
             Squares = new Square[64];
-            Array.Copy (other.Squares, Squares, 64);
+            for (int i = 0; i < 64; i++) {
+                Squares [i] = new Square ();
+                if (other.Squares [i].Piece != null) {
+                    Squares [i].Piece = new Piece (other.Squares [i].Piece);
+                }
+            }
+            BlackCheck = other.BlackCheck;
+            WhiteCheck = other.WhiteCheck;
+            BlackCastled = other.BlackCastled;
+            WhiteCastled = other.WhiteCastled;
+            PlayerToMove = other.PlayerToMove;
         }
 
         public void AddPiece(PieceColour colour, PieceType type, int position)
@@ -106,10 +118,72 @@ namespace GUI
             if (movingPiece == null)
                 return false;
 
-            if (movingPiece.ValidMoves.Contains (destination))
+            if (movingPiece.LegalMoves.Contains (destination))
                 return true;
 
             return false;
+        }
+
+        public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        {
+            if (!IsMoveValid (source, destination)) {
+                throw new InvalidOperationException ("Invalid move entered.");
+            }
+            Piece movingPiece = Squares [source].Piece;
+            Squares [destination].Piece = movingPiece;
+            Squares [source].Piece = null;
+            if (PlayerToMove == PieceColour.White) {
+                PlayerToMove = PieceColour.Black;
+            } else {
+                PlayerToMove = PieceColour.White;
+            }
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
+            PieceLegalMoves.GenerateLegalMoves (this);
+            CheckForMate ();
+        }
+
+        public void UndoMove(byte originalSource, byte originalDestination,
+                             PieceType? originalPromoteTo = null)
+        {
+            Piece movingPiece = Squares [originalDestination].Piece;
+            Squares [originalSource].Piece = movingPiece;
+            Squares [originalDestination].Piece = null;
+            if (PlayerToMove == PieceColour.White) {
+                PlayerToMove = PieceColour.Black;
+            } else {
+                PlayerToMove = PieceColour.White;
+            }
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
+            PieceLegalMoves.GenerateLegalMoves (this);
+        }
+
+        public GameStatus CheckForMate()
+        {
+            int legalMoveCountWhite = 0;
+            int legalMoveCountBlack = 0;
+
+            for (int i = 0; i < 64; i++) {
+                Piece currentPiece = Squares [i].Piece;
+                if (currentPiece == null)
+                    continue;
+
+                if (currentPiece.Colour == PieceColour.White) {
+                    legalMoveCountWhite += currentPiece.LegalMoves.Count;
+                } else {
+                    legalMoveCountBlack += currentPiece.LegalMoves.Count;
+                }
+            }
+
+            if (legalMoveCountWhite == 0 && WhiteCheck) {
+                return GameStatus.WhiteCheckmate;
+            } else if (legalMoveCountBlack == 0 && BlackCheck) {
+                return GameStatus.BlackCheckmate;
+            } else if ((legalMoveCountWhite == 0 || legalMoveCountBlack == 0) &&
+                !WhiteCheck && !BlackCheck) {
+                return GameStatus.Stalemate;
+            }
+
+            return GameStatus.Unfinished;
         }
 
         public Piece PieceAt(int square)
@@ -255,7 +329,8 @@ namespace GUI
     {
         public PieceColour Colour { get; private set; }
         public PieceType Type { get; private set; }
-        public List<byte> ValidMoves { get; set; }
+        public List<byte> PseudoLegalMoves { get; set; }
+        public List<byte> LegalMoves { get; set; }
         public byte TimesAttacked { get; set; }
         public byte TimesDefended { get; set; }
         public bool HasMoved { get; set; } /**< We need this to know if we can castle, for example. */

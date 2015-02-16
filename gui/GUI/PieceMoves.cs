@@ -153,9 +153,9 @@ namespace GUI
                 byte y = (byte)(index / 8);
 
                 // Diagonal: can move if capturing
-                if (x < 7 && y < 0)
+                if (x < 7 && y > 0)
                     moveset.Moves.Add ((byte)(index - 8 + 1));
-                if (x > 0 && y < 0)
+                if (x > 0 && y > 0)
                     moveset.Moves.Add ((byte)(index - 8 - 1));
 
                 // Move one space forward
@@ -185,6 +185,18 @@ namespace GUI
 
                     if (y > 1 && x < 7) {
                         move = Position ((byte)(y - 2), (byte)(x + 1));
+                        if (move < 64)
+                            moveset.Moves.Add (move);
+                    }
+
+                    if (y > 1 && x > 0) {
+                        move = Position ((byte)(y - 2), (byte)(x - 1));
+                        if (move < 64)
+                            moveset.Moves.Add (move);
+                    }
+
+                    if (y < 6 && x < 7) {
+                        move = Position ((byte)(y + 2), (byte)(x + 1));
                         if (move < 64)
                             moveset.Moves.Add (move);
                     }

@@ -66,8 +66,24 @@ namespace GUI
             engine.Write (output);
         }
 
-        public void Go(string time = "infinite") {
+        public string Go(string time = "infinite") {
             engine.Write("go " + time);
+            if (time != "infinite") {
+                string response;
+                do {
+                    response = engine.Read ();
+                    Console.WriteLine(response);
+                    if (response.StartsWith ("bestmove")) {
+                        if(response.Substring(9).Length > 4) {
+                            return response.Substring (9, 5);
+                        } else {
+                            return response.Substring (9, 4);
+                        }
+                    }
+                } while(response != null);
+                throw new TimeoutException ("Engine has stopped responding.");
+            }
+            return null;
         }
 
         public string StopAndGetBestMove()
@@ -78,7 +94,7 @@ namespace GUI
                 response = engine.Read ();
                 Console.WriteLine(response);
                 if (response.StartsWith ("bestmove")) {
-                    return response.Substring (9, 4);
+                    return response.Substring (9, 5);
                 }
             } while(response != null);
             throw new TimeoutException ("Engine has stopped responding.");

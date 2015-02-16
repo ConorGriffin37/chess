@@ -46,6 +46,7 @@ all: $(ASSEMBLY) $(PROGRAMFILES) $(BINARIES)
 
 FILES =  \
 	Board.cs \
+	DummyBoard.cs \
 	Engine.cs \
 	FENParser.cs \
 	gtk-gui/generated.cs \
@@ -54,8 +55,9 @@ FILES =  \
 	LoadFENDialog.cs \
 	MainWindow.cs \
 	PieceDisplay.cs \
+	PieceLegalMoves.cs \
 	PieceMoves.cs \
-	PieceValidMoves.cs \
+	PiecePseudoLegalMoves.cs \
 	Program.cs \
 	Properties/AssemblyInfo.cs \
 	UCITransceiver.cs 

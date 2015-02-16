@@ -1,5 +1,5 @@
 ﻿/**
- * @file PieceValidMoves.cs
+ * @file PiecePseudoLegalMoves.cs
  * 
  * Uses the information generated in @c PieceMoves.cs to dynamically generate
  * a list of possible moves for a given piece in a particular board
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace GUI
 {
-    public static class PieceValidMoves
+    public static class PiecePseudoLegalMoves
     {
         internal static bool[] BlackAttackBoard;    /**< Board squares attacked by black at current board configuration. */
         internal static bool[] WhiteAttackBoard;    /**< Board squares attacked by white at current board configuration. */
@@ -37,7 +37,7 @@ namespace GUI
 
             // If destination is empty, add the move and return.
             if (board.Squares [destination].Piece == null) {
-                movingPiece.ValidMoves.Add (destination);
+                movingPiece.PseudoLegalMoves.Add (destination);
                 return true;
             }
 
@@ -56,7 +56,7 @@ namespace GUI
                 } else {
                     // Add as a valid move. Note that we do not add a valid move for the king's
                     // square above, as the king cannot be taken.
-                    movingPiece.ValidMoves.Add (destination);
+                    movingPiece.PseudoLegalMoves.Add (destination);
                 }
 
                 // Cannot continue moving past this piece.
@@ -68,7 +68,7 @@ namespace GUI
         }
 
         /**
-         * @fn CheckValidMovesPawn
+         * @fn CheckPseudoLegalMovesPawn
          * @brief Checks available pawn moves to see which are valid.
          * 
          * Checks available pawn moves to see which are valid. If the pawn is making an attack,
@@ -76,7 +76,7 @@ namespace GUI
          * 
          * @see CheckValidAttacksPawn
          */
-        private static void CheckValidMovesPawn(List<byte> moves, Piece movingPiece, byte source, Board board, int count)
+        private static void CheckPseudoLegalMovesPawn(List<byte> moves, Piece movingPiece, byte source, Board board, int count)
         {
             for (byte i = 0; i < count; i++) {
                 byte destination = moves [i];
@@ -94,7 +94,7 @@ namespace GUI
                     return;
                 } else {
                     // If there is nothing in front of the pawn
-                    movingPiece.ValidMoves.Add (destination);
+                    movingPiece.PseudoLegalMoves.Add (destination);
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace GUI
                 if (attackedPiece.Type == PieceType.King)
                     board.BlackCheck = true;
                 else
-                    movingPiece.ValidMoves.Add (destination);
+                    movingPiece.PseudoLegalMoves.Add (destination);
             } else {
                 BlackAttackBoard [destination] = true;
 
@@ -137,11 +137,11 @@ namespace GUI
                 if (attackedPiece.Type == PieceType.King)
                     board.WhiteCheck = true;
                 else
-                    movingPiece.ValidMoves.Add (destination);
+                    movingPiece.PseudoLegalMoves.Add (destination);
             }
         }
 
-        private static void CheckValidMovesKingCastle(Board board, Piece king)
+        private static void CheckPseudoLegalMovesKingCastle(Board board, Piece king)
         {
             if (king.HasMoved)
                 return;
@@ -159,7 +159,7 @@ namespace GUI
                         if (board.Squares [62].Piece == null && board.Squares [61].Piece == null) {
                             if (BlackAttackBoard [62] == false && BlackAttackBoard [61] == false) {
                                 // Finally, we can add the move
-                                king.ValidMoves.Add (62);
+                                king.PseudoLegalMoves.Add (62);
                                 WhiteAttackBoard [62] = true;
                             }
                         }
@@ -174,7 +174,7 @@ namespace GUI
                         if (board.Squares [57].Piece == null && board.Squares [58].Piece == null && board.Squares[59] == null) {
                             if (BlackAttackBoard [57] == false && BlackAttackBoard [58] == false && BlackAttackBoard[59] == false) {
                                 // Finally, we can add the move
-                                king.ValidMoves.Add (58);
+                                king.PseudoLegalMoves.Add (58);
                                 WhiteAttackBoard [58] = true;
                             }
                         }
@@ -191,7 +191,7 @@ namespace GUI
                         if (board.Squares [6].Piece == null && board.Squares [5].Piece == null) {
                             if (BlackAttackBoard [6] == false && BlackAttackBoard [5] == false) {
                                 // Finally, we can add the move
-                                king.ValidMoves.Add (6);
+                                king.PseudoLegalMoves.Add (6);
                                 WhiteAttackBoard [6] = true;
                             }
                         }
@@ -206,7 +206,7 @@ namespace GUI
                         if (board.Squares [1].Piece == null && board.Squares [2].Piece == null && board.Squares[3] == null) {
                             if (WhiteAttackBoard [1] == false && WhiteAttackBoard [2] == false && WhiteAttackBoard[3] == false) {
                                 // Finally, we can add the move
-                                king.ValidMoves.Add (2);
+                                king.PseudoLegalMoves.Add (2);
                                 BlackAttackBoard [2] = true;
                             }
                         }
@@ -216,10 +216,10 @@ namespace GUI
         }
 
         /**
-         * @fn GenerateValidMoves
+         * @fn GeneratePseudoLegalMoves
          * @brief Generates all valid moves for a specific board configuration.
          */
-        public static void GenerateValidMoves(Board board)
+        public static void GeneratePseudoLegalMoves(Board board)
         {
             // Reset board
             board.WhiteCheck = false;
@@ -236,15 +236,19 @@ namespace GUI
                 if (currentSquare.Piece == null)
                     continue;
 
-                currentSquare.Piece.ValidMoves = new List<byte> ();
+                // Reset how many times this piece is attacked/defended.
+                currentSquare.Piece.TimesAttacked = 0;
+                currentSquare.Piece.TimesDefended = 0;
+
+                currentSquare.Piece.PseudoLegalMoves = new List<byte> ();
 
                 switch (currentSquare.Piece.Type) {
                     case PieceType.Pawn:
                         if (currentSquare.Piece.Colour == PieceColour.White) {
-                            CheckValidMovesPawn (MoveArrays.WhitePawnMoves [position].Moves, currentSquare.Piece,
+                            CheckPseudoLegalMovesPawn (MoveArrays.WhitePawnMoves [position].Moves, currentSquare.Piece,
                                 position, board, MoveArrays.WhitePawnMoves [position].Moves.Count);
                         } else if (currentSquare.Piece.Colour == PieceColour.Black) {
-                            CheckValidMovesPawn (MoveArrays.BlackPawnMoves [position].Moves, currentSquare.Piece,
+                            CheckPseudoLegalMovesPawn (MoveArrays.BlackPawnMoves [position].Moves, currentSquare.Piece,
                                 position, board, MoveArrays.BlackPawnMoves [position].Moves.Count);
                         }
                         break;
@@ -360,8 +364,8 @@ namespace GUI
             }
 
             // Finally, we can check for castling now that we know about king check, attacked squares, etc.
-            CheckValidMovesKingCastle (board, board.Squares [WhiteKingPosition].Piece);
-            CheckValidMovesKingCastle (board, board.Squares [BlackKingPosition].Piece);
+            CheckPseudoLegalMovesKingCastle (board, board.Squares [WhiteKingPosition].Piece);
+            CheckPseudoLegalMovesKingCastle (board, board.Squares [BlackKingPosition].Piece);
         }
     }
 }

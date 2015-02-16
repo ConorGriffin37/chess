@@ -8,12 +8,14 @@ namespace GUI
     {
         public static Board CurrentBoard { get; set; }
         public static UCITransceiver CurrentEngine { get; set; }
+        public static GameStatus CurrentGameStatus { get; set; }
 
         public static void Main (string[] args)
         {
             CurrentBoard = new Board ();
+            CurrentGameStatus = GameStatus.Unfinished;
             PieceMoves.InitiateChessPieceMoves ();
-            PieceValidMoves.GenerateValidMoves (CurrentBoard);
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (CurrentBoard);
 
             Application.Init ();
             MainWindow win = new MainWindow ();
