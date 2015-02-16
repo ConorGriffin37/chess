@@ -1,7 +1,6 @@
-#include "Search.h"
+#include "search.hpp"
 #include "board.hpp"
 #include <iostream>
-
 
 void outbitboard(u64 n);
 
@@ -13,13 +12,13 @@ string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDept
     int score;
     for (unsigned int i = 0; i < possibleMoves.size(); i++){
         score = -AlphaBeta(possibleMoves[i], -1000000, -maxScore, remainingDepth - 1, playerColor*-1);
-        cout << "Move is " << gameBoard.getmove(possibleMoves[i]) << " and score is " << score << std::endl;
+        cout << "Move is " << gameBoard.getMove(possibleMoves[i]) << " and score is " << score << std::endl;
         if (score > maxScore){
             maxScore = score;
             curBestMove = possibleMoves[i];
         }
     }
-    return gameBoard.getmove(curBestMove);
+    return gameBoard.getMove(curBestMove);
 }
 
 int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
@@ -53,9 +52,3 @@ int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, 
     }
     return alpha;
 }
-
-
-
-
-
-
