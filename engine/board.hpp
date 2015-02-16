@@ -19,6 +19,7 @@ class Board
 
     public:
         Board(std::string fen);
+        Board();
         u64 getPieces();  //return all piece locations
         u64 getPieceColor(int colorcode); //return all pices of a certain color, black or white
         u64 getPiece(int code);  //return all of a certain piece type e.g Knights
@@ -30,12 +31,12 @@ class Board
         int getColorCode(char p); //get the color code from the FEN char notation
         int getPieceFromPos(int x, int y); //gets the piece code in a given position
         void setBB(int code, u64 value);
-        void setCastleorenpas(u64 value);
-        void makemove(int code, int colorcode, std::pair <int, int> from, std::pair <int, int> to); //moves a piece from position to position
+        void setCastleOrEnpas(u64 value);
+        void makeMove(int code, int colorcode, std::pair <int, int> from, std::pair <int, int> to); //moves a piece from position to position
         bool simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, char promote); //makes a move given the positions
-        std::string getmove(Board nextboard); //gets the move code (eg. e4e5) from a given finishing position
-        void promotepawn(int colorcode, std::pair <int, int> from, std::pair <int, int> to, int code); //color of pawn, column, what to promote it to
-        void takepiece(std::pair<int, int> position); //removes the unknown piece from the position
+        std::string getMove(Board nextboard); //gets the move code (eg. e4e5) from a given finishing position
+        void promotePawn(int colorcode, std::pair <int, int> from, std::pair <int, int> to, int code); //color of pawn, column, what to promote it to
+        void takePiece(std::pair<int, int> position); //removes the unknown piece from the position
         int evaluateBoard();  //simple evaluation function based on piece values
         std::vector<Board> getBoards(int colorcode); //gets all legal boards from a given board
         std::vector<Board> getMoves(int positon, int code, int colorcode); //makes all moves with a certain piece (does not check for king in check)
