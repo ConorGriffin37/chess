@@ -1,4 +1,4 @@
-#include "board.hpp"
+#include "Board.hpp"
 #include <iostream>
 
 void outbitboard(u64 n);
