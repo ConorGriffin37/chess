@@ -1,6 +1,6 @@
 #include <iostream>
-#include "UCI.h"
-#include "Search.h"
+#include "UCI.hpp"
+#include "Search.hpp"
 
 using namespace std;
 
