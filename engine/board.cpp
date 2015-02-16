@@ -954,43 +954,51 @@ std::vector<Board> Board::getMoves(int position, int code, int colorcode)
                 }
             }
         }
-        if (colorcode == 6) { //white
+                if (colorcode == 6) { //white
             u64 attacked = getAttacked(7);
             if (checkbit(getCastleOrEnpasent(), 0)) {
-                if (checkbit(occupied, 2) or checkbit(occupied, 1)) {
-                    if (checkbit(attacked, 3) or checkbit(attacked, 2) or checkbit(attacked, 1)) {
-                        boards.push_back(test3);
-                        boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 0), std::make_pair(6, 0));
-                        boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(7, 0), std::make_pair(5, 0));
+                if (checkbit(whiteocc, 0)) {
+                    if (checkbit(occupied, 2) or checkbit(occupied, 1)) {
+                        if (checkbit(attacked, 3) or checkbit(attacked, 2) or checkbit(attacked, 1)) {
+                            boards.push_back(test3);
+                            boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 0), std::make_pair(6, 0));
+                            boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(7, 0), std::make_pair(5, 0));
+                        }
                     }
                 }
             }
             if (checkbit(getCastleOrEnpasent(), 7)) {
-                if (checkbit(occupied, 4) or checkbit(occupied, 5) or checkbit(occupied, 6)) {
-                    if (checkbit(attacked, 3) or checkbit(attacked, 4) or checkbit(attacked, 5)) {
-                        boards.push_back(test3);
-                        boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 0), std::make_pair(3, 0));
-                        boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(0, 0), std::make_pair(2, 0));
+                if (checkbit(whiteocc, 7)) {
+                    if (checkbit(occupied, 4) or checkbit(occupied, 5) or checkbit(occupied, 6)) {
+                        if (checkbit(attacked, 3) or checkbit(attacked, 4) or checkbit(attacked, 5)) {
+                            boards.push_back(test3);
+                            boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 0), std::make_pair(3, 0));
+                            boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(0, 0), std::make_pair(2, 0));
+                        }
                     }
                 }
             }
         } else { //black
             u64 attacked = getAttacked(6);
             if (checkbit(getCastleOrEnpasent(), 56)) {
-                if (not checkbit(occupied, 57) and not checkbit(occupied, 58)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 58) and not checkbit(attacked, 57)) {
-                        boards.push_back(test3);
-                        boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 7), std::make_pair(6, 7));
-                        boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(7, 7), std::make_pair(5, 7));
+                if (checkbit(blackocc, 56)) {
+                    if (not checkbit(occupied, 57) and not checkbit(occupied, 58)) {
+                        if (not checkbit(attacked, 59) and not checkbit(attacked, 58) and not checkbit(attacked, 57)) {
+                            boards.push_back(test3);
+                            boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 7), std::make_pair(6, 7));
+                            boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(7, 7), std::make_pair(5, 7));
+                        }
                     }
                 }
             }
             if (checkbit(getCastleOrEnpasent(), 63)) {
-                if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
-                        boards.push_back(test3);
-                        boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 7), std::make_pair(2, 7));
-                        boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(0, 7), std::make_pair(3, 7));
+                if (checkbit(blackocc, 63)) {
+                    if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
+                        if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
+                            boards.push_back(test3);
+                            boards[boards.size() - 1].makemove(code, colorcode, std::make_pair(4, 7), std::make_pair(2, 7));
+                            boards[boards.size() - 1].makemove(1, colorcode, std::make_pair(0, 7), std::make_pair(3, 7));
+                        }
                     }
                 }
             }
