@@ -1,5 +1,5 @@
-#include "UCI.h"
-#include "Search.h"
+#include "UCI.hpp"
+#include "Search.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
