@@ -20,12 +20,14 @@ $ ./autogen.sh && make
 
 Then, to run the main program, run the following:
 ```bash
-$ ./GUI/bin/Debug/gui.exe
+$ cd ./GUI/bin/Debug/
+$ ./GUI.exe
 ```
 
 To run the unit tests:
 ```bash
-$ nunit-console ./Test/bin/Debug/test.dll
+$ cd ./Test/bin/Debug/
+$ nunit-console ./test.dll
 ```
 
 And, finally, to compile documentation:
