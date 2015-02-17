@@ -12,7 +12,7 @@ string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDept
     int score;
     for (unsigned int i = 0; i < possibleMoves.size(); i++){
         score = -AlphaBeta(possibleMoves[i], -1000000, -maxScore, remainingDepth - 1, playerColor*-1);
-        cout << "Move is " << gameBoard.getMove(possibleMoves[i]) << " and score is " << score << std::endl;
+        //cout << "Move is " << gameBoard.getMove(possibleMoves[i]) << " and score is " << score << std::endl;
         if (score > maxScore){
             maxScore = score;
             curBestMove = possibleMoves[i];
