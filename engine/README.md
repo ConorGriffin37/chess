@@ -7,7 +7,7 @@ The engine can be compiled using the command make all
 
 It can be run with the command ./Saruman (Saruman is the name of the engine)
 
-It uses the UCI protocal and can be used with most UCI compatible GUIs
+It uses the UCI protocol and can be used with most UCI compatible GUIs
 
 ##Unit testing
 
