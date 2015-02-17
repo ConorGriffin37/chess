@@ -29,6 +29,8 @@ BOOST_AUTO_TEST_CASE(board_evaluateBoard)
 	cout << "Testing evaluateBoard function" << endl;
 	Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	BOOST_CHECK(testBoard.evaluateBoard() == 0); //evaluation should be 0 for initial board
+	testBoard = Board("7k/8/8/8/8/8/8/7K w - - 0 1");
+	BOOST_CHECK(testBoard.evaluateBoard() == 0); //no piece difference, symmetrical position
 }
 
 BOOST_AUTO_TEST_CASE(board_inCheck)
@@ -73,3 +75,32 @@ BOOST_AUTO_TEST_CASE(board_takePiece)
     testBoard.takePiece(make_pair(0, 0));
     BOOST_CHECK(testBoard.getPieceFromPos(0, 0) == -1); //piece has been removed
 }
+
+BOOST_AUTO_TEST_CASE(board_getPieceCode)
+{
+    cout << "Testing getPieceCode function" << endl;
+    Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    BOOST_CHECK(testBoard.getPieceCode('p') == 0); //pawn
+    BOOST_CHECK(testBoard.getPieceCode('P') == 0); //pawn
+    BOOST_CHECK(testBoard.getPieceCode('r') == 1); //rook
+    BOOST_CHECK(testBoard.getPieceCode('R') == 1); //rook
+    BOOST_CHECK(testBoard.getPieceCode('n') == 2); //knight
+    BOOST_CHECK(testBoard.getPieceCode('N') == 2); //knight
+    BOOST_CHECK(testBoard.getPieceCode('b') == 3); //bishop
+    BOOST_CHECK(testBoard.getPieceCode('B') == 3); //bishop
+    BOOST_CHECK(testBoard.getPieceCode('q') == 4); //queen
+    BOOST_CHECK(testBoard.getPieceCode('Q') == 4); //queen
+    BOOST_CHECK(testBoard.getPieceCode('k') == 5); //king
+    BOOST_CHECK(testBoard.getPieceCode('K') == 5); //king
+}
+
+BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
+{
+    cout << "Testing search" << endl;
+    Board testBoard = Board("k7/pppp4/8/8/8/8/8/K4R2 w - - 0 1");
+    Search searchClass;
+    BOOST_CHECK(searchClass.RootAlphaBeta(testBoard, 1, 4) == "f1f8"); //it should find the checkmate for white
+}
+
+
+
