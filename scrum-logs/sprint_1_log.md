@@ -81,3 +81,33 @@ which is capable of interfacing with a GUI and playing a game.
 	* Debugged the board and evaluation functions.
 * Darragh:
 	* Fine-tuned the search algorithm.
+
+**2015-2-15:**
+* Terry:
+	* Added piece drawing.
+	* *Next:* Enable user to input moves.
+* Conor & Darragh:
+	* Fixed error in the rootAlphaBeta function.
+	* Other minor bugfixes.
+
+**2015-2-16:**
+* Terry:
+	* Added ability for user to input moves.
+	* Added more functions for checking the legality of moves.
+	* Added checking for checkmate and stalemate, as well as GUI adjudications.
+* Conor:
+	* Minor bug fixes.
+	* Improved code formatting.
+* Darragh:
+	* Wrote unit tests.
+
+**2015-2-17:**
+* Terry:
+	* Added button to reset board to starting position.
+	* Added button to instruct the engine to make a move.
+	* Wrote documentation.
+	* Wrote unit tests.
+* Conor & Darragh:
+	* Wrote makefiles.
+	* Wrote documentation.
+	* Enabled Doxygen support.
