@@ -3,6 +3,15 @@ using System.IO;
 
 namespace GUI
 {
+    /**
+     * @class UCITransceiver
+     * @brief Sends and receives UCI commands.
+     * 
+     * This class contains an @c Engine object which it uses to send
+     * and receive UCI commands.
+     * 
+     * @see Engine
+     */
     public class UCITransceiver
     {
         Engine engine;

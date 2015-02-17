@@ -16,6 +16,7 @@ namespace GUI
             CurrentGameStatus = GameStatus.Unfinished;
             PieceMoves.InitiateChessPieceMoves ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (CurrentBoard);
+            PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
 
             Application.Init ();
             MainWindow win = new MainWindow ();

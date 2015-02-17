@@ -4,6 +4,14 @@ using System.IO;
 
 namespace GUI
 {
+    /**
+     * @class Engine
+     * @brief Class to represent an engine process.
+     * 
+     * @c Engine is a small wrapper for @c System.Process which controls
+     * the engine process as a child process of the GUI. It sets up the
+     * IO redirects necessary for the UCI protocol to function.
+     */
     public class Engine
     {
         Process childProcess;

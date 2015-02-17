@@ -4,6 +4,13 @@ using Cairo;
 
 namespace GUI
 {
+    /**
+     * @class PieceDisplay
+     * @brief Class which displays the pieces on the GUI board.
+     * 
+     * This class manages the @c ImageSurface objects for each piece. It also contains
+     * an array of @c PointD objects, one for each square on the chessboard.
+     */
     public static class PieceDisplay
     {
         private static ImageSurface whitePawn;

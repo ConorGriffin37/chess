@@ -60,6 +60,26 @@
         <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;a</property>
         <property name="Label" translatable="yes">_About</property>
         <property name="ShortLabel" translatable="yes">_About</property>
+        <signal name="Activated" handler="OnAbout" />
+      </action>
+      <action id="ResetBoardAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Reset Board</property>
+        <property name="ShortLabel" translatable="yes">Reset Board</property>
+      </action>
+      <action id="ResetBoardAction1">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;r</property>
+        <property name="Label" translatable="yes">_Reset Board</property>
+        <property name="ShortLabel" translatable="yes">_Reset Board</property>
+        <signal name="Activated" handler="OnResetBoard" />
+      </action>
+      <action id="MakeEngineMoveAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;m</property>
+        <property name="Label" translatable="yes">Make Engine _Move</property>
+        <property name="ShortLabel" translatable="yes">Make Engine _Move</property>
+        <signal name="Activated" handler="OnMakeEngineMove" />
       </action>
     </action-group>
     <property name="MemberName" />
@@ -80,10 +100,12 @@
                 <node type="Menuitem" action="QuitAction" />
               </node>
               <node type="Menu" action="BoardAction">
+                <node type="Menuitem" action="ResetBoardAction1" />
                 <node type="Menuitem" action="LoadFENAction" />
               </node>
               <node type="Menu" action="EngineAction">
                 <node type="Menuitem" action="LoadEngineAction" />
+                <node type="Menuitem" action="MakeEngineMoveAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="AboutAction" />

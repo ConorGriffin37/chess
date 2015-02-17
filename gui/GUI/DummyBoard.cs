@@ -2,6 +2,18 @@
 
 namespace GUI
 {
+    /**
+     * @class DummyBoard
+     * @brief Version of @c Board used for generating legal moves.
+     * 
+     * @c DummyBoard is identical to Board except it does not call
+     * @c PieceLegalMoves.GenerateLegalMoves after each call to @c MakeMove
+     * and @c UndoMove. It only generates pseudo-legal moves because it is
+     * used to generate legal moves.
+     * 
+     * @see Board
+     * @see PieceLegalMoves
+     */
     public class DummyBoard : Board
     {
         public new Square[] Squares { get; private set; }

@@ -32,6 +32,17 @@ namespace GUI
             Application.Quit ();
         }
 
+        protected void OnAbout (object sender, EventArgs e)
+        {
+            AboutDialog about = new AboutDialog ();
+            about.ProgramName = "Gandalf Chess";
+            about.Authors = new string[] { "Terry Bolt", "Conor Griffin", "Darragh Griffin" };
+            about.Version = "0.1";
+            about.Copyright = "Copyright 2015 Terry Bolt, Conor Griffin, Darragh Griffin";
+            about.Run ();
+            about.Destroy ();
+        }
+
         protected void OnLoadFEN (object sender, EventArgs e)
         {
             LoadFENDialog fen = new LoadFENDialog();
@@ -292,6 +303,76 @@ namespace GUI
             byte square = (byte)(col + (row * 8));
 
             return square;
+        }
+
+        protected void OnResetBoard (object sender, EventArgs e)
+        {
+            MainClass.CurrentBoard = new Board ();
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (MainClass.CurrentBoard);
+            PieceLegalMoves.GenerateLegalMoves (MainClass.CurrentBoard);
+            RedrawBoard ();
+        }
+
+        protected void OnMakeEngineMove (object sender, EventArgs e)
+        {
+            if (MainClass.CurrentEngine == null) {
+                Console.Error.WriteLine ("(EE) Engine not loaded.");
+                MessageDialog errorDialog = new MessageDialog (
+                                                this,
+                                                DialogFlags.DestroyWithParent,
+                                                MessageType.Error,
+                                                ButtonsType.Ok,
+                                                "Please load an engine first.");
+                errorDialog.Run ();
+                errorDialog.Destroy ();
+                return;
+            }
+
+            string currentFEN = MainClass.CurrentBoard.ToFEN ();
+            MainClass.CurrentEngine.SendPosition (currentFEN);
+            MainClass.CurrentEngine.WaitUntilReady ();
+            string engineMove = MainClass.CurrentEngine.Go ("depth 5");
+
+            string sourceStr = engineMove.Substring (0, 2);
+            string destinationStr = engineMove.Substring (2, 2);
+            string promoteToStr = "";
+            if (engineMove.Length > 4) {
+                promoteToStr = engineMove.Substring (4, 1);
+            }
+
+            byte sourceByte = NotationToBoardSquare (sourceStr);
+            byte destinationByte = NotationToBoardSquare (destinationStr);
+            PieceType? promoteTo = null;
+            switch (promoteToStr) {
+                case "n":
+                    promoteTo = PieceType.Knight;
+                    break;
+                case "b":
+                    promoteTo = PieceType.Bishop;
+                    break;
+                case "r":
+                    promoteTo = PieceType.Rook;
+                    break;
+                case "q":
+                    promoteTo = PieceType.Queen;
+                    break;
+                default:
+                    break;
+            }
+
+            try {
+                MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
+                RedrawBoard();
+            } catch(InvalidOperationException) {
+                Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + engineMove);
+                MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
+                ShowGameOverDialog (GameStatus.WhiteAdjudicate);
+            }
+            GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
+            if (currentStatus != GameStatus.Unfinished) {
+                ShowGameOverDialog (currentStatus);
+                return;
+            }
         }
     }
 }

@@ -28,6 +28,40 @@ namespace Test
             // history has not yet been implemented. There is no error in the code.
             Assert.AreEqual ("rn2kbnr/ppq2pp1/2p1p2p/7P/3P4/3Q1NN1/PPP2PP1/R1B1K2R w KQkq - 0 1", fen.GetBoard ().ToFEN ());
         }
+
+        [Test()]
+        public void MakeMoveTest()
+        {
+            Board board = new Board ();
+            PieceMoves.InitiateChessPieceMoves ();
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (board);
+            PieceLegalMoves.GenerateLegalMoves (board);
+            board.MakeMove (62, 45);
+            Assert.AreEqual ("rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 0 1", board.ToFEN ());
+        }
+
+        [Test()]
+        public void UndoMoveTest()
+        {
+            Board board = new Board ();
+            PieceMoves.InitiateChessPieceMoves ();
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (board);
+            PieceLegalMoves.GenerateLegalMoves (board);
+            board.MakeMove (62, 45);
+            board.UndoMove (62, 45);
+            Assert.AreEqual ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFEN ());
+        }
+
+        [Test()]
+        public void CheckForMateWithMateTest()
+        {
+            FENParser parser = new FENParser ("rnbqkbnr/ppppp2p/8/5ppQ/4PP2/8/PPPP2PP/RNB1KBNR b KQkq - 0 3");
+            Board board = parser.GetBoard ();
+            PieceMoves.InitiateChessPieceMoves ();
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (board);
+            PieceLegalMoves.GenerateLegalMoves (board);
+            Assert.AreEqual (GameStatus.BlackCheckmate, board.CheckForMate ());
+        }
     }
 
     [TestFixture ()]

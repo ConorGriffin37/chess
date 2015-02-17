@@ -22,6 +22,12 @@ namespace GUI
 		
 		private global::Gtk.Action AboutAction;
 		
+		private global::Gtk.Action ResetBoardAction;
+		
+		private global::Gtk.Action ResetBoardAction1;
+		
+		private global::Gtk.Action MakeEngineMoveAction;
+		
 		private global::Gtk.VBox vbox1;
 		
 		private global::Gtk.MenuBar MenuBar;
@@ -60,6 +66,15 @@ namespace GUI
 			this.AboutAction = new global::Gtk.Action ("AboutAction", global::Mono.Unix.Catalog.GetString ("_About"), null, null);
 			this.AboutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_About");
 			w1.Add (this.AboutAction, "<Primary><Mod2>a");
+			this.ResetBoardAction = new global::Gtk.Action ("ResetBoardAction", global::Mono.Unix.Catalog.GetString ("Reset Board"), null, null);
+			this.ResetBoardAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Reset Board");
+			w1.Add (this.ResetBoardAction, null);
+			this.ResetBoardAction1 = new global::Gtk.Action ("ResetBoardAction1", global::Mono.Unix.Catalog.GetString ("_Reset Board"), null, null);
+			this.ResetBoardAction1.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Reset Board");
+			w1.Add (this.ResetBoardAction1, "<Primary>r");
+			this.MakeEngineMoveAction = new global::Gtk.Action ("MakeEngineMoveAction", global::Mono.Unix.Catalog.GetString ("Make Engine _Move"), null, null);
+			this.MakeEngineMoveAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Make Engine _Move");
+			w1.Add (this.MakeEngineMoveAction, "<Primary>m");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.WidthRequest = 600;
@@ -72,7 +87,7 @@ namespace GUI
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='BoardAction' action='BoardAction'><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.MenuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/MenuBar")));
 			this.MenuBar.Name = "MenuBar";
 			this.vbox1.Add (this.MenuBar);
@@ -109,6 +124,9 @@ namespace GUI
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
 			this.LoadFENAction.Activated += new global::System.EventHandler (this.OnLoadFEN);
 			this.LoadEngineAction.Activated += new global::System.EventHandler (this.OnLoadEngine);
+			this.AboutAction.Activated += new global::System.EventHandler (this.OnAbout);
+			this.ResetBoardAction1.Activated += new global::System.EventHandler (this.OnResetBoard);
+			this.MakeEngineMoveAction.Activated += new global::System.EventHandler (this.OnMakeEngineMove);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
 		}

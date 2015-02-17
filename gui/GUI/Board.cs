@@ -5,6 +5,7 @@ namespace GUI
 {
     public enum PieceColour { White, Black };
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
+    // The colour before the game result indicates which colour has lost.
     public enum GameStatus { Unfinished, Stalemate, WhiteCheckmate,
         BlackCheckmate, WhiteAdjudicate, BlackAdjudicate };
 
@@ -111,6 +112,13 @@ namespace GUI
             Squares[position].Piece = new Piece(colour, type);
         }
 
+        /**
+         * @fn IsMoveValid
+         * @brief Checks if a move is legal.
+         * 
+         * Checks is a move is legal by checking if the moving piece
+         * contains the move in its @c LegalMoves list.
+         */
         public bool IsMoveValid(byte source, byte destination)
         {
             Piece movingPiece = Squares [source].Piece;
@@ -124,6 +132,13 @@ namespace GUI
             return false;
         }
 
+        /**
+         * @fn MakeMove
+         * @brief Makes a move.
+         * 
+         * Makes a move, switches the @c PlayerToMove variable,
+         * and updates piece legal moves.
+         */
         public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
             if (!IsMoveValid (source, destination)) {
@@ -139,9 +154,15 @@ namespace GUI
             }
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
             PieceLegalMoves.GenerateLegalMoves (this);
-            CheckForMate ();
         }
 
+        /**
+         * @fn UndoMove
+         * @brief Undoes a move.
+         * 
+         * Undoes a move by doing the complete reverse of MakeMove and then
+         * regenerating legal moves.
+         */
         public void UndoMove(byte originalSource, byte originalDestination,
                              PieceType? originalPromoteTo = null)
         {
