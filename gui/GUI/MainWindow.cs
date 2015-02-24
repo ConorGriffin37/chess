@@ -1,6 +1,8 @@
 ﻿using System;
 using Gtk;
 using Cairo;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GUI
 {
@@ -103,6 +105,8 @@ namespace GUI
 
         protected void OnMoveEntry (object sender, EventArgs e)
         {
+            string userMove = MoveEntry.Text;
+            MoveEntry.Text = "";
             if (MainClass.CurrentGameStatus != GameStatus.Unfinished) {
                 Console.Error.WriteLine ("(EE) Attempted move during finished game.");
                 MessageDialog errorDialog = new MessageDialog (
@@ -116,19 +120,7 @@ namespace GUI
                 return;
             }
 
-            if (MainClass.CurrentEngine == null) {
-                Console.Error.WriteLine ("(EE) Engine not loaded.");
-                MessageDialog errorDialog = new MessageDialog (
-                                                this,
-                                                DialogFlags.DestroyWithParent,
-                                                MessageType.Error,
-                                                ButtonsType.Ok,
-                                                "Please load an engine first.");
-                errorDialog.Run ();
-                errorDialog.Destroy ();
-                return;
-            }
-            if (MoveEntry.Text.Length < 4) {
+            if (userMove.Length < 4) {
                 Console.Error.WriteLine ("(EE) Error making move.");
                 MessageDialog errorDialog = new MessageDialog (
                                                 this,
@@ -140,105 +132,19 @@ namespace GUI
                 errorDialog.Destroy ();
                 return;
             }
-            string sourceStr = MoveEntry.Text.Substring (0, 2);
-            string destinationStr = MoveEntry.Text.Substring (2, 2);
-            string promoteToStr = "";
-            if (MoveEntry.Text.Length > 4) {
-                promoteToStr = MoveEntry.Text.Substring (4, 1);
-            }
-            MoveEntry.Text = "";
-                
-            byte sourceByte = NotationToBoardSquare (sourceStr);
-            byte destinationByte = NotationToBoardSquare (destinationStr);
 
-            PieceType? promoteTo = null;
-            switch (promoteToStr) {
-                case "n":
-                    promoteTo = PieceType.Knight;
-                    break;
-                case "b":
-                    promoteTo = PieceType.Bishop;
-                    break;
-                case "r":
-                    promoteTo = PieceType.Rook;
-                    break;
-                case "q":
-                    promoteTo = PieceType.Queen;
-                    break;
-                default:
-                    break;
-            }
             try {
-                MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
-                RedrawBoard();
-                // Since this whole process takes quite a while, we halt briefly
-                // and allow GTK# to run through queued events before running the engine.
-                // This keeps the GUI responsive.
-                // TODO: Move all this "waiting for the engine" code to a new thread.
-                while(Application.EventsPending()) {
-                    Application.RunIteration();
-                }
-            } catch(InvalidOperationException ex) {
-                Console.Error.WriteLine ("(EE) Error making move: " + ex.Message);
+                ParseAndMakeMove(userMove);
+            } catch(InvalidOperationException io) {
+                Console.Error.WriteLine ("(EE) Illegal move entered: " + io.Message);
                 MessageDialog errorDialog = new MessageDialog (
                                                 this,
                                                 DialogFlags.DestroyWithParent,
                                                 MessageType.Error,
                                                 ButtonsType.Ok,
-                                                "Invalid move given.");
+                                                "Illegal move entered.");
                 errorDialog.Run ();
                 errorDialog.Destroy ();
-                return;
-            }
-            GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
-            if (currentStatus != GameStatus.Unfinished) {
-                ShowGameOverDialog (currentStatus);
-                return;
-            }
-
-            string currentFEN = MainClass.CurrentBoard.ToFEN ();
-            MainClass.CurrentEngine.SendPosition (currentFEN);
-            MainClass.CurrentEngine.WaitUntilReady ();
-            string engineMove = MainClass.CurrentEngine.Go ("depth 5");
-
-            sourceStr = engineMove.Substring (0, 2);
-            destinationStr = engineMove.Substring (2, 2);
-            promoteToStr = "";
-            if (engineMove.Length > 4) {
-                promoteToStr = engineMove.Substring (4, 1);
-            }
-
-            sourceByte = NotationToBoardSquare (sourceStr);
-            destinationByte = NotationToBoardSquare (destinationStr);
-            promoteTo = null;
-            switch (promoteToStr) {
-                case "n":
-                    promoteTo = PieceType.Knight;
-                    break;
-                case "b":
-                    promoteTo = PieceType.Bishop;
-                    break;
-                case "r":
-                    promoteTo = PieceType.Rook;
-                    break;
-                case "q":
-                    promoteTo = PieceType.Queen;
-                    break;
-                default:
-                    break;
-            }
-
-            try {
-                MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
-                RedrawBoard();
-            } catch(InvalidOperationException) {
-                Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + engineMove);
-                MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
-                ShowGameOverDialog (GameStatus.WhiteAdjudicate);
-            }
-            currentStatus = MainClass.CurrentBoard.CheckForMate ();
-            if (currentStatus != GameStatus.Unfinished) {
-                ShowGameOverDialog (currentStatus);
                 return;
             }
         }
@@ -331,13 +237,31 @@ namespace GUI
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
             MainClass.CurrentEngine.SendPosition (currentFEN);
             MainClass.CurrentEngine.WaitUntilReady ();
-            string engineMove = MainClass.CurrentEngine.Go ("depth 5");
+            try {
+                var engineMoveTask = Task.Factory.StartNew<string> (
+                                         () => MainClass.CurrentEngine.Go ("depth 5")
+                                     )
+                    .ContinueWith (task => ParseAndMakeMove (task.Result));
+            } catch(AggregateException ae) {
+                ae.Handle ((x) => {
+                    if (x is InvalidOperationException) {
+                        Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + x.Message);
+                        MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
+                        ShowGameOverDialog (GameStatus.WhiteAdjudicate);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+        }
 
-            string sourceStr = engineMove.Substring (0, 2);
-            string destinationStr = engineMove.Substring (2, 2);
+        private void ParseAndMakeMove(string move)
+        {
+            string sourceStr = move.Substring (0, 2);
+            string destinationStr = move.Substring (2, 2);
             string promoteToStr = "";
-            if (engineMove.Length > 4) {
-                promoteToStr = engineMove.Substring (4, 1);
+            if (move.Length > 4) {
+                promoteToStr = move.Substring (4, 1);
             }
 
             byte sourceByte = NotationToBoardSquare (sourceStr);
@@ -364,9 +288,7 @@ namespace GUI
                 MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
                 RedrawBoard();
             } catch(InvalidOperationException) {
-                Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + engineMove);
-                MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
-                ShowGameOverDialog (GameStatus.WhiteAdjudicate);
+                throw new InvalidOperationException (move);
             }
             GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
             if (currentStatus != GameStatus.Unfinished) {

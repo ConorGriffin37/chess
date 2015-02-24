@@ -126,6 +126,9 @@ namespace GUI
             if (movingPiece == null)
                 return false;
 
+            if (movingPiece.Colour != PlayerToMove)
+                return false;
+
             if (movingPiece.LegalMoves.Contains (destination))
                 return true;
 
