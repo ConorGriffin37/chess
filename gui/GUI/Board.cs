@@ -14,12 +14,12 @@ namespace GUI
      */
     public class Board
     {
-        public Square[] Squares { get; private set; }
-        public bool BlackCheck { get; set; }
-        public bool WhiteCheck { get; set; }
-        public bool BlackCastled { get; set; }
-        public bool WhiteCastled { get; set; }
-        public PieceColour PlayerToMove { get; set; }
+        public virtual Square[] Squares { get; protected set; }
+        public virtual bool BlackCheck { get; set; }
+        public virtual bool WhiteCheck { get; set; }
+        public virtual bool BlackCastled { get; set; }
+        public virtual bool WhiteCastled { get; set; }
+        public virtual PieceColour PlayerToMove { get; set; }
 
         /**
          * @brief Default constructor.
@@ -139,7 +139,7 @@ namespace GUI
          * Makes a move, switches the @c PlayerToMove variable,
          * and updates piece legal moves.
          */
-        public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        public virtual void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
             if (!IsMoveValid (source, destination)) {
                 throw new InvalidOperationException ("Invalid move entered.");
@@ -163,7 +163,7 @@ namespace GUI
          * Undoes a move by doing the complete reverse of MakeMove and then
          * regenerating legal moves.
          */
-        public void UndoMove(byte originalSource, byte originalDestination,
+        public virtual void UndoMove(byte originalSource, byte originalDestination,
                              PieceType? originalPromoteTo = null)
         {
             Piece movingPiece = Squares [originalDestination].Piece;

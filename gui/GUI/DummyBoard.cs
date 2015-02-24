@@ -16,12 +16,12 @@ namespace GUI
      */
     public class DummyBoard : Board
     {
-        public new Square[] Squares { get; private set; }
-        public new bool BlackCheck { get; set; }
-        public new bool WhiteCheck { get; set; }
-        public new bool BlackCastled { get; set; }
-        public new bool WhiteCastled { get; set; }
-        public new PieceColour PlayerToMove { get; set; }
+        public override Square[] Squares { get; protected set; }
+        public override bool BlackCheck { get; set; }
+        public override bool WhiteCheck { get; set; }
+        public override bool BlackCastled { get; set; }
+        public override bool WhiteCastled { get; set; }
+        public override PieceColour PlayerToMove { get; set; }
 
         public DummyBoard (Board other)
         {
@@ -39,7 +39,7 @@ namespace GUI
             PlayerToMove = other.PlayerToMove;
         }
 
-        public new void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        public override void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
             Piece movingPiece = Squares [source].Piece;
             Squares [destination].Piece = movingPiece;
@@ -52,7 +52,7 @@ namespace GUI
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
         }
 
-        public new void UndoMove(byte originalSource, byte originalDestination,
+        public override void UndoMove(byte originalSource, byte originalDestination,
             PieceType? originalPromoteTo = null)
         {
             Piece movingPiece = Squares [originalDestination].Piece;
