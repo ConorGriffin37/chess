@@ -1,7 +1,7 @@
 Chess GUI
 =========
 
-GUI for the chess project.
+GUI for the chess project. Currently runs on Linux, Windows, and OSX (unstable).
 
 ## Dependencies ##
 
@@ -13,6 +13,9 @@ This engine requires the latest versions of the following software:
 
 ## How to Install ##
 
+If you are using Linux you can follow the commands below. Otherwise, you can open GUI.sln in 
+VisualStudio or MonoDevelop and compile within the IDE.
+
 From the directory in which this file is located, run the following commands:
 ```bash
 $ ./autogen.sh && make
@@ -20,12 +23,14 @@ $ ./autogen.sh && make
 
 Then, to run the main program, run the following:
 ```bash
-$ ./GUI/bin/Debug/gui.exe
+$ cd ./GUI/bin/Debug/
+$ ./GUI.exe
 ```
 
 To run the unit tests:
 ```bash
-$ nunit-console ./Test/bin/Debug/test.dll
+$ cd ./Test/bin/Debug/
+$ nunit-console ./test.dll
 ```
 
 And, finally, to compile documentation:
