@@ -34,7 +34,7 @@ namespace GUI
             string response;
             do {
                 response = engine.Read();
-                Console.WriteLine(response);
+                Debug.Log(response);
                 if(response.StartsWith("id name ")) {
                     EngineName = response.Substring(8);
                 } else if(response.StartsWith("id author ")) {
@@ -47,7 +47,7 @@ namespace GUI
             engine.Write ("isready");
             do {
                 response = engine.Read ();
-                Console.WriteLine(response);
+                Debug.Log(response);
                 if (response == "readyok") {
                     return;
                 }
@@ -81,7 +81,7 @@ namespace GUI
                 string response;
                 do {
                     response = engine.Read ();
-                    Console.WriteLine(response);
+                    Debug.Log(response);
                     if (response.StartsWith ("bestmove")) {
                         if(response.Substring(9).Length > 4) {
                             return response.Substring (9, 5);
@@ -98,10 +98,11 @@ namespace GUI
         public string StopAndGetBestMove()
         {
             engine.Write("stop");
+            Debug.Log ("Engine stopped.");
             string response;
             do {
                 response = engine.Read ();
-                Console.WriteLine(response);
+                Debug.Log(response);
                 if (response.StartsWith ("bestmove")) {
                     return response.Substring (9, 5);
                 }
@@ -115,7 +116,7 @@ namespace GUI
             string response;
             do {
                 response = engine.Read ();
-                Console.WriteLine(response);
+                Debug.Log(response);
                 if (response == "readyok") {
                     return;
                 }
@@ -125,6 +126,12 @@ namespace GUI
         public void Quit()
         {
             engine.Write("quit");
+        }
+
+        public void StopAndIgnoreMove()
+        {
+            engine.Write("stop");
+            Debug.Log ("Engine stopped.");
         }
     }
 }

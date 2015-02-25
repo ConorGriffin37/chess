@@ -47,6 +47,11 @@ namespace GUI
 
         protected void OnLoadFEN (object sender, EventArgs e)
         {
+            if (MainClass.CurrentEngine != null) {
+                MainClass.StopAndResetEngineTask ();
+                Debug.Log ("Signal sent for engine stop.");
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
             LoadFENDialog fen = new LoadFENDialog();
             if (fen.Run () == (int)ResponseType.Ok) {
                 try {
@@ -77,6 +82,11 @@ namespace GUI
 
         protected void OnLoadEngine (object sender, EventArgs e)
         {
+            if (MainClass.CurrentEngine != null) {
+                MainClass.StopAndResetEngineTask ();
+                Debug.Log ("Signal sent for engine stop.");
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
             FileChooserDialog chooser = new FileChooserDialog (
                                             "Please choose an engine executable.",
                                             this,
@@ -105,6 +115,11 @@ namespace GUI
 
         protected void OnMoveEntry (object sender, EventArgs e)
         {
+            if (MainClass.CurrentEngine != null) {
+                MainClass.StopAndResetEngineTask ();
+                Debug.Log ("Signal sent for engine stop.");
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
             string userMove = MoveEntry.Text;
             MoveEntry.Text = "";
             if (MainClass.CurrentGameStatus != GameStatus.Unfinished) {
@@ -193,7 +208,7 @@ namespace GUI
 
         void RedrawBoard()
         {
-            Console.WriteLine ("Redrawing.");
+            Debug.Log ("Redrawing board.");
             boardContext = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
             double transx = Math.Abs((this.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
             boardContext.Translate (transx, 0);
@@ -213,6 +228,11 @@ namespace GUI
 
         protected void OnResetBoard (object sender, EventArgs e)
         {
+            if (MainClass.CurrentEngine != null) {
+                MainClass.StopAndResetEngineTask ();
+                Debug.Log ("Signal sent for engine stop.");
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
             MainClass.CurrentBoard = new Board ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (MainClass.CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (MainClass.CurrentBoard);
@@ -234,14 +254,18 @@ namespace GUI
                 return;
             }
 
+            MainClass.StopAndResetEngineTask ();
+            Debug.Log ("Signal sent for engine stop.");
+            MainClass.CurrentEngine.StopAndIgnoreMove ();
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
             MainClass.CurrentEngine.SendPosition (currentFEN);
             MainClass.CurrentEngine.WaitUntilReady ();
             try {
                 var engineMoveTask = Task.Factory.StartNew<string> (
-                                         () => MainClass.CurrentEngine.Go ("depth 5")
+                                         () => MainClass.CurrentEngine.Go ("depth 25"),
+                                         MainClass.EngineStopTokenSource.Token
                                      )
-                    .ContinueWith (task => ParseAndMakeMove (task.Result));
+                    .ContinueWith (task => ParseAndMakeMove (task.Result), MainClass.EngineStopTokenSource.Token);
             } catch(AggregateException ae) {
                 ae.Handle ((x) => {
                     if (x is InvalidOperationException) {

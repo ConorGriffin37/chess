@@ -46,6 +46,7 @@ all: $(ASSEMBLY) $(PROGRAMFILES) $(BINARIES)
 
 FILES =  \
 	Board.cs \
+	Debug.cs \
 	DummyBoard.cs \
 	Engine.cs \
 	FENParser.cs \

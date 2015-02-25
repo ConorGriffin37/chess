@@ -9,6 +9,7 @@ namespace GUI
         public static Board CurrentBoard { get; set; }
         public static UCITransceiver CurrentEngine { get; set; }
         public static GameStatus CurrentGameStatus { get; set; }
+        public static CancellationTokenSource EngineStopTokenSource { get; private set; }
 
         public static void Main (string[] args)
         {
@@ -17,6 +18,7 @@ namespace GUI
             PieceMoves.InitiateChessPieceMoves ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
+            EngineStopTokenSource = new CancellationTokenSource ();
 
             Application.Init ();
             MainWindow win = new MainWindow ();
@@ -34,6 +36,13 @@ namespace GUI
             Console.WriteLine (uci.StopAndGetBestMove ());
             uci.Quit ();
             */
+        }
+
+        public static void StopAndResetEngineTask()
+        {
+            EngineStopTokenSource.Cancel ();
+            EngineStopTokenSource.Dispose ();
+            EngineStopTokenSource = new CancellationTokenSource ();
         }
     }
 }
