@@ -47,9 +47,8 @@ namespace GUI
 
         protected void OnLoadFEN (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null) {
-                MainClass.StopAndResetEngineTask ();
-                Debug.Log ("Signal sent for engine stop.");
+            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
             LoadFENDialog fen = new LoadFENDialog();
@@ -82,9 +81,8 @@ namespace GUI
 
         protected void OnLoadEngine (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null) {
-                MainClass.StopAndResetEngineTask ();
-                Debug.Log ("Signal sent for engine stop.");
+            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
             FileChooserDialog chooser = new FileChooserDialog (
@@ -115,9 +113,8 @@ namespace GUI
 
         protected void OnMoveEntry (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null) {
-                MainClass.StopAndResetEngineTask ();
-                Debug.Log ("Signal sent for engine stop.");
+            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
             string userMove = MoveEntry.Text;
@@ -228,9 +225,8 @@ namespace GUI
 
         protected void OnResetBoard (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null) {
-                MainClass.StopAndResetEngineTask ();
-                Debug.Log ("Signal sent for engine stop.");
+            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
             MainClass.CurrentBoard = new Board ();
@@ -254,9 +250,10 @@ namespace GUI
                 return;
             }
 
-            MainClass.StopAndResetEngineTask ();
-            Debug.Log ("Signal sent for engine stop.");
-            MainClass.CurrentEngine.StopAndIgnoreMove ();
+            if (MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
             MainClass.CurrentEngine.SendPosition (currentFEN);
             MainClass.CurrentEngine.WaitUntilReady ();

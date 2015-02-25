@@ -17,6 +17,7 @@ namespace GUI
         Engine engine;
         public string EngineName { get; private set; }
         public string EngineAuthor { get; private set; }
+        public bool IsThinking { get; private set; }
 
         public UCITransceiver (string engineFilename)
         {
@@ -77,12 +78,19 @@ namespace GUI
 
         public string Go(string time = "infinite") {
             engine.Write("go " + time);
+            IsThinking = true;
             if (time != "infinite") {
                 string response;
                 do {
+                    if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
+                        Debug.Log ("Engine task cancelled.");
+                        MainClass.ResetEngineStopTokenSource();
+                        return null;
+                    }
                     response = engine.Read ();
                     Debug.Log(response);
                     if (response.StartsWith ("bestmove")) {
+                        IsThinking = false;
                         if(response.Substring(9).Length > 4) {
                             return response.Substring (9, 5);
                         } else {
@@ -98,12 +106,14 @@ namespace GUI
         public string StopAndGetBestMove()
         {
             engine.Write("stop");
-            Debug.Log ("Engine stopped.");
+            IsThinking = false;
             string response;
             do {
                 response = engine.Read ();
                 Debug.Log(response);
                 if (response.StartsWith ("bestmove")) {
+                    WaitUntilReady();
+                    Debug.Log ("Engine stopped and ready for new input.");
                     return response.Substring (9, 5);
                 }
             } while(response != null);
@@ -131,7 +141,13 @@ namespace GUI
         public void StopAndIgnoreMove()
         {
             engine.Write("stop");
-            Debug.Log ("Engine stopped.");
+            IsThinking = false;
+            // Wait until the EngineStopTokenSource has been reset.
+            // This indicates that the task has in fact stopped and we can now proceed as normal.
+            while (MainClass.EngineStopTokenSource.IsCancellationRequested)
+                continue;
+            WaitUntilReady ();
+            Debug.Log ("Engine stopped and ready for new input.");
         }
     }
 }
