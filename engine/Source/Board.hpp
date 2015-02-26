@@ -14,7 +14,7 @@ typedef unsigned long long u64;
  * @brief The board representation and methods
  *
  * The class represents a given position
- * The class also handles move generation and board evaluation
+ * The class also handles move generation
  */
 
 class Board
