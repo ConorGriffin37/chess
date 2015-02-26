@@ -1,5 +1,6 @@
 #include "UCI.hpp"
 #include "Search.hpp"
+#include "Evaluation.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -8,6 +9,10 @@
 using namespace std;
 
 void outbitboard(u64 n);
+
+bool UCI::quit = false;
+Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+int UCI::currentColor = 1;
 
 bool UCI::waitForInput()
 {
@@ -173,8 +178,7 @@ bool UCI::startCalculating(string input)
         }
     }
     //send information to engine for calculation at the current position
-    Search searchClass;
-    string bestMove = searchClass.RootAlphaBeta(currentBoard, currentColor, depth);
+    string bestMove = Search::RootAlphaBeta(UCI::currentBoard, currentColor, depth);
     outputBestMove(bestMove);
     return true;
 }

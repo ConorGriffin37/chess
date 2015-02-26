@@ -139,12 +139,6 @@ class Board
 		 */
         void takePiece(std::pair<int, int> position);
         /**
-		 * @fn evaluateBoard
-		 * @brief Evaluates a board based on material and piece position
-		 * @return Evaluation, + means white is ahead, - means black is ahead. 100 = value of a pawn
-		 */
-        int evaluateBoard();
-        /**
 		 * @fn getBoards
 		 * @brief Gets all the resulting boards after 1 move
 		 * @param colorcode Color whose turn it is to move

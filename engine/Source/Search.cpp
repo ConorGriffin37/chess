@@ -24,7 +24,7 @@ string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDept
 int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
 {
     if (remainingDepth == 0){
-        return gameBoard.evaluateBoard()*playerColor;
+        return Evaluation::evaluateBoard(gameBoard)*playerColor;
     }
     int score;
     vector<Board> possibleMoves = gameBoard.getBoards(playerColor);
