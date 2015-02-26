@@ -199,17 +199,21 @@ int Evaluation::evaluateBoard(Board boardToEvaluate)
             if (piecesBoards[x] & bittest) {
                 if (colorboard & bittest) {
                     whitescore = whitescore + scores[x];
-                    whitescore = whitescore + positionalScores[0][x][63 - i];
+                    whitescore = whitescore + positionalScores[0][x][i];
                     break;
                 } else {
                     blackscore = blackscore + scores[x];
-                    blackscore = blackscore + positionalScores[1][x][63 - i];
+                    blackscore = blackscore + positionalScores[1][x][i];
                     break;
                 }
             }
         }
         bittest <<= 1;
     }
-    return (whitescore - blackscore) + GetMobilityScore(boardToEvaluate);
+    return (whitescore - blackscore); //+ GetMobilityScore(boardToEvaluate);
 }
 
+int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position)
+{
+    return positionalScores[colorCode - 6][code][position.second*8 + position.first];
+}
