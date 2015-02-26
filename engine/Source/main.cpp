@@ -34,10 +34,10 @@ void outbitboard(u64 n)
 
 int main()
 {
-    UCI uciObject;
+    Evaluation::initpopCountOfByte();
     while (true){
-        uciObject.waitForInput();
-        if (uciObject.quit == true){
+        UCI::waitForInput();
+        if (UCI::quit == true){
             break;
         }
     }
