@@ -106,6 +106,49 @@ int positionalScores[2][5][64] =  {
                                     -20,-10,-10, -5, -5,-10,-10,-20,
                                 }}};
 
+int kingPositionalScores[2][2][64] = {  //White King
+                                        {{//White king middlegame
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -20,-30,-30,-40,-40,-30,-30,-20,
+                                        -10,-20,-20,-20,-20,-20,-20,-10,
+                                         20, 20,  0,  0,  0,  0, 20, 20,
+                                         20, 30, 10,  0,  0, 10, 30, 20
+                                        },
+                                        { //White king endgame
+                                        -50,-40,-30,-20,-20,-30,-40,-50,
+                                        -30,-20,-10,  0,  0,-10,-20,-30,
+                                        -30,-10, 20, 30, 30, 20,-10,-30,
+                                        -30,-10, 30, 40, 40, 30,-10,-30,
+                                        -30,-10, 30, 40, 40, 30,-10,-30,
+                                        -30,-10, 20, 30, 30, 20,-10,-30,
+                                        -30,-30,  0,  0,  0,  0,-30,-30,
+                                        -50,-30,-30,-30,-30,-30,-30,-50
+                                        }},
+                                        //Black King
+                                        {{//Black king middlegame
+                                         20, 30, 10,  0,  0, 10, 30, 20,
+                                         20, 20,  0,  0,  0,  0, 20, 20,
+                                        -10,-20,-20,-20,-20,-20,-20,-10,
+                                        -20,-30,-30,-40,-40,-30,-30,-20,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30,
+                                        -30,-40,-40,-50,-50,-40,-40,-30
+                                        },
+                                        { //Black king endgame
+                                        -50,-30,-30,-30,-30,-30,-30,-50,
+                                        -30,-30,  0,  0,  0,  0,-30,-30,
+                                        -30,-10, 20, 30, 30, 20,-10,-30,
+                                        -30,-10, 30, 40, 40, 30,-10,-30,
+                                        -30,-10, 30, 40, 40, 30,-10,-30,
+                                        -30,-10, 20, 30, 30, 20,-10,-30,
+                                        -30,-20,-10,  0,  0,-10,-20,-30,
+                                        -50,-40,-30,-20,-20,-30,-40,-50
+                                        }}};
+
 unsigned char popCountOfByte[256];
 
 void Evaluation::initpopCountOfByte()
@@ -139,7 +182,7 @@ u64 RemoveRanks[8] = {  18374403900871474942,  //1111111011111110111111101111111
 
 bool filesOpen[2][8] = { {false} };
 
-int Evaluation::CheckForDoublePawns(int colorCode, Board evalBoard)
+int Evaluation::CheckForDoublePawns(int colorCode, Board& evalBoard)
 {
     u64 pawns = evalBoard.getPieceAndColor(0, colorCode);
     int numPawns = popCount(pawns);
@@ -158,7 +201,7 @@ int Evaluation::CheckForDoublePawns(int colorCode, Board evalBoard)
     return doublePawns;
 }
 
-int Evaluation::rooksOnOpenFile(int colorCode, Board evalBoard)
+int Evaluation::rooksOnOpenFile(int colorCode, Board& evalBoard)
 {
     u64 rooks = evalBoard.getPieceAndColor(1, colorCode);
     int numRooks = popCount(rooks);
@@ -176,7 +219,7 @@ int Evaluation::rooksOnOpenFile(int colorCode, Board evalBoard)
     return rooksOpen;
 }
 
-int Evaluation::GetMobilityScore(Board evalBoard)
+int Evaluation::GetMobilityScore(Board& evalBoard)
 {
     int whiteDoublePawns = CheckForDoublePawns(6, evalBoard);
     int blackDoublePawns = CheckForDoublePawns(7, evalBoard);
@@ -187,13 +230,13 @@ int Evaluation::GetMobilityScore(Board evalBoard)
 
 
 
-int Evaluation::evaluateBoard(Board boardToEvaluate)
+int Evaluation::evaluateBoard(Board& boardToEvaluate)
 {
     int whitescore = 0;
     int blackscore = 0;
     u64 bittest = 1;
     u64 colorboard = boardToEvaluate.getPieceColor(6);
-    u64 piecesBoards[5] = {boardToEvaluate.getPiece(0), boardToEvaluate.getPiece(1), boardToEvaluate.getPiece(2), boardToEvaluate.getPiece(3), boardToEvaluate.getPiece(4)};
+    u64 piecesBoards[6] = {boardToEvaluate.getPiece(0), boardToEvaluate.getPiece(1), boardToEvaluate.getPiece(2), boardToEvaluate.getPiece(3), boardToEvaluate.getPiece(4), boardToEvaluate.getPiece(5)};
     for (int i = 0; i < 64; i++) {
         for (int x = 0; x < 5; x++) {
             if (piecesBoards[x] & bittest) {
@@ -208,12 +251,54 @@ int Evaluation::evaluateBoard(Board boardToEvaluate)
                 }
             }
         }
+        if (piecesBoards[6] & bittest) {
+            if (colorboard & bittest) {
+                whitescore = whitescore + kingPositionalScores[0][stageOfGame(boardToEvaluate)][i];
+            } else {
+                blackscore = blackscore + kingPositionalScores[0][stageOfGame(boardToEvaluate)][i];
+            }
+        }
         bittest <<= 1;
     }
-    return (whitescore - blackscore); //+ GetMobilityScore(boardToEvaluate);
+    return (whitescore - blackscore) + GetMobilityScore(boardToEvaluate);
 }
 
-int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position)
+int Evaluation::numMinorPieces(int colorCode, Board& evalBoard)
 {
-    return positionalScores[colorCode - 6][code][position.second*8 + position.first];
+    int num = 0;
+    for (int i = 1; i < 4; i++){
+        num += popCount(evalBoard.getPieceAndColor(i, colorCode));
+    }
+    return num;
+}
+
+int Evaluation::stageOfGame(Board& evalBoard)
+{
+    int numWhiteQueens = popCount(evalBoard.getPieceAndColor(4, 6));
+    int numBlackQueens = popCount(evalBoard.getPieceAndColor(4, 7));
+    if ((!numWhiteQueens) and (!numBlackQueens)){
+        return 1;
+    } else if ((numWhiteQueens) and (!numBlackQueens)){
+        if (numMinorPieces(6, evalBoard) <= 1){
+            return 1;
+        }
+    } else if ((!numWhiteQueens) and (numBlackQueens)){
+        if (numMinorPieces(7, evalBoard) <= 1){
+            return 1;
+        }
+    } else {
+        if ((numMinorPieces(6, evalBoard) <= 1) and (numMinorPieces(7, evalBoard) <= 1)){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position, Board& evalBoard)
+{
+    if (code == 5){
+        return kingPositionalScores[colorCode - 6][stageOfGame(evalBoard)][position.second*8 + position.first];
+    } else {
+        return positionalScores[colorCode - 6][code][position.second*8 + position.first];
+    }
 }
