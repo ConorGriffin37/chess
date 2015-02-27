@@ -15,8 +15,8 @@ namespace Test
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (testBoard);
             PieceLegalMoves.GenerateLegalMoves (testBoard);
 
-            Assert.AreEqual (true, testBoard.IsMoveValid (8, 16));
-            Assert.AreEqual (false, testBoard.IsMoveValid (0, 37));
+            Assert.AreEqual (true, testBoard.IsMoveValid (52, 36));
+            Assert.AreEqual (false, testBoard.IsMoveValid (12, 28));
         }
     }
 }
