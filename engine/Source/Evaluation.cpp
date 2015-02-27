@@ -225,7 +225,7 @@ int Evaluation::GetMobilityScore(Board& evalBoard)
     int blackDoublePawns = CheckForDoublePawns(7, evalBoard);
     int whiteRooksOpen = rooksOnOpenFile(6, evalBoard);
     int blackRooksOpen = rooksOnOpenFile(7, evalBoard);
-    return (-10*(whiteDoublePawns-blackDoublePawns) + 40*(whiteRooksOpen-blackRooksOpen));
+    return (-15*(whiteDoublePawns-blackDoublePawns) + 40*(whiteRooksOpen-blackRooksOpen));
 }
 
 
@@ -260,7 +260,7 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
         }
         bittest <<= 1;
     }
-    return (whitescore - blackscore) + GetMobilityScore(boardToEvaluate);
+    return (whitescore - blackscore);
 }
 
 int Evaluation::numMinorPieces(int colorCode, Board& evalBoard)
