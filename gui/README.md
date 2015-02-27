@@ -25,7 +25,7 @@ $ ./GUI.exe
 To run the unit tests:
 ```bash
 $ cd <chess_dir_location>/gui/Test/bin/Debug/
-$ nunit-console ./Test.dll
+$ nunit-console4 ./Test.dll
 ```
 
 And, finally, to compile documentation:
