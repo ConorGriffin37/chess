@@ -8,7 +8,7 @@ GUI for the chess project. Currently runs on Linux, Windows, and OSX (unstable).
 This engine requires the latest versions of the following software:
 * The Mono Runtme
 * GTK+
-* MonoDevelop/Visual Studio
+* MonoDevelop(AKA Xamarin Studio)/Visual Studio
 * Doxygen
 
 ## How to Install ##
