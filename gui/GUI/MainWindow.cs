@@ -259,7 +259,7 @@ namespace GUI
             MainClass.CurrentEngine.WaitUntilReady ();
             try {
                 var engineMoveTask = Task.Factory.StartNew<string> (
-                                         () => MainClass.CurrentEngine.Go ("depth 25"),
+                                         () => MainClass.CurrentEngine.Go ("depth 5"),
                                          MainClass.EngineStopTokenSource.Token
                                      )
                     .ContinueWith (task => ParseAndMakeMove (task.Result), MainClass.EngineStopTokenSource.Token);

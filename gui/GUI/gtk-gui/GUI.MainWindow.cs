@@ -239,7 +239,6 @@ namespace GUI
 			this.MakeEngineMoveAction.Activated += new global::System.EventHandler (this.OnMakeEngineMove);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
-			this.WhiteClockLabel.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnClockExpose);
 		}
 	}
 }
