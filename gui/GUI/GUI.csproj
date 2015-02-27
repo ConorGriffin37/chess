@@ -75,6 +75,7 @@
     <Compile Include="PiecePseudoLegalMoves.cs" />
     <Compile Include="DummyBoard.cs" />
     <Compile Include="Debug.cs" />
+    <Compile Include="ChessClock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -10,6 +10,9 @@ namespace GUI
         public static UCITransceiver CurrentEngine { get; set; }
         public static GameStatus CurrentGameStatus { get; set; }
         public static CancellationTokenSource EngineStopTokenSource { get; private set; }
+        public static ChessClock WhiteClock { get; private set; }
+        public static ChessClock BlackClock { get; private set; }
+        public static MainWindow win { get; private set; }
 
         public static void Main (string[] args)
         {
@@ -19,9 +22,11 @@ namespace GUI
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
             EngineStopTokenSource = new CancellationTokenSource ();
+            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
+            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
 
             Application.Init ();
-            MainWindow win = new MainWindow ();
+            win = new MainWindow ();
             win.Show ();
             Application.Run ();
 

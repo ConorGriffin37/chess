@@ -32,9 +32,29 @@ namespace GUI
 		
 		private global::Gtk.MenuBar MenuBar;
 		
+		private global::Gtk.HBox hbox3;
+		
+		private global::Gtk.VBox vbox2;
+		
 		private global::Gtk.DrawingArea BoardArea;
 		
 		private global::Gtk.Entry MoveEntry;
+		
+		private global::Gtk.VBox vbox3;
+		
+		private global::Gtk.HBox hbox4;
+		
+		private global::Gtk.VBox vbox4;
+		
+		private global::Gtk.Label WhiteClockName;
+		
+		private global::Gtk.Label WhiteClockLabel;
+		
+		private global::Gtk.VBox vbox5;
+		
+		private global::Gtk.Label BlackClockTime;
+		
+		private global::Gtk.Label BlackClockLabel;
 
 		protected virtual void Build ()
 		{
@@ -77,8 +97,6 @@ namespace GUI
 			w1.Add (this.MakeEngineMoveAction, "<Primary>m");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
-			this.WidthRequest = 600;
-			this.HeightRequest = 615;
 			this.Name = "GUI.MainWindow";
 			this.Title = global::Mono.Unix.Catalog.GetString ("Gandalf Chess GUI");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -96,29 +114,121 @@ namespace GUI
 			w2.Expand = false;
 			w2.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
+			this.hbox3 = new global::Gtk.HBox ();
+			this.hbox3.Name = "hbox3";
+			this.hbox3.Spacing = 3;
+			// Container child hbox3.Gtk.Box+BoxChild
+			this.vbox2 = new global::Gtk.VBox ();
+			this.vbox2.Name = "vbox2";
+			this.vbox2.Spacing = 6;
+			// Container child vbox2.Gtk.Box+BoxChild
 			this.BoardArea = new global::Gtk.DrawingArea ();
+			this.BoardArea.WidthRequest = 570;
+			this.BoardArea.HeightRequest = 550;
 			this.BoardArea.Name = "BoardArea";
-			this.vbox1.Add (this.BoardArea);
-			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.BoardArea]));
-			w3.Position = 1;
-			// Container child vbox1.Gtk.Box+BoxChild
+			this.vbox2.Add (this.BoardArea);
+			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.BoardArea]));
+			w3.Position = 0;
+			// Container child vbox2.Gtk.Box+BoxChild
 			this.MoveEntry = new global::Gtk.Entry ();
 			this.MoveEntry.CanFocus = true;
 			this.MoveEntry.Name = "MoveEntry";
 			this.MoveEntry.IsEditable = true;
 			this.MoveEntry.MaxLength = 5;
 			this.MoveEntry.InvisibleChar = '•';
-			this.vbox1.Add (this.MoveEntry);
-			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.MoveEntry]));
-			w4.Position = 2;
+			this.vbox2.Add (this.MoveEntry);
+			global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.MoveEntry]));
+			w4.Position = 1;
 			w4.Expand = false;
 			w4.Fill = false;
+			this.hbox3.Add (this.vbox2);
+			global::Gtk.Box.BoxChild w5 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox2]));
+			w5.Position = 0;
+			// Container child hbox3.Gtk.Box+BoxChild
+			this.vbox3 = new global::Gtk.VBox ();
+			this.vbox3.WidthRequest = 200;
+			this.vbox3.Name = "vbox3";
+			this.vbox3.Spacing = 6;
+			// Container child vbox3.Gtk.Box+BoxChild
+			this.hbox4 = new global::Gtk.HBox ();
+			this.hbox4.Name = "hbox4";
+			this.hbox4.Spacing = 6;
+			// Container child hbox4.Gtk.Box+BoxChild
+			this.vbox4 = new global::Gtk.VBox ();
+			this.vbox4.Name = "vbox4";
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.WhiteClockName = new global::Gtk.Label ();
+			this.WhiteClockName.Name = "WhiteClockName";
+			this.WhiteClockName.Xpad = 30;
+			this.WhiteClockName.Ypad = 5;
+			this.WhiteClockName.LabelProp = global::Mono.Unix.Catalog.GetString ("White");
+			this.WhiteClockName.Justify = ((global::Gtk.Justification)(2));
+			this.vbox4.Add (this.WhiteClockName);
+			global::Gtk.Box.BoxChild w6 = ((global::Gtk.Box.BoxChild)(this.vbox4 [this.WhiteClockName]));
+			w6.Position = 0;
+			w6.Expand = false;
+			w6.Fill = false;
+			// Container child vbox4.Gtk.Box+BoxChild
+			this.WhiteClockLabel = new global::Gtk.Label ();
+			this.WhiteClockLabel.Name = "WhiteClockLabel";
+			this.WhiteClockLabel.Ypad = 5;
+			this.WhiteClockLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("white_clock_label");
+			this.vbox4.Add (this.WhiteClockLabel);
+			global::Gtk.Box.BoxChild w7 = ((global::Gtk.Box.BoxChild)(this.vbox4 [this.WhiteClockLabel]));
+			w7.Position = 1;
+			w7.Expand = false;
+			w7.Fill = false;
+			this.hbox4.Add (this.vbox4);
+			global::Gtk.Box.BoxChild w8 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.vbox4]));
+			w8.Position = 0;
+			w8.Expand = false;
+			w8.Fill = false;
+			// Container child hbox4.Gtk.Box+BoxChild
+			this.vbox5 = new global::Gtk.VBox ();
+			this.vbox5.Name = "vbox5";
+			// Container child vbox5.Gtk.Box+BoxChild
+			this.BlackClockTime = new global::Gtk.Label ();
+			this.BlackClockTime.Name = "BlackClockTime";
+			this.BlackClockTime.Xpad = 30;
+			this.BlackClockTime.Ypad = 5;
+			this.BlackClockTime.LabelProp = global::Mono.Unix.Catalog.GetString ("Black");
+			this.vbox5.Add (this.BlackClockTime);
+			global::Gtk.Box.BoxChild w9 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.BlackClockTime]));
+			w9.Position = 0;
+			w9.Expand = false;
+			w9.Fill = false;
+			// Container child vbox5.Gtk.Box+BoxChild
+			this.BlackClockLabel = new global::Gtk.Label ();
+			this.BlackClockLabel.Name = "BlackClockLabel";
+			this.BlackClockLabel.Ypad = 5;
+			this.BlackClockLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("black_clock_label");
+			this.vbox5.Add (this.BlackClockLabel);
+			global::Gtk.Box.BoxChild w10 = ((global::Gtk.Box.BoxChild)(this.vbox5 [this.BlackClockLabel]));
+			w10.Position = 1;
+			w10.Expand = false;
+			w10.Fill = false;
+			this.hbox4.Add (this.vbox5);
+			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(this.hbox4 [this.vbox5]));
+			w11.Position = 1;
+			w11.Expand = false;
+			w11.Fill = false;
+			this.vbox3.Add (this.hbox4);
+			global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.vbox3 [this.hbox4]));
+			w12.Position = 0;
+			w12.Expand = false;
+			w12.Fill = false;
+			this.hbox3.Add (this.vbox3);
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(this.hbox3 [this.vbox3]));
+			w13.Position = 1;
+			this.vbox1.Add (this.hbox3);
+			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox3]));
+			w14.Position = 1;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 600;
-			this.DefaultHeight = 615;
+			this.DefaultWidth = 773;
+			this.DefaultHeight = 610;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
@@ -129,6 +239,7 @@ namespace GUI
 			this.MakeEngineMoveAction.Activated += new global::System.EventHandler (this.OnMakeEngineMove);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
+			this.WhiteClockLabel.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnClockExpose);
 		}
 	}
 }

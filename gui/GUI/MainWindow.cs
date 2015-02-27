@@ -207,7 +207,7 @@ namespace GUI
         {
             Debug.Log ("Redrawing board.");
             boardContext = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
-            double transx = Math.Abs((this.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
+            double transx = Math.Abs((BoardArea.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
             boardContext.Translate (transx, 0);
             boardContext.Scale (0.75, 0.75);
             boardBackground.Show (boardContext, 0, 0);
@@ -316,6 +316,23 @@ namespace GUI
                 ShowGameOverDialog (currentStatus);
                 return;
             }
+        }
+
+        public void UpdateClock(ChessClock clock)
+        {
+            if (clock.Colour == PieceColour.White) {
+                WhiteClockLabel.Text = clock.TimeLeft.ToString ("g");
+            } else {
+                BlackClockLabel.Text = clock.TimeLeft.ToString ("g");
+            }
+        }
+
+        protected void OnClockExpose (object o, ExposeEventArgs args)
+        {
+            UpdateClock (MainClass.WhiteClock);
+            UpdateClock (MainClass.BlackClock);
+
+            MainClass.WhiteClock.Start ();
         }
     }
 }
