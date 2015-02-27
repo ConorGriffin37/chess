@@ -326,13 +326,5 @@ namespace GUI
                 BlackClockLabel.Text = clock.TimeLeft.ToString ("g");
             }
         }
-
-        protected void OnClockExpose (object o, ExposeEventArgs args)
-        {
-            UpdateClock (MainClass.WhiteClock);
-            UpdateClock (MainClass.BlackClock);
-
-            MainClass.WhiteClock.Start ();
-        }
     }
 }

@@ -191,7 +191,6 @@
                             <property name="MemberName" />
                             <property name="Ypad">5</property>
                             <property name="LabelProp" translatable="yes">white_clock_label</property>
-                            <signal name="ExposeEvent" handler="OnClockExpose" />
                           </widget>
                           <packing>
                             <property name="Position">1</property>

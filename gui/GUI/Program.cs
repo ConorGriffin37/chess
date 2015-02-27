@@ -27,6 +27,8 @@ namespace GUI
 
             Application.Init ();
             win = new MainWindow ();
+            win.UpdateClock (WhiteClock);
+            win.UpdateClock (BlackClock);
             win.Show ();
             Application.Run ();
 
