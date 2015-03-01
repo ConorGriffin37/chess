@@ -14,10 +14,19 @@ MoveList::MoveList(Board& gameBoard, int colorcode)
     scoreMoves();
 }
 
+int pieceScore[] = {1, 5, 3, 3, 9, 2};
+
 void MoveList::scoreMoves()
 {
     for (int i = 0; i < moves.size(); i++) {
-        moves[i].score = 0;
+        int score = 50;
+        if (moves[i].take) {
+            score = score + 1 + (pieceScore[moves[i].takecode] - pieceScore[moves[i].code]);
+        }
+        if (moves[i].promote) {
+            score = score + pieceScore[moves[i].procode];
+        }
+        moves[i].score = score;
     }
 }
 
@@ -419,26 +428,26 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
     if (x < 7) {
         if (checkbit(colorboard, getpos(x + 1, y)) == false) {
             if (checkbit(oppcolorboard, getpos(x + 1, y))) {
-                addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y), gameBoard.getPieceFromPos(x + 1, y));
+                addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y), gameBoard.getPieceFromPos(x + 1, y));
             } else {
-                addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y));
+                addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y));
             }
         }
         if (y < 7) {
             if (checkbit(colorboard, getpos(x + 1, y + 1)) == false) {
                 if (checkbit(oppcolorboard, getpos(x + 1, y + 1))) {
-                    addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y  + 1), gameBoard.getPieceFromPos(x + 1, y + 1));
+                    addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y  + 1), gameBoard.getPieceFromPos(x + 1, y + 1));
                 } else {
-                    addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1));
+                    addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1));
                 }
             }
         }
         if (y > 0) {
             if (checkbit(colorboard, getpos(x + 1, y - 1)) == false) {
                 if (checkbit(oppcolorboard, getpos(x + 1, y - 1))) {
-                    addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y  - 1), gameBoard.getPieceFromPos(x + 1, y - 1));
+                    addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y  - 1), gameBoard.getPieceFromPos(x + 1, y - 1));
                 } else {
-                    addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1));
+                    addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1));
                 }
             }
         }
@@ -446,44 +455,44 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
     if (y < 7) {
         if (checkbit(colorboard, getpos(x, y + 1)) == false) {
             if (checkbit(oppcolorboard, getpos(x, y + 1))) {
-                addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), gameBoard.getPieceFromPos(x, y + 1));
+                addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), gameBoard.getPieceFromPos(x, y + 1));
             } else {
-                addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1));
+                addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1));
             }
         }
     }
     if (y > 0) {
         if (checkbit(colorboard, getpos(x, y - 1)) == false) {
             if (checkbit(oppcolorboard, getpos(x, y - 1))) {
-                addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), gameBoard.getPieceFromPos(x, y - 1));
+                addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), gameBoard.getPieceFromPos(x, y - 1));
             } else {
-                addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1));
+                addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1));
             }
         }
     }
     if (x > 0) {
         if (checkbit(colorboard, getpos(x - 1, y)) == false) {
             if (checkbit(oppcolorboard, getpos(x - 1, y))) {
-                addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y), gameBoard.getPieceFromPos(x - 1, y));
+                addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y), gameBoard.getPieceFromPos(x - 1, y));
             } else {
-                addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y));
+                addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y));
             }
         }
         if (y < 7) {
             if (checkbit(colorboard, getpos(x - 1, y + 1)) == false) {
                 if (checkbit(oppcolorboard, getpos(x - 1, y + 1))) {
-                    addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1));
+                    addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1));
                 } else {
-                    addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1));
+                    addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1));
                 }
             }
         }
         if (y > 0) {
             if (checkbit(colorboard, getpos(x - 1, y - 1)) == false) {
                 if (checkbit(oppcolorboard, getpos(x - 1, y - 1))) {
-                    addMoveTake(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1));
+                    addMoveTake(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1));
                 } else {
-                    addMove(4, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1));
+                    addMove(5, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1));
                 }
             }
         }
@@ -492,18 +501,18 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         u64 attacked = gameBoard.getAttacked(7);
         if (checkbit(gameBoard.getCastleOrEnpasent(), 0)) {
             if (checkbit(whiteocc, 0)) {
-                if (checkbit(occupied, 2) or checkbit(occupied, 1)) {
-                    if (checkbit(attacked, 3) or checkbit(attacked, 2) or checkbit(attacked, 1)) {
-                        addMoveCastle(4, colorcode, std::make_pair(4, 0), std::make_pair(6, 0), std::make_pair(7, 0), std::make_pair(5, 0));
+                if (not checkbit(occupied, 2) and not checkbit(occupied, 1)) {
+                    if (not checkbit(attacked, 3) and not checkbit(attacked, 2) and not checkbit(attacked, 1)) {
+                        addMoveCastle(5, colorcode, std::make_pair(4, 0), std::make_pair(6, 0), std::make_pair(7, 0), std::make_pair(5, 0));
                     }
                 }
             }
         }
         if (checkbit(gameBoard.getCastleOrEnpasent(), 7)) {
             if (checkbit(whiteocc, 7)) {
-                if (checkbit(occupied, 4) or checkbit(occupied, 5) or checkbit(occupied, 6)) {
-                    if (checkbit(attacked, 3) or checkbit(attacked, 4) or checkbit(attacked, 5)) {
-                        addMoveCastle(4, colorcode, std::make_pair(4, 0), std::make_pair(2, 0), std::make_pair(0, 0), std::make_pair(3, 0));
+                if (not checkbit(occupied, 4) and not checkbit(occupied, 5) and not checkbit(occupied, 6)) {
+                    if (not checkbit(attacked, 3) and not checkbit(attacked, 4) and not checkbit(attacked, 5)) {
+                        addMoveCastle(5, colorcode, std::make_pair(4, 0), std::make_pair(2, 0), std::make_pair(0, 0), std::make_pair(3, 0));
                     }
                 }
             }
@@ -514,7 +523,7 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
             if (checkbit(blackocc, 56)) {
                 if (not checkbit(occupied, 57) and not checkbit(occupied, 58)) {
                     if (not checkbit(attacked, 59) and not checkbit(attacked, 58) and not checkbit(attacked, 57)) {
-                        addMoveCastle(4, colorcode, std::make_pair(4, 7), std::make_pair(6, 7), std::make_pair(7, 7), std::make_pair(5, 7));
+                        addMoveCastle(5, colorcode, std::make_pair(4, 7), std::make_pair(6, 7), std::make_pair(7, 7), std::make_pair(5, 7));
                     }
                 }
             }
@@ -523,7 +532,7 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
             if (checkbit(blackocc, 63)) {
                 if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
                     if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
-                        addMoveCastle(4, colorcode, std::make_pair(4, 7), std::make_pair(2, 7), std::make_pair(0, 7), std::make_pair(3, 7));
+                        addMoveCastle(5, colorcode, std::make_pair(4, 7), std::make_pair(2, 7), std::make_pair(0, 7), std::make_pair(3, 7));
                     }
                 }
             }
@@ -593,4 +602,9 @@ std::pair<bool, mov> MoveList::getNextMove()
     }
     mov bad;
     return std::make_pair(false, bad);
+}
+
+mov MoveList::getMovN(int n)
+{
+    return moves[n];
 }

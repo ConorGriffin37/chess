@@ -9,6 +9,24 @@
 
 typedef unsigned long long u64;
 
+struct mov
+{
+    int code;
+    int colorcode;
+    std::pair<int, int> from;
+    std::pair<int, int> to;
+    bool take = false;
+    bool promote = false;
+    bool enPas = false;
+    bool castle = false;
+    std::pair<int, int> rookfrom;
+    std::pair<int, int> rookto;
+    int procode;
+    int takecode;
+    std::pair<int, int> takepos;
+    int score;
+};
+
 /**
  * @class Board
  * @brief The board representation and methods
@@ -22,6 +40,7 @@ class Board
     private:
         u64 castleorenpasent; /**< Represents ability to castle and take enpasent */
         u64 pieceBB[8]; /**< Indexes 0 - 5 represent pawns, rooks, knights, bishops, queens and kings respectively. 6 represents white pieces, 7 black. */
+        int materialEval;
 
     public:
         Board(std::string fen);
@@ -117,13 +136,6 @@ class Board
 		 */
         bool simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, char promote);
         /**
-		 * @fn getMove
-		 * @brief gets the move that was made to advance to the given board
-		 * @param nextboard The move after the move was made
-		 * @return The move code, e.g "e4e5".
-		 */
-        std::string getMove(Board nextboard);
-        /**
 		 * @fn promotePawn
 		 * @brief Handles pawn promotion
 		 * @param colorcode pawn color
@@ -139,28 +151,18 @@ class Board
 		 */
         void takePiece(std::pair<int, int> position);
         /**
-		 * @fn getBoards
-		 * @brief Gets all the resulting boards after 1 move
-		 * @param colorcode Color whose turn it is to move
-		 * @return Vector of the boards
-		 */
-        std::vector<Board> getBoards(int colorcode);
-        /**
-		 * @fn getMoves
-		 * @brief Gets all the resulting boards from a single pieces moves
-		 * @param position Position of the piece (in bits)
-		 * @param code Type of piece
-		 * @param colorcode Color whose turn it is to move
-		 * @return Vector of the boards
-		 */
-        std::vector<Board> getMoves(int positon, int code, int colorcode);
-        /**
 		 * @fn inCheck
 		 * @brief Checks if the king of a given color is in check
 		 * @param colorcode Check if the king of this color is in check
 		 * @return True for incheck, false otherwise.
 		 */
         bool inCheck(int colorcode); //checks if the piece of a given color is in check
+        void putPiece(int code, int colorcode, std::pair<int, int> position);
+        void specTakePiece(int code, int colorcode, std::pair<int, int> position);
+        void makeMov(mov theMove);
+        void unMakeMov(mov theMove, u64 oldCastleOrEnpas);
+        void setEvaluation(int eval);
+        int getEvaluation();
 };
 
 #endif // BOARD_HPP_INCLUDED

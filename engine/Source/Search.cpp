@@ -1,54 +1,82 @@
 #include "Search.hpp"
 #include "Board.hpp"
+#include "MoveList.hpp"
 #include <iostream>
 
 void outbitboard(u64 n);
 
-string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
+int getRealColor(int x)
 {
-    vector<Board> possibleMoves = gameBoard.getBoards(playerColor);
-    Board curBestMove = possibleMoves[0];
-    int maxScore = -1000000;
-    int score;
-    for (unsigned int i = 0; i < possibleMoves.size(); i++){
-        score = -AlphaBeta(possibleMoves[i], -1000000, -maxScore, remainingDepth - 1, playerColor*-1);
-        //cout << "Move is " << gameBoard.getMove(possibleMoves[i]) << " and score is " << score << std::endl;
-        if (score > maxScore){
-            maxScore = score;
-            curBestMove = possibleMoves[i];
-        }
+    if (x == 1) {
+        return 6;
     }
-    return gameBoard.getMove(curBestMove);
+    return 7;
 }
 
-int Search::AlphaBeta(Board gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
+string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
+{
+    MoveList possibleMoves(gameBoard, getRealColor(playerColor));
+    gameBoard.setEvaluation(Evaluation::evaluateBoard(gameBoard));
+    mov curBestMove = possibleMoves.getMovN(0);
+    int maxScore = -10000000;
+    int score;
+    u64 castle = gameBoard.getCastleOrEnpasent();
+    while (true) {
+        pair<bool, mov> get = possibleMoves.getNextMove();
+        if (get.first) {
+            gameBoard.makeMov(get.second);
+            if (gameBoard.inCheck(getRealColor(playerColor)) == false) {
+                score = -AlphaBeta(gameBoard, -10000000, -maxScore, remainingDepth - 1, playerColor*-1);
+                //score = -AlphaBeta(gameBoard, -10000000, 10000000, remainingDepth - 1, playerColor*-1);
+                //cout << "Move is " << possibleMoves.getMoveCode(get.second) << " and score is " << score << std::endl;
+                if (score > maxScore){
+                    maxScore = score;
+                    curBestMove = get.second;
+                }
+            }
+            gameBoard.unMakeMov(get.second, castle);
+        } else {
+            break;
+        }
+    }
+    return possibleMoves.getMoveCode(curBestMove);
+}
+
+int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
 {
     if (remainingDepth == 0){
-        return Evaluation::evaluateBoard(gameBoard)*playerColor;
+        //return Evaluation::evaluateBoard(gameBoard)*playerColor; //doesn't work right???
+        return gameBoard.getEvaluation()*playerColor;
     }
     int score;
-    vector<Board> possibleMoves = gameBoard.getBoards(playerColor);
-    if (possibleMoves.size() == 0){
-        int colorCode = 6;
-        if (playerColor == -1){
-            colorCode = 7;
-        }
-        if (gameBoard.inCheck(colorCode) == true){
-            //checkmate
-            return (-1000000 - remainingDepth);
+    MoveList possibleMoves = MoveList(gameBoard, getRealColor(playerColor));
+    u64 castle = gameBoard.getCastleOrEnpasent();
+    bool canMove = false;
+    while (true) {
+        pair<bool, mov> get = possibleMoves.getNextMove();
+        if (get.first) {
+            gameBoard.makeMov(get.second);
+            if (gameBoard.inCheck(getRealColor(playerColor)) == false) {
+                canMove = true;
+                score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1);
+                if (score >= beta){
+                    gameBoard.unMakeMov(get.second, castle);
+                    return beta;
+                }
+                if (score > alpha){
+                    alpha = score;
+                }
+            }
+            gameBoard.unMakeMov(get.second, castle);
         } else {
-            //stale mate
-            return 0;
+            break;
         }
     }
-    for (unsigned int i = 0; i < possibleMoves.size(); i++){
-        score = -AlphaBeta(possibleMoves[i], -beta, -alpha, remainingDepth - 1, playerColor*-1);
-        if (score >= beta){
-            return beta;
+    if (canMove == false) {
+        if (gameBoard.inCheck(getRealColor(playerColor))) {
+            return (-1000000 - remainingDepth);
         }
-        if (score > alpha){
-            alpha = score;
-        }
+        return 0;
     }
     return alpha;
 }

@@ -6,23 +6,6 @@
 #include <utility>
 #include "Board.hpp"
 
-struct mov
-{
-    int code;
-    int colorcode;
-    std::pair<int, int> from;
-    std::pair<int, int> to;
-    bool take = false;
-    bool promote = false;
-    bool enPas = false;
-    bool castle = false;
-    std::pair<int, int> rookfrom;
-    std::pair<int, int> rookto;
-    int procode;
-    int takecode;
-    std::pair<int, int> takepos;
-    int score;
-};
 
 class MoveList
 {
@@ -48,6 +31,7 @@ class MoveList
         void getBishopMoves(Board &gameBoard, int pos, int code, int colorcode); //bishop moves can be made by queen
         void getKingMoves(Board &gameBoard, int pos, int colorcode);
         std::pair<bool, mov> getNextMove();
+        mov getMovN(int n);
 };
 
 

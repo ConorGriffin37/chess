@@ -251,11 +251,11 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
                 }
             }
         }
-        if (piecesBoards[6] & bittest) {
+        if (piecesBoards[5] & bittest) {
             if (colorboard & bittest) {
-                whitescore = whitescore + kingPositionalScores[0][stageOfGame(boardToEvaluate)][i];
+                whitescore = whitescore + kingPositionalScores[0][0 /*stageOfGame(boardToEvaluate)*/][i];
             } else {
-                blackscore = blackscore + kingPositionalScores[0][stageOfGame(boardToEvaluate)][i];
+                blackscore = blackscore + kingPositionalScores[1][0 /*stageOfGame(boardToEvaluate)*/][i];
             }
         }
         bittest <<= 1;
@@ -297,8 +297,17 @@ int Evaluation::stageOfGame(Board& evalBoard)
 int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position, Board& evalBoard)
 {
     if (code == 5){
-        return kingPositionalScores[colorCode - 6][stageOfGame(evalBoard)][position.second*8 + position.first];
+        return kingPositionalScores[colorCode - 6][stageOfGame(evalBoard)][position.second*8 + (7 - position.first)];
     } else {
-        return positionalScores[colorCode - 6][code][position.second*8 + position.first];
+        return scores[code] + positionalScores[colorCode - 6][code][position.second*8 + (7 - position.first)];
+    }
+}
+
+int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position)
+{
+    if (code == 5){
+        return kingPositionalScores[colorCode - 6][0][position.second*8 + (7 - position.first)];
+    } else {
+        return scores[code] + positionalScores[colorCode - 6][code][position.second*8 + (7 - position.first)];
     }
 }
