@@ -81,6 +81,12 @@
         <property name="ShortLabel" translatable="yes">Make Engine _Move</property>
         <signal name="Activated" handler="OnMakeEngineMove" />
       </action>
+      <action id="FlipBoardAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Flip Board</property>
+        <property name="ShortLabel" translatable="yes">Flip Board</property>
+        <signal name="Activated" handler="OnFlipBoard" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -99,6 +105,7 @@
               </node>
               <node type="Menu" action="BoardAction">
                 <node type="Menuitem" action="ResetBoardAction1" />
+                <node type="Menuitem" action="FlipBoardAction" />
                 <node type="Menuitem" action="LoadFENAction" />
               </node>
               <node type="Menu" action="EngineAction">

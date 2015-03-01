@@ -39,25 +39,59 @@ namespace GUI
             PlayerToMove = other.PlayerToMove;
         }
 
-        public override void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        // Returns value of captured piece, for use in DummyBoard.UndoMove
+        public new Piece MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
             Piece movingPiece = Squares [source].Piece;
-            Squares [destination].Piece = movingPiece;
-            Squares [source].Piece = null;
+            Piece capturedPiece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                Array.IndexOf (castleDestinations, destination) != -1) {
+                Square castleRookSquare = destination - source > 0 ?
+                    Squares [destination + 1] : Squares [destination - 2];
+                Squares [destination].Piece = movingPiece;
+                Squares [source].Piece = null;
+                Squares [destination - source > 0 ?
+                    destination - 1 :
+                    destination + 1].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+            } else {
+                capturedPiece = Squares [destination].Piece;
+                Squares [destination].Piece = movingPiece;
+                Squares [source].Piece = null;
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {
                 PlayerToMove = PieceColour.White;
             }
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
+            return capturedPiece;
         }
 
-        public override void UndoMove(byte originalSource, byte originalDestination,
+        public void UndoMove(byte originalSource, byte originalDestination, Piece capturedPiece,
             PieceType? originalPromoteTo = null)
         {
             Piece movingPiece = Squares [originalDestination].Piece;
-            Squares [originalSource].Piece = movingPiece;
-            Squares [originalDestination].Piece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                Array.IndexOf (castleDestinations, originalDestination) != -1) {
+                Square castleRookSquare = originalDestination - originalSource > 0 ?
+                    Squares [originalDestination - 1] : Squares [originalDestination + 1];
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = null;
+                Squares [originalDestination - originalSource > 0 ?
+                    originalDestination + 1 :
+                    originalDestination - 2].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+            } else {
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = capturedPiece;
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {

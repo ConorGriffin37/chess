@@ -13,15 +13,17 @@ namespace GUI
         public static ChessClock WhiteClock { get; private set; }
         public static ChessClock BlackClock { get; private set; }
         public static MainWindow win { get; private set; }
+        public static PieceColour BoardOrientation { get; set; }
 
         public static void Main (string[] args)
         {
             CurrentBoard = new Board ();
-            CurrentGameStatus = GameStatus.Unfinished;
+            CurrentGameStatus = GameStatus.Inactive;
             PieceMoves.InitiateChessPieceMoves ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
             EngineStopTokenSource = new CancellationTokenSource ();
+            BoardOrientation = PieceColour.White;
             WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
             BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
 
@@ -56,6 +58,32 @@ namespace GUI
             EngineStopTokenSource.Dispose ();
             EngineStopTokenSource = new CancellationTokenSource ();
             Debug.Log ("Engine cancellation token source reset.");
+        }
+
+        public static void UpdateClock()
+        {
+            if (CurrentGameStatus != GameStatus.Active) {
+                WhiteClock.Stop ();
+                BlackClock.Stop ();
+            } else {
+                if (CurrentBoard.PlayerToMove == PieceColour.White) {
+                    BlackClock.Stop ();
+                    WhiteClock.Start ();
+                } else {
+                    WhiteClock.Stop ();
+                    BlackClock.Start ();
+                }
+            }
+        }
+
+        public static void ResetClock()
+        {
+            WhiteClock.Stop ();
+            BlackClock.Stop ();
+            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
+            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
+            win.UpdateClock (WhiteClock);
+            win.UpdateClock (BlackClock);
         }
     }
 }

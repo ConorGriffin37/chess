@@ -132,7 +132,8 @@ namespace GUI
         {
             for (int i = 0; i < 64; i++) {
                 Piece currentPiece = MainClass.CurrentBoard.Squares [i].Piece;
-                PointD currentPoint = pieceCoordinates [i];
+                PointD currentPoint = MainClass.BoardOrientation == PieceColour.White ?
+                    pieceCoordinates [i] : pieceCoordinates [Math.Abs (i - 63)];
                 if (currentPiece == null)
                     continue;
                 if (currentPiece.Colour == PieceColour.White) {

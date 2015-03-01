@@ -6,7 +6,7 @@ namespace GUI
     public enum PieceColour { White, Black };
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
     // The colour before the game result indicates which colour has lost.
-    public enum GameStatus { Unfinished, Stalemate, WhiteCheckmate,
+    public enum GameStatus { Inactive, Active, Stalemate, WhiteCheckmate,
         BlackCheckmate, WhiteAdjudicate, BlackAdjudicate };
 
     /**
@@ -20,6 +20,8 @@ namespace GUI
         public virtual bool BlackCastled { get; set; }
         public virtual bool WhiteCastled { get; set; }
         public virtual PieceColour PlayerToMove { get; set; }
+
+        public readonly byte[] castleDestinations = { 2, 8, 56, 62 };
 
         /**
          * @brief Default constructor.
@@ -142,14 +144,29 @@ namespace GUI
          * Makes a move, switches the @c PlayerToMove variable,
          * and updates piece legal moves.
          */
-        public virtual void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
             if (!IsMoveValid (source, destination)) {
                 throw new InvalidOperationException ("Invalid move entered.");
             }
             Piece movingPiece = Squares [source].Piece;
-            Squares [destination].Piece = movingPiece;
-            Squares [source].Piece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                Array.IndexOf (castleDestinations, destination) != -1) {
+                Square castleRookSquare = destination - source > 0 ?
+                    Squares [destination + 1] : Squares [destination - 2];
+                Squares [destination].Piece = movingPiece;
+                Squares [source].Piece = null;
+                Squares [destination - source > 0 ?
+                    destination - 1 :
+                    destination + 1].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+            } else {
+                Squares [destination].Piece = movingPiece;
+                Squares [source].Piece = null;
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {
@@ -166,12 +183,27 @@ namespace GUI
          * Undoes a move by doing the complete reverse of MakeMove and then
          * regenerating legal moves.
          */
-        public virtual void UndoMove(byte originalSource, byte originalDestination,
+        public void UndoMove(byte originalSource, byte originalDestination,
                              PieceType? originalPromoteTo = null)
         {
             Piece movingPiece = Squares [originalDestination].Piece;
-            Squares [originalSource].Piece = movingPiece;
-            Squares [originalDestination].Piece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                Array.IndexOf (castleDestinations, originalDestination) != -1) {
+                Square castleRookSquare = originalDestination - originalSource > 0 ?
+                    Squares [originalDestination - 1] : Squares [originalDestination + 1];
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = null;
+                Squares [originalDestination - originalSource > 0 ?
+                    originalDestination + 1 :
+                    originalDestination - 2].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+            } else {
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = null;
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {
@@ -207,7 +239,7 @@ namespace GUI
                 return GameStatus.Stalemate;
             }
 
-            return GameStatus.Unfinished;
+            return GameStatus.Active;
         }
 
         public Piece PieceAt(int square)

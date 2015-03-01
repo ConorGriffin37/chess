@@ -56,6 +56,7 @@ namespace GUI
                 try {
                     FENParser parser = new FENParser(fen.FENString);
                     MainClass.CurrentBoard = parser.GetBoard();
+                    MainClass.CurrentGameStatus = GameStatus.Inactive;
                     PiecePseudoLegalMoves.GeneratePseudoLegalMoves(MainClass.CurrentBoard);
                     PieceLegalMoves.GenerateLegalMoves(MainClass.CurrentBoard);
                     RedrawBoard();
@@ -72,11 +73,12 @@ namespace GUI
                 }
             }
             fen.Destroy ();
-            MainClass.CurrentGameStatus = GameStatus.Unfinished;
+            MainClass.CurrentGameStatus = GameStatus.Inactive;
             GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
-            if (currentStatus != GameStatus.Unfinished) {
+            if (currentStatus != GameStatus.Inactive && currentStatus != GameStatus.Active) {
                 ShowGameOverDialog (currentStatus);
             }
+            MainClass.ResetClock ();
         }
 
         protected void OnLoadEngine (object sender, EventArgs e)
@@ -119,7 +121,8 @@ namespace GUI
             }
             string userMove = MoveEntry.Text;
             MoveEntry.Text = "";
-            if (MainClass.CurrentGameStatus != GameStatus.Unfinished) {
+            if (MainClass.CurrentGameStatus != GameStatus.Active &&
+                MainClass.CurrentGameStatus != GameStatus.Inactive) {
                 Console.Error.WriteLine ("(EE) Attempted move during finished game.");
                 MessageDialog errorDialog = new MessageDialog (
                                                 this,
@@ -212,6 +215,7 @@ namespace GUI
             boardContext.Scale (0.75, 0.75);
             boardBackground.Show (boardContext, 0, 0);
             PieceDisplay.DrawPieces (boardContext);
+            boardContext.Dispose ();
         }
 
         byte NotationToBoardSquare(string notation)
@@ -230,6 +234,8 @@ namespace GUI
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
             MainClass.CurrentBoard = new Board ();
+            MainClass.CurrentGameStatus = GameStatus.Inactive;
+            MainClass.ResetClock ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (MainClass.CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (MainClass.CurrentBoard);
             RedrawBoard ();
@@ -311,11 +317,11 @@ namespace GUI
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
-            GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
-            if (currentStatus != GameStatus.Unfinished) {
-                ShowGameOverDialog (currentStatus);
-                return;
+            MainClass.CurrentGameStatus = MainClass.CurrentBoard.CheckForMate ();
+            if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
+                ShowGameOverDialog (MainClass.CurrentGameStatus);
             }
+            MainClass.UpdateClock ();
         }
 
         public void UpdateClock(ChessClock clock)
@@ -325,6 +331,13 @@ namespace GUI
             } else {
                 BlackClockLabel.Text = clock.TimeLeft.ToString ("g");
             }
+        }
+
+        protected void OnFlipBoard (object sender, EventArgs e)
+        {
+            MainClass.BoardOrientation = MainClass.BoardOrientation == PieceColour.White ?
+                PieceColour.Black : PieceColour.White;
+            RedrawBoard ();
         }
     }
 }

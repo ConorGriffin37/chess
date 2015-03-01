@@ -28,6 +28,8 @@ namespace GUI
 		
 		private global::Gtk.Action MakeEngineMoveAction;
 		
+		private global::Gtk.Action FlipBoardAction;
+		
 		private global::Gtk.VBox vbox1;
 		
 		private global::Gtk.MenuBar MenuBar;
@@ -95,6 +97,9 @@ namespace GUI
 			this.MakeEngineMoveAction = new global::Gtk.Action ("MakeEngineMoveAction", global::Mono.Unix.Catalog.GetString ("Make Engine _Move"), null, null);
 			this.MakeEngineMoveAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Make Engine _Move");
 			w1.Add (this.MakeEngineMoveAction, "<Primary>m");
+			this.FlipBoardAction = new global::Gtk.Action ("FlipBoardAction", global::Mono.Unix.Catalog.GetString ("Flip Board"), null, null);
+			this.FlipBoardAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Flip Board");
+			w1.Add (this.FlipBoardAction, null);
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "GUI.MainWindow";
@@ -105,7 +110,7 @@ namespace GUI
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='FlipBoardAction' action='FlipBoardAction'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.MenuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/MenuBar")));
 			this.MenuBar.Name = "MenuBar";
 			this.vbox1.Add (this.MenuBar);
@@ -237,6 +242,7 @@ namespace GUI
 			this.AboutAction.Activated += new global::System.EventHandler (this.OnAbout);
 			this.ResetBoardAction1.Activated += new global::System.EventHandler (this.OnResetBoard);
 			this.MakeEngineMoveAction.Activated += new global::System.EventHandler (this.OnMakeEngineMove);
+			this.FlipBoardAction.Activated += new global::System.EventHandler (this.OnFlipBoard);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
 		}
