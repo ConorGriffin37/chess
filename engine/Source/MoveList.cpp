@@ -206,7 +206,7 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), gameBoard.getPieceFromPos(x + 1, y - 1), 2);
                 }
             } else if (checkbit(gameBoard.getCastleOrEnpasent(), getpos(x + 1, y - 1))) {
-                addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), std::make_pair(x - 1, y));
+                addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), std::make_pair(x + 1, y));
             }
         }
     }
