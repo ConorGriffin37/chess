@@ -24,8 +24,8 @@ namespace GUI
             PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
             EngineStopTokenSource = new CancellationTokenSource ();
             BoardOrientation = PieceColour.White;
-            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 0, 10));
-            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 0, 10));
+            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
+            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
 
             Application.Init ();
             win = new MainWindow ();
@@ -82,6 +82,16 @@ namespace GUI
             BlackClock.Stop ();
             WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
             BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
+            win.UpdateClock (WhiteClock);
+            win.UpdateClock (BlackClock);
+        }
+
+        public static void SetClock(TimeSpan time)
+        {
+            WhiteClock.Stop ();
+            BlackClock.Stop ();
+            WhiteClock = new ChessClock (PieceColour.White, time);
+            BlackClock = new ChessClock (PieceColour.Black, time);
             win.UpdateClock (WhiteClock);
             win.UpdateClock (BlackClock);
         }

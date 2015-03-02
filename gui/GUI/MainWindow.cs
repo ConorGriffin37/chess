@@ -347,5 +347,27 @@ namespace GUI
                 PieceColour.Black : PieceColour.White;
             RedrawBoard ();
         }
+
+        protected void OnSetClock (object sender, EventArgs e)
+        {
+            SetClockTimeDialog time = new SetClockTimeDialog ();
+            if (time.Run () == (int)ResponseType.Ok) {
+                try {
+                    MainClass.SetClock(TimeSpan.Parse(time.Time));
+                    MainClass.CurrentGameStatus = GameStatus.Inactive;
+                } catch(Exception ex) {
+                    Console.Error.WriteLine ("Error parsing game time: " + ex.Message);
+                    MessageDialog errorDialog = new MessageDialog (
+                                                    time,
+                                                    DialogFlags.DestroyWithParent,
+                                                    MessageType.Error,
+                                                    ButtonsType.Ok,
+                                                    "Invalid game time entered.");
+                    errorDialog.Run ();
+                    errorDialog.Destroy ();
+                }
+            }
+            time.Destroy ();
+        }
     }
 }
