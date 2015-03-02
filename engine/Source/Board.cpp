@@ -592,9 +592,9 @@ void Board::makeMov(mov theMove)
     }
     if (theMove.code == 0) { //enpasent
         if (theMove.from.second - theMove.to.second == 2) { //moving out 2 at first
-            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second + 1)));
-        } else if (theMove.from.second - theMove.to.second == -2) {
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second - 1)));
+        } else if (theMove.from.second - theMove.to.second == -2) {
+            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second + 1)));
         }
     }
 }
