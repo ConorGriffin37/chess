@@ -45,6 +45,18 @@ namespace GUI
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             TimeLeft -= second;
+            if (TimeLeft == new TimeSpan (0)) {
+                this.Stop ();
+                if (Colour == PieceColour.White) {
+                    Gtk.Application.Invoke(delegate {
+                        MainClass.win.ShowGameOverDialog (GameStatus.WhiteTime);
+                    });
+                } else {
+                    Gtk.Application.Invoke(delegate {
+                        MainClass.win.ShowGameOverDialog (GameStatus.WhiteTime);
+                    });
+                }
+            }
             MainClass.win.UpdateClock (this);
         }
     }

@@ -169,7 +169,7 @@ namespace GUI
             RedrawBoard ();
         }
 
-        void ShowGameOverDialog(GameStatus status)
+        public void ShowGameOverDialog(GameStatus status)
         {
             string message = "";
             switch (status) {
@@ -192,6 +192,14 @@ namespace GUI
                 case GameStatus.BlackAdjudicate:
                     message = "Illegal move by black. Gandalf adjudication: White wins.";
                     MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
+                    break;
+                case GameStatus.WhiteTime:
+                    message = "Time expired: White. Black wins.";
+                    MainClass.CurrentGameStatus = GameStatus.WhiteTime;
+                    break;
+                case GameStatus.BlackTime:
+                    message = "Time expired: Black. White wins.";
+                    MainClass.CurrentGameStatus = GameStatus.BlackTime;
                     break;
                 default:
                     break;

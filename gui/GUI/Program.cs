@@ -24,8 +24,8 @@ namespace GUI
             PieceLegalMoves.GenerateLegalMoves (CurrentBoard);
             EngineStopTokenSource = new CancellationTokenSource ();
             BoardOrientation = PieceColour.White;
-            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
-            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
+            WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 0, 10));
+            BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 0, 10));
 
             Application.Init ();
             win = new MainWindow ();
