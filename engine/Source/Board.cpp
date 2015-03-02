@@ -603,7 +603,7 @@ void Board::unMakeMov(mov theMove, u64 oldCastleOrEnpas)
 {
     setCastleOrEnpas(oldCastleOrEnpas);
     if (theMove.promote) {
-        specTakePiece(theMove.code, theMove.colorcode, theMove.to);
+        specTakePiece(theMove.procode, theMove.colorcode, theMove.to);
         putPiece(0, theMove.colorcode, theMove.from);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.procode, theMove.colorcode, theMove.to);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.from);
