@@ -45,3 +45,5 @@ Scrum Log - Sprint 2
   * Added basic engine output
 * Conor:
   * Researched Transposition tables.
+* Darragh:
+  * Implemented threads.
