@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <thread>
 
 using namespace std;
 
@@ -13,6 +14,8 @@ void outbitboard(u64 n);
 bool UCI::quit = false;
 Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 int UCI::currentColor = 1;
+bool UCI::stopSearching = false;
+bool UCI::killSearch = false;
 
 bool UCI::waitForInput()
 {
@@ -26,12 +29,19 @@ bool UCI::waitForInput()
     } else if (command == "quit"){
         quit = true;
     } else if (command == "position"){
+        killSearch = true;
         sentPosition(input);
     } else if (command == "ucinewgame"){
+        killSearch = true;
         currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         currentColor = 1;
     } else if (command == "go"){
-        startCalculating(input);
+        killSearch = true;
+        std::thread t1(&startCalculating, input);
+        std::thread t2(waitForInput);
+        t1.join();
+        t2.join();
+        //startCalculating(input);
     } else if (command == "stop"){
         //tell engine to stop calculating, needs multithreading to work
     } else if (command == "ponderhit"){
@@ -123,7 +133,7 @@ bool UCI::startCalculating(string input)
     int winc = -1; //whites increment per move in mseconds
     int binc = -1; //blacks increment per move in mseconds
     int movestogo = -1; //number of moves left until the next time control
-    int depth = 5; //search only to a certain depth
+    int depth = 6; //search only to a certain depth
     int nodes = -1; //number of nodes to search
     int mate = -1; //search for a mate in x moves
     int movetime = -1; //time allowed for the move in mseconds
@@ -179,6 +189,9 @@ bool UCI::startCalculating(string input)
     }
     //send information to engine for calculation at the current position
     string bestMove = Search::RootAlphaBeta(UCI::currentBoard, currentColor, depth);
+    if (bestMove == ""){
+        return false;
+    }
     outputBestMove(bestMove);
     return true;
 }
