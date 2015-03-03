@@ -369,5 +369,16 @@ namespace GUI
             }
             time.Destroy ();
         }
+
+        public void LogEngineOutput(string output)
+        {
+            var buffer = EngineOutput.Buffer;
+            buffer.Insert (buffer.GetIterAtLineIndex (0, 0), output + Environment.NewLine);
+        }
+
+        public void ClearEngineOutput()
+        {
+            EngineOutput.Buffer.Clear ();
+        }
     }
 }

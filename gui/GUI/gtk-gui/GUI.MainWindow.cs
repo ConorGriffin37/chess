@@ -61,6 +61,10 @@ namespace GUI
 		private global::Gtk.Label BlackClockTime;
 		
 		private global::Gtk.Label BlackClockLabel;
+		
+		private global::Gtk.ScrolledWindow GtkScrolledWindow;
+		
+		private global::Gtk.TextView EngineOutput;
 
 		protected virtual void Build ()
 		{
@@ -139,7 +143,7 @@ namespace GUI
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.BoardArea = new global::Gtk.DrawingArea ();
 			this.BoardArea.WidthRequest = 570;
-			this.BoardArea.HeightRequest = 550;
+			this.BoardArea.HeightRequest = 560;
 			this.BoardArea.Name = "BoardArea";
 			this.vbox2.Add (this.BoardArea);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.BoardArea]));
@@ -238,12 +242,28 @@ namespace GUI
 			this.vbox1.Add (this.hbox3);
 			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox3]));
 			w14.Position = 1;
+			// Container child vbox1.Gtk.Box+BoxChild
+			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
+			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
+			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
+			// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
+			this.EngineOutput = new global::Gtk.TextView ();
+			this.EngineOutput.HeightRequest = 30;
+			this.EngineOutput.CanFocus = true;
+			this.EngineOutput.Name = "EngineOutput";
+			this.EngineOutput.Editable = false;
+			this.EngineOutput.CursorVisible = false;
+			this.EngineOutput.LeftMargin = 5;
+			this.GtkScrolledWindow.Add (this.EngineOutput);
+			this.vbox1.Add (this.GtkScrolledWindow);
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
+			w16.Position = 2;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 612;
+			this.DefaultHeight = 696;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);

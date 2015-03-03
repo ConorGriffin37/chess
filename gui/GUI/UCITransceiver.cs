@@ -36,6 +36,9 @@ namespace GUI
             do {
                 response = engine.Read();
                 Debug.Log(response);
+                // We don't require Gtk.Application.Invoke() in Init() because
+                // it will always run in the main thread.
+                MainClass.win.LogEngineOutput(response);
                 if(response.StartsWith("id name ")) {
                     EngineName = response.Substring(8);
                 } else if(response.StartsWith("id author ")) {
@@ -77,6 +80,9 @@ namespace GUI
         }
 
         public string Go(string time = "infinite") {
+            Gtk.Application.Invoke (delegate {
+                MainClass.win.ClearEngineOutput();
+            });
             engine.Write("go " + time);
             IsThinking = true;
             if (time != "infinite") {
@@ -89,6 +95,9 @@ namespace GUI
                     }
                     response = engine.Read ();
                     Debug.Log(response);
+                    Helper.SynchronousInvoke(delegate {
+                        MainClass.win.LogEngineOutput(response);
+                    });
                     if (response.StartsWith ("bestmove")) {
                         IsThinking = false;
                         if(response.Substring(9).Length > 4) {

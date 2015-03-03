@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 612">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 696">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -151,7 +151,7 @@
                   <widget class="Gtk.DrawingArea" id="BoardArea">
                     <property name="MemberName" />
                     <property name="WidthRequest">570</property>
-                    <property name="HeightRequest">550</property>
+                    <property name="HeightRequest">560</property>
                     <signal name="ExposeEvent" handler="OnBoardExpose" />
                   </widget>
                   <packing>
@@ -287,6 +287,28 @@
           </widget>
           <packing>
             <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+            <property name="MemberName" />
+            <property name="ShadowType">In</property>
+            <child>
+              <widget class="Gtk.TextView" id="EngineOutput">
+                <property name="MemberName" />
+                <property name="HeightRequest">30</property>
+                <property name="CanFocus">True</property>
+                <property name="ShowScrollbars">True</property>
+                <property name="Editable">False</property>
+                <property name="CursorVisible">False</property>
+                <property name="Text" translatable="yes" />
+                <property name="LeftMargin">5</property>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>

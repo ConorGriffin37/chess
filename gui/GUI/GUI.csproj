@@ -84,6 +84,7 @@
     <Compile Include="ChessClock.cs" />
     <Compile Include="SetClockTimeDialog.cs" />
     <Compile Include="gtk-gui\GUI.SetClockTimeDialog.cs" />
+    <Compile Include="Helper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
