@@ -512,9 +512,9 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
     }
     if (pcode == 0) { //enpasent
         if (from.second - to.second == 2) { //moving out 2 at first
-            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second + 1)));
-        } else if (from.second - to.second == -2) {
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second - 1)));
+        } else if (from.second - to.second == -2) {
+            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second + 1)));
         }
     }
     takePiece(to);
