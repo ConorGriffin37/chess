@@ -376,6 +376,14 @@ namespace GUI
             buffer.Insert (buffer.GetIterAtLineIndex (0, 0), output + Environment.NewLine);
         }
 
+        public void LogEngineNameAndAuthor(string name, string author)
+        {
+            EngineNameLabel.Text = name;
+            EngineAuthorLabel.Text = author;
+            ClearEngineOutput ();
+            EngineOutput.Buffer.Text = "Engine loaded: " + name;
+        }
+
         public void ClearEngineOutput()
         {
             EngineOutput.Buffer.Clear ();

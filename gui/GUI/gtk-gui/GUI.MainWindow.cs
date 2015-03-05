@@ -62,6 +62,12 @@ namespace GUI
 		
 		private global::Gtk.Label BlackClockLabel;
 		
+		private global::Gtk.HBox hbox1;
+		
+		private global::Gtk.Label EngineNameLabel;
+		
+		private global::Gtk.Label EngineAuthorLabel;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		
 		private global::Gtk.TextView EngineOutput;
@@ -243,6 +249,34 @@ namespace GUI
 			global::Gtk.Box.BoxChild w14 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox3]));
 			w14.Position = 1;
 			// Container child vbox1.Gtk.Box+BoxChild
+			this.hbox1 = new global::Gtk.HBox ();
+			this.hbox1.Name = "hbox1";
+			this.hbox1.Spacing = 6;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.EngineNameLabel = new global::Gtk.Label ();
+			this.EngineNameLabel.Name = "EngineNameLabel";
+			this.EngineNameLabel.Xpad = 10;
+			this.EngineNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("No Engine Loaded");
+			this.hbox1.Add (this.EngineNameLabel);
+			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNameLabel]));
+			w15.Position = 0;
+			w15.Expand = false;
+			w15.Fill = false;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.EngineAuthorLabel = new global::Gtk.Label ();
+			this.EngineAuthorLabel.Name = "EngineAuthorLabel";
+			this.EngineAuthorLabel.Xpad = 10;
+			this.hbox1.Add (this.EngineAuthorLabel);
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineAuthorLabel]));
+			w16.Position = 1;
+			w16.Expand = false;
+			w16.Fill = false;
+			this.vbox1.Add (this.hbox1);
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox1]));
+			w17.Position = 2;
+			w17.Expand = false;
+			w17.Fill = false;
+			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
 			this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
@@ -253,17 +287,18 @@ namespace GUI
 			this.EngineOutput.Name = "EngineOutput";
 			this.EngineOutput.Editable = false;
 			this.EngineOutput.CursorVisible = false;
+			this.EngineOutput.WrapMode = ((global::Gtk.WrapMode)(2));
 			this.EngineOutput.LeftMargin = 5;
 			this.GtkScrolledWindow.Add (this.EngineOutput);
 			this.vbox1.Add (this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
-			w16.Position = 2;
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
+			w19.Position = 3;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 696;
+			this.DefaultHeight = 717;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);

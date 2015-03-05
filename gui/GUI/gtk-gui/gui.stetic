@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 696">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 717">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -291,6 +291,43 @@
           </packing>
         </child>
         <child>
+          <widget class="Gtk.HBox" id="hbox1">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Label" id="EngineNameLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+                <property name="LabelProp" translatable="yes">No Engine Loaded</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="EngineAuthorLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
           <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
             <property name="MemberName" />
             <property name="ShadowType">In</property>
@@ -303,12 +340,13 @@
                 <property name="Editable">False</property>
                 <property name="CursorVisible">False</property>
                 <property name="Text" translatable="yes" />
+                <property name="WrapMode">Word</property>
                 <property name="LeftMargin">5</property>
               </widget>
             </child>
           </widget>
           <packing>
-            <property name="Position">2</property>
+            <property name="Position">3</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>

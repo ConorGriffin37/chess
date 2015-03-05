@@ -36,23 +36,14 @@ namespace GUI
             do {
                 response = engine.Read();
                 Debug.Log(response);
-                // We don't require Gtk.Application.Invoke() in Init() because
-                // it will always run in the main thread.
-                MainClass.win.LogEngineOutput(response);
                 if(response.StartsWith("id name ")) {
                     EngineName = response.Substring(8);
                 } else if(response.StartsWith("id author ")) {
                     EngineAuthor = response.Substring(10);
                 } else if(response == "uciok") {
-                    return;
-                }
-            } while(response != null);
-
-            engine.Write ("isready");
-            do {
-                response = engine.Read ();
-                Debug.Log(response);
-                if (response == "readyok") {
+                    // We don't require Helper.SynchronousInvoke() in Init() because
+                    // it will always run in the main thread.
+                    MainClass.win.LogEngineNameAndAuthor(EngineName, EngineAuthor);
                     return;
                 }
             } while(response != null);
