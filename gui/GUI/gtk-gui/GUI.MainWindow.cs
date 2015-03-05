@@ -68,6 +68,10 @@ namespace GUI
 		
 		private global::Gtk.Label EngineAuthorLabel;
 		
+		private global::Gtk.Label EngineDepthLabel;
+		
+		private global::Gtk.Label EngineNPSLabel;
+		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		
 		private global::Gtk.TextView EngineOutput;
@@ -251,12 +255,11 @@ namespace GUI
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.hbox1 = new global::Gtk.HBox ();
 			this.hbox1.Name = "hbox1";
-			this.hbox1.Spacing = 6;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.EngineNameLabel = new global::Gtk.Label ();
 			this.EngineNameLabel.Name = "EngineNameLabel";
 			this.EngineNameLabel.Xpad = 10;
-			this.EngineNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("No Engine Loaded");
+			this.EngineNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_name");
 			this.hbox1.Add (this.EngineNameLabel);
 			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNameLabel]));
 			w15.Position = 0;
@@ -266,16 +269,37 @@ namespace GUI
 			this.EngineAuthorLabel = new global::Gtk.Label ();
 			this.EngineAuthorLabel.Name = "EngineAuthorLabel";
 			this.EngineAuthorLabel.Xpad = 10;
+			this.EngineAuthorLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_author");
 			this.hbox1.Add (this.EngineAuthorLabel);
 			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineAuthorLabel]));
 			w16.Position = 1;
 			w16.Expand = false;
 			w16.Fill = false;
-			this.vbox1.Add (this.hbox1);
-			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox1]));
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.EngineDepthLabel = new global::Gtk.Label ();
+			this.EngineDepthLabel.Name = "EngineDepthLabel";
+			this.EngineDepthLabel.Xpad = 10;
+			this.EngineDepthLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_depth");
+			this.hbox1.Add (this.EngineDepthLabel);
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineDepthLabel]));
 			w17.Position = 2;
 			w17.Expand = false;
 			w17.Fill = false;
+			// Container child hbox1.Gtk.Box+BoxChild
+			this.EngineNPSLabel = new global::Gtk.Label ();
+			this.EngineNPSLabel.Name = "EngineNPSLabel";
+			this.EngineNPSLabel.Xpad = 10;
+			this.EngineNPSLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_nps");
+			this.hbox1.Add (this.EngineNPSLabel);
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNPSLabel]));
+			w18.Position = 3;
+			w18.Expand = false;
+			w18.Fill = false;
+			this.vbox1.Add (this.hbox1);
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox1]));
+			w19.Position = 2;
+			w19.Expand = false;
+			w19.Fill = false;
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
@@ -291,8 +315,8 @@ namespace GUI
 			this.EngineOutput.LeftMargin = 5;
 			this.GtkScrolledWindow.Add (this.EngineOutput);
 			this.vbox1.Add (this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
-			w19.Position = 3;
+			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
+			w21.Position = 3;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();

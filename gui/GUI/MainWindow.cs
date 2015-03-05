@@ -1,14 +1,16 @@
 ﻿using System;
-using Gtk;
-using Cairo;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using Gtk;
+using Cairo;
 
 namespace GUI
 {
     public partial class MainWindow: Gtk.Window
     {
         ImageSurface boardBackground;
+        Regex engineOutputRegex = new Regex (@".*(depth \d*).*(nps \d*).*");
 
         Cairo.Context boardContext;
 
@@ -372,8 +374,11 @@ namespace GUI
 
         public void LogEngineOutput(string output)
         {
-            var buffer = EngineOutput.Buffer;
-            buffer.Insert (buffer.GetIterAtLineIndex (0, 0), output + Environment.NewLine);
+            Match match = engineOutputRegex.Match (output);
+            if (match.Success) {
+                EngineDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
+                EngineNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
+            }
         }
 
         public void LogEngineNameAndAuthor(string name, string author)
@@ -382,6 +387,14 @@ namespace GUI
             EngineAuthorLabel.Text = author;
             ClearEngineOutput ();
             EngineOutput.Buffer.Text = "Engine loaded: " + name;
+        }
+
+        public void ClearEngineInfo()
+        {
+            EngineNameLabel.Text = "No engine loaded";
+            EngineAuthorLabel.Text = "";
+            EngineDepthLabel.Text = "";
+            EngineNPSLabel.Text = "";
         }
 
         public void ClearEngineOutput()

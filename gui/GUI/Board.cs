@@ -162,6 +162,11 @@ namespace GUI
                     destination - 1 :
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastled = true;
+                } else {
+                    BlackCastled = true;
+                }
             } else {
                 Squares [destination].Piece = movingPiece;
                 Squares [source].Piece = null;
@@ -199,6 +204,11 @@ namespace GUI
                     originalDestination + 1 :
                     originalDestination - 2].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastled = false;
+                } else {
+                    BlackCastled = false;
+                }
             } else {
                 Squares [originalSource].Piece = movingPiece;
                 Squares [originalDestination].Piece = null;

@@ -71,7 +71,7 @@ namespace GUI
         }
 
         public string Go(string time = "infinite") {
-            Gtk.Application.Invoke (delegate {
+            Helper.SynchronousInvoke (delegate {
                 MainClass.win.ClearEngineOutput();
             });
             engine.Write("go " + time);
