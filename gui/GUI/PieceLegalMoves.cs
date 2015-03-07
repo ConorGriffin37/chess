@@ -29,6 +29,8 @@ namespace GUI
                 if (currentPiece == null)
                     continue;
                 currentPiece.LegalMoves = new List<byte> ();
+                if (currentPiece.Colour != board.PlayerToMove)
+                    continue;
                 foreach (byte pseudoLegalMove in currentPiece.PseudoLegalMoves) {
                     Piece capturedPiece;
                     // Make a move on the temp board

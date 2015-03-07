@@ -153,7 +153,7 @@ namespace GUI
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.BoardArea = new global::Gtk.DrawingArea ();
 			this.BoardArea.WidthRequest = 570;
-			this.BoardArea.HeightRequest = 560;
+			this.BoardArea.HeightRequest = 550;
 			this.BoardArea.Name = "BoardArea";
 			this.vbox2.Add (this.BoardArea);
 			global::Gtk.Box.BoxChild w3 = ((global::Gtk.Box.BoxChild)(this.vbox2 [this.BoardArea]));
@@ -322,7 +322,7 @@ namespace GUI
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 717;
+			this.DefaultHeight = 676;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);

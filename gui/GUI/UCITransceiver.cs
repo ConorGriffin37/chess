@@ -67,6 +67,7 @@ namespace GUI
             if (moves != null) {
                 output += " moves " + moves;
             }
+            Debug.Log ("Position: " + position);
             engine.Write (output);
         }
 

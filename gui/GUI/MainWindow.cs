@@ -278,7 +278,8 @@ namespace GUI
                                          () => MainClass.CurrentEngine.Go ("depth 5"),
                                          MainClass.EngineStopTokenSource.Token
                                      )
-                    .ContinueWith (task => ParseAndMakeMove (task.Result), MainClass.EngineStopTokenSource.Token);
+                    .ContinueWith (task => ParseAndMakeMove (task.Result),
+                        MainClass.EngineStopTokenSource.Token);
             } catch(AggregateException ae) {
                 ae.Handle ((x) => {
                     if (x is InvalidOperationException) {
@@ -323,7 +324,9 @@ namespace GUI
 
             try {
                 MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
-                RedrawBoard();
+                Gtk.Application.Invoke(delegate {
+                    RedrawBoard();
+                });
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
@@ -331,7 +334,9 @@ namespace GUI
             if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
                 ShowGameOverDialog (MainClass.CurrentGameStatus);
             }
-            MainClass.UpdateClock ();
+            Gtk.Application.Invoke (delegate {
+                MainClass.UpdateClock ();
+            });
         }
 
         public void UpdateClock(ChessClock clock)

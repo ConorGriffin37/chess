@@ -50,6 +50,7 @@ namespace GUI
                 Array.IndexOf (castleDestinations, destination) != -1) {
                 Square castleRookSquare = destination - source > 0 ?
                     Squares [destination + 1] : Squares [destination - 2];
+                capturedPiece = castleRookSquare.Piece;
                 Squares [destination].Piece = movingPiece;
                 Squares [source].Piece = null;
                 Squares [destination - source > 0 ?
@@ -58,8 +59,28 @@ namespace GUI
                 castleRookSquare.Piece = null;
             } else {
                 capturedPiece = Squares [destination].Piece;
-                Squares [destination].Piece = movingPiece;
-                Squares [source].Piece = null;
+                switch (promoteTo) {
+                    case PieceType.Bishop:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Knight:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Knight);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Rook:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Rook);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Queen:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Knight);
+                        Squares [source].Piece = null;
+                        break;
+                    default:
+                        Squares [destination].Piece = movingPiece;
+                        Squares [source].Piece = null;
+                        break;
+                }
             }
 
             if (PlayerToMove == PieceColour.White) {
@@ -67,7 +88,11 @@ namespace GUI
             } else {
                 PlayerToMove = PieceColour.White;
             }
-            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
+            if (!(movingPiece.Type == PieceType.Pawn &&
+                ((int)(destination / 8) == 0 ||
+                (int)(destination / 8) == 7))) {
+                PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
+            }
             return capturedPiece;
         }
 
@@ -78,7 +103,9 @@ namespace GUI
 
             // Special rules for castling
             if (movingPiece.Type == PieceType.King &&
-                Array.IndexOf (castleDestinations, originalDestination) != -1) {
+                Array.IndexOf (castleDestinations, originalDestination) != -1 &&
+                capturedPiece != null &&
+                capturedPiece.Colour == movingPiece.Colour) {
                 Square castleRookSquare = originalDestination - originalSource > 0 ?
                     Squares [originalDestination - 1] : Squares [originalDestination + 1];
                 Squares [originalSource].Piece = movingPiece;
@@ -88,7 +115,11 @@ namespace GUI
                     originalDestination - 2].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
-                Squares [originalSource].Piece = movingPiece;
+                if (originalPromoteTo != null) {
+                    Squares [originalSource].Piece = new Piece (movingPiece.Colour, PieceType.Pawn);
+                } else {
+                    Squares [originalSource].Piece = movingPiece;
+                }
                 Squares [originalDestination].Piece = capturedPiece;
             }
 

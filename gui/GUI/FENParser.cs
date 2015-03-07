@@ -153,7 +153,7 @@ namespace GUI
                 }
             }
 
-            if (position < 64)
+            if (position > 64)
                 throw new ArgumentException ("FEN string passed to parser too long.", "fen");
 
             return output;

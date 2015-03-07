@@ -168,8 +168,28 @@ namespace GUI
                     BlackCastled = true;
                 }
             } else {
-                Squares [destination].Piece = movingPiece;
-                Squares [source].Piece = null;
+                switch (promoteTo) {
+                    case PieceType.Bishop:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Knight:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Knight);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Rook:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Rook);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Queen:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Queen);
+                        Squares [source].Piece = null;
+                        break;
+                    default:
+                        Squares [destination].Piece = movingPiece;
+                        Squares [source].Piece = null;
+                        break;
+                }
             }
 
             if (PlayerToMove == PieceColour.White) {
@@ -244,7 +264,8 @@ namespace GUI
                 return GameStatus.WhiteCheckmate;
             } else if (legalMoveCountBlack == 0 && BlackCheck) {
                 return GameStatus.BlackCheckmate;
-            } else if ((legalMoveCountWhite == 0 || legalMoveCountBlack == 0) &&
+            } else if (((legalMoveCountWhite == 0 && PlayerToMove == PieceColour.White) ||
+                (legalMoveCountBlack == 0 && PlayerToMove == PieceColour.Black)) &&
                 !WhiteCheck && !BlackCheck) {
                 return GameStatus.Stalemate;
             }
