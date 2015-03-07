@@ -11,26 +11,57 @@
 #include "../Source/UCI.hpp"
 #include "../Source/Search.hpp"
 #include "../Source/Board.hpp"
+#include "../Source/Evaluation.hpp"
+#include "../Source/MoveList.hpp"
 
 using namespace std;
 
 BOOST_AUTO_TEST_CASE(UCI_sentPosition)
 {
 	cout << "Testing sentPosition function" << endl;
-	UCI uciObject;
-	BOOST_CHECK(uciObject.sentPosition("position startpos moves e3e2") == false);
-	BOOST_CHECK(uciObject.sentPosition("position startpos moves e2e4") == true);
-	BOOST_CHECK(uciObject.sentPosition("position startpos") == false);
-	BOOST_CHECK(uciObject.sentPosition("position fen not a fen") == false);
+	BOOST_CHECK(UCI::sentPosition("position startpos moves e3e2") == false);
+	BOOST_CHECK(UCI::sentPosition("position startpos moves e2e4") == true);
+	BOOST_CHECK(UCI::sentPosition("position startpos") == false);
+	BOOST_CHECK(UCI::sentPosition("position fen not a fen") == false);
 }
 
-BOOST_AUTO_TEST_CASE(board_evaluateBoard)
+BOOST_AUTO_TEST_CASE(evaluation_evaluateBoard)
 {
 	cout << "Testing evaluateBoard function" << endl;
 	Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	BOOST_CHECK(testBoard.evaluateBoard() == 0); //evaluation should be 0 for initial board
+	BOOST_CHECK(Evaluation::evaluateBoard(testBoard) == 0); //evaluation should be 0 for initial board
 	testBoard = Board("7k/8/8/8/8/8/8/7K w - - 0 1");
-	BOOST_CHECK(testBoard.evaluateBoard() == 0); //no piece difference, symmetrical position
+	BOOST_CHECK(Evaluation::evaluateBoard(testBoard) == 0); //no piece difference, symmetrical position
+}
+
+BOOST_AUTO_TEST_CASE(evaluation_CheckForDoublePawns)
+{
+    Evaluation::initpopCountOfByte(); //initialising look-up table
+	cout << "Testing CheckForDoublePawns function" << endl;
+	Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	BOOST_CHECK(Evaluation::CheckForDoublePawns(6, testBoard) == 0); //No double pawns for white
+	BOOST_CHECK(Evaluation::CheckForDoublePawns(7, testBoard) == 0); //No double pawns for black
+	testBoard = Board("8/8/4kP2/8/5P2/PP1P2P1/PPP1P2P/3K4 w - - 0 1");
+	BOOST_CHECK(Evaluation::CheckForDoublePawns(6, testBoard) == 3); //3 sets of white double pawns
+	testBoard = Board("8/8/4kP2/8/5P2/PPPPP1PP/PPP1P2P/3K4 w - - 0 1");
+	BOOST_CHECK(Evaluation::CheckForDoublePawns(6, testBoard) == 6); //6 sets of white double pawns
+	testBoard = Board("4k3/pppppppp/pppppppp/2b2b2/P5P1/P1qK1PP1/P4PP1/6q1 w - - 0 1");
+	BOOST_CHECK(Evaluation::CheckForDoublePawns(7, testBoard) == 8); //8 sets of black double pawns
+}
+
+BOOST_AUTO_TEST_CASE(evaluation_rooksOnOpenFile)
+{
+	cout << "Testing rooksOnOpenFile function" << endl;
+	Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	int temp = Evaluation::CheckForDoublePawns(6, testBoard); //check for double pawns initialises array of open files
+	temp = Evaluation::CheckForDoublePawns(7, testBoard);
+	BOOST_CHECK(Evaluation::rooksOnOpenFile(6, testBoard) == 0); //no rooks on open file for white
+	BOOST_CHECK(Evaluation::rooksOnOpenFile(7, testBoard) == 0); //no rooks on open file for black
+	testBoard = Board("r2k1r2/pp2p1pp/8/5P2/7P/8/1P6/RRRKRRRR w - - 0 1");
+	temp = Evaluation::CheckForDoublePawns(6, testBoard);
+	temp = Evaluation::CheckForDoublePawns(7, testBoard);
+	BOOST_CHECK(Evaluation::rooksOnOpenFile(6, testBoard) == 4); //4 rooks on open file for white
+	BOOST_CHECK(Evaluation::rooksOnOpenFile(7, testBoard) == 1); //1 rook on open file for black
 }
 
 BOOST_AUTO_TEST_CASE(board_inCheck)
@@ -47,16 +78,6 @@ BOOST_AUTO_TEST_CASE(board_inCheck)
 	BOOST_CHECK(testBoard.inCheck(6) == false); //white isn't in check
 }
 
-BOOST_AUTO_TEST_CASE(board_getMoves)
-{
-	cout << "Testing getMoves function" << endl;
-    Board testBoard = Board("k5R1/7R/8/8/8/8/8/K7 b - - 0 1");
-    BOOST_CHECK(testBoard.getBoards(7).size() == 0); //black is check mated
-    testBoard = Board("k7/8/8/8/8/8/8/K7 w - - 0 1");
-    BOOST_CHECK(testBoard.getBoards(6).size() == 3); //only piece is king in corner
-    testBoard = Board("k7/8/8/8/4K3/8/8/8 w - - 0 1");
-    BOOST_CHECK(testBoard.getBoards(6).size() == 8); //only piece is king in center
-}
 
 BOOST_AUTO_TEST_CASE(board_simpleMakeMove)
 {
@@ -94,6 +115,44 @@ BOOST_AUTO_TEST_CASE(board_getPieceCode)
     BOOST_CHECK(testBoard.getPieceCode('K') == 5); //king
 }
 
+int getColor(int x)
+{
+    if (x == 1) {
+        return 6;
+    }
+    return 7;
+}
+
+int getLegalMoves(Board testBoard, int playerColor) {
+    MoveList possibleMoves = MoveList(testBoard, getColor(playerColor));
+    u64 castle = testBoard.getCastleOrEnpasent();
+    int legalMoves = 0;
+    while (true) {
+        pair<bool, mov> get = possibleMoves.getNextMove();
+        if (get.first) {
+            testBoard.makeMov(get.second);
+            if (testBoard.inCheck(getColor(playerColor)) == false) {
+                legalMoves++;
+            }
+            testBoard.unMakeMov(get.second, castle);
+        } else {
+            break;
+        }
+    }
+    return legalMoves;
+}
+
+BOOST_AUTO_TEST_CASE(MoveList_generateMoves)
+{
+	cout << "Testing MoveList class" << endl;
+    Board testBoard = Board("k5R1/7R/8/8/8/8/8/K7 b - - 0 1");
+    BOOST_CHECK(getLegalMoves(testBoard, -1) == 0); //black is check mated
+    testBoard = Board("k7/8/8/8/8/8/8/K7 w - - 0 1");
+    BOOST_CHECK(getLegalMoves(testBoard, 1) == 3); //only piece is king in corner
+    testBoard = Board("k7/8/8/8/4K3/8/8/8 w - - 0 1");
+    BOOST_CHECK(getLegalMoves(testBoard, 1) == 8); //only piece is king in center
+}
+
 BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
 {
     cout << "Testing search" << endl;
@@ -101,6 +160,3 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
     Search searchClass;
     BOOST_CHECK(searchClass.RootAlphaBeta(testBoard, 1, 4) == "f1f8"); //it should find the checkmate for white
 }
-
-
-
