@@ -157,6 +157,49 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
 {
     cout << "Testing search" << endl;
     Board testBoard = Board("k7/pppp4/8/8/8/8/8/K4R2 w - - 0 1");
-    Search searchClass;
-    BOOST_CHECK(searchClass.RootAlphaBeta(testBoard, 1, 4) == "f1f8"); //it should find the checkmate for white
+    BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4) == "f1f8"); //it should find the checkmate for white
+}
+
+//Perft is good for verifying the correctness of the move generation, generate all the leaf nodes at a given depth from a known position.
+//This also shows how fast the move generation works in relation to other engines (slow, magic bitboards would speed up move generation)
+u64 Perft(int depth, Board& gameBoard, int playerColor)
+{
+    if (depth == 0) {
+        return 1;
+    }
+
+    u64 nodes = 0;
+    u64 castle = gameBoard.getCastleOrEnpasent();
+
+    MoveList possibleMoves(gameBoard, getColor(playerColor));
+    while (true) {
+        pair<bool, mov> get = possibleMoves.getNextMove();
+        if (get.first) {
+            gameBoard.makeMov(get.second);
+            if (gameBoard.inCheck(getColor(playerColor)) == false) {
+                nodes += Perft(depth - 1, gameBoard, playerColor*-1);
+            }
+            gameBoard.unMakeMov(get.second, castle);
+        } else {
+            break;
+        }
+    }
+    return nodes;
+}
+
+BOOST_AUTO_TEST_CASE(perft_Test)
+{
+    cout << "Testing move generation (perft), this is slow" << endl;
+    Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); //initial position
+    BOOST_CHECK(Perft(4, testBoard, 1) == 197281); //Known value from the chess programming wiki http://chessprogramming.wikispaces.com/Perft+Results
+    testBoard = Board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    BOOST_CHECK(Perft(4, testBoard, 1) == 4085603);
+    testBoard = Board("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");
+    BOOST_CHECK(Perft(5, testBoard, 1) == 674624);
+    testBoard = Board("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1");
+    BOOST_CHECK(Perft(4, testBoard, -1) == 422333);
+    testBoard = Board("rnbqkb1r/pp1p1ppp/2p5/4P3/2B5/8/PPP1NnPP/RNBQK2R w KQkq - 0 6");
+    BOOST_CHECK(Perft(3, testBoard, 1) == 53392);
+    testBoard = Board("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
+    BOOST_CHECK(Perft(4, testBoard, 1) == 3894594);
 }
