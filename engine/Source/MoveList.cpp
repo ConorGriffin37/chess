@@ -126,13 +126,6 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
     u64 occupied = gameBoard.getPieces();
     u64 whiteocc = gameBoard.getPieceColor(6);
     u64 blackocc = gameBoard.getPieceColor(7);
-    u64 colorboard = gameBoard.getPieceColor(colorcode);
-    u64 oppcolorboard;
-    if (colorcode == 6) {
-        oppcolorboard = gameBoard.getPieceColor(7);
-    } else {
-        oppcolorboard = gameBoard.getPieceColor(6);
-    }
     if (colorcode == 6) { //white pawn
         if (checkbit(occupied, getpos(x, y + 1)) == false) {
             if (y + 1 < 7) {
@@ -140,6 +133,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
             } else {
                 addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), 4);
                 addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), 2);
+                addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), 1);
+                addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y + 1), 3);
             }
             if (y == 1) {
                 if (checkbit(occupied, getpos(x, y + 2)) == false) {
@@ -154,6 +149,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
                 } else {
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1), 4);
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1), 2);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1), 1);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), gameBoard.getPieceFromPos(x - 1, y + 1), 3);
                 }
             } else if (checkbit(gameBoard.getCastleOrEnpasent(), getpos(x - 1, y + 1))) {
                 addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y + 1), std::make_pair(x - 1, y));
@@ -166,6 +163,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
                 } else {  //taking to promotion
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1), gameBoard.getPieceFromPos(x + 1, y + 1), 4);
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1), gameBoard.getPieceFromPos(x + 1, y + 1), 2);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1), gameBoard.getPieceFromPos(x + 1, y + 1), 1);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1), gameBoard.getPieceFromPos(x + 1, y + 1), 3);
                 }
             } else if (checkbit(gameBoard.getCastleOrEnpasent(), getpos(x + 1, y + 1))) {
                 addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y + 1), std::make_pair(x + 1, y));
@@ -178,6 +177,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
             } else {
                 addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), 4);
                 addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), 2);
+                addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), 1);
+                addMovePro(0, colorcode, std::make_pair(x, y), std::make_pair(x, y - 1), 3);
             }
             if (y == 6) {
                 if (checkbit(occupied, getpos(x, y - 2)) == false) {
@@ -192,6 +193,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
                 } else {
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1), 4);
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1), 2);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1), 1);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), gameBoard.getPieceFromPos(x - 1, y - 1), 3);
                 }
             } else if (checkbit(gameBoard.getCastleOrEnpasent(), getpos(x - 1, y - 1))) {
                 addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x - 1, y - 1), std::make_pair(x - 1, y));
@@ -204,6 +207,8 @@ void MoveList::getPawnMoves(Board &gameBoard, int pos, int colorcode)
                 } else {  //taking to promotion
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), gameBoard.getPieceFromPos(x + 1, y - 1), 4);
                     addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), gameBoard.getPieceFromPos(x + 1, y - 1), 2);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), gameBoard.getPieceFromPos(x + 1, y - 1), 1);
+                    addMoveTakePro(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), gameBoard.getPieceFromPos(x + 1, y - 1), 3);
                 }
             } else if (checkbit(gameBoard.getCastleOrEnpasent(), getpos(x + 1, y - 1))) {
                 addMoveEnpas(0, colorcode, std::make_pair(x, y), std::make_pair(x + 1, y - 1), std::make_pair(x + 1, y));
