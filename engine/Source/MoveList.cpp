@@ -19,6 +19,14 @@ MoveList::MoveList(Board& gameBoard, int colorcode, mov bestMove)
     }
 }
 
+MoveList::MoveList(Board& gameBoard, int colorcode, bool dontScore)
+{
+    timesCalled = 0;
+    position = 0;
+    kingTake = false;
+    generateMoves(gameBoard, colorcode);
+}
+
 int pieceScore[] = {1, 5, 3, 3, 9, 2};
 
 bool getEqual(mov x, mov y)
@@ -685,3 +693,9 @@ mov MoveList::getMovN(int n)
 {
     return moves[n];
 }
+
+int MoveList::getMoveNumber()
+{
+    return (int)moves.size();
+}
+
