@@ -1,8 +1,37 @@
 #include "Board.hpp"
 #include "Evaluation.hpp"
+#include "TranspositionTables.hpp"
 #include <iostream>
 
 void outbitboard(u64 n);
+
+bool checkbit(u64 bitboard, int pos)
+{
+    u64 shift = 1;
+    shift <<= pos;
+    return (bitboard & shift);
+}
+
+u64 setbit(u64 bitboard, int pos)
+{
+    u64 shift32 = 1;
+    shift32 <<= pos;
+    bitboard |= shift32;
+    return bitboard;
+}
+
+u64 unsetbit(u64 bitboard, int pos)
+{
+    u64 shift = 1;
+    shift <<= pos;
+    bitboard &= ~(shift);
+    return bitboard;
+}
+
+int getpos(int x, int y)
+{
+    return y*8 + (7 - x);
+}
 
 Board::Board()
 {
@@ -15,6 +44,7 @@ Board::Board(std::string fen)
         return;
     }
     castleorenpasent = 0;
+    enpasentCol = -1;
     for (int i = 0; i < 8; i++) {
         pieceBB[i] = 0;
     }
@@ -32,43 +62,24 @@ Board::Board(std::string fen)
                         pos = pos - (fen[i] - '0');
                     }
                 } else {
-                    u64 shift = 1;
-                    if (pos > 31) {
-                        shift <<= 31;
-                        shift <<= pos - 31;
-                    } else {
-                        shift <<= pos;
-                    }
-                    pieceBB[x] |= shift;
-                    pieceBB[getColorCode(fen[i])] |= shift;
+                    pieceBB[x] = setbit(pieceBB[x], pos);
+                    pieceBB[getColorCode(fen[i])] = setbit(pieceBB[getColorCode(fen[i])], pos);
                     pos--;
                 }
             } else if (section == 2) {
                 if (fen[i] == 'K') {
-                    castleorenpasent |= 1 << 7;
+                    castleorenpasent = setbit(castleorenpasent, 7);
                 } else if (fen[i] == 'Q') {
-                    castleorenpasent |= 1;
+                    castleorenpasent = setbit(castleorenpasent, 0);
                 } else if (fen[i] == 'k') {
-                    u64 shift = 1;
-                    shift <<= 31;
-                    shift <<= 56 - 31;
-                    castleorenpasent |= shift;
+                    castleorenpasent = setbit(castleorenpasent, 56);
                 } else if (fen[i] == 'q') {
-                    u64 shift = 1;
-                    shift <<= 31;
-                    shift <<= 63 - 31;
-                    castleorenpasent |= shift;
+                    castleorenpasent = setbit(castleorenpasent, 63);
                 }
             } else if (section == 3) {
                 if (isdigit(fen[i])) {
-                    if ((8*(fen[i] - '1') + lastone) <= 32) {
-                        castleorenpasent |= 1 << (8*(fen[i] - '1') + lastone);
-                    } else {
-                        u64 shift = 1;
-                        shift <<= 31;
-                        shift <<= (8*(fen[i] - '1') + lastone) - 31;
-                        castleorenpasent |= shift;
-                    }
+                    castleorenpasent = setbit(castleorenpasent, (8*(fen[i] - '1') + lastone));
+                    enpasentCol = lastone;
                 } else {
                     lastone = ('h' - fen[i]);
                 }
@@ -134,55 +145,14 @@ u64 Board::getCastleOrEnpasent()
 
 void Board::promotePawn(int colorcode, std::pair<int, int> from, std::pair<int, int> to, int code)
 {
-    u64 shift = 1;
     int ammount = from.second*8 + (7 - from.first);
-    if (ammount > 31) {
-        shift <<= 31;
-        shift <<= ammount - 31;
-    } else {
-        shift <<= ammount;
-    }
-    pieceBB[0] &= ~(shift);
-    pieceBB[colorcode] &= ~(shift);
-    shift = 1;
+    pieceBB[0] = unsetbit(pieceBB[0], ammount);
+    pieceBB[colorcode] = unsetbit(pieceBB[colorcode], ammount);
     ammount = to.second*8 + (7 - to.first);
-    if (ammount > 31) {
-        shift <<= 31;
-        shift <<= ammount - 31;
-    } else {
-        shift <<= ammount;
-    }
-    pieceBB[code] |= shift;
-    pieceBB[colorcode] |= shift;
+    pieceBB[code] = setbit(pieceBB[code], ammount);
+    pieceBB[colorcode] = setbit(pieceBB[colorcode], ammount);
 }
 
-bool checkbit(u64 bitboard, int pos)
-{
-    u64 shift = 1;
-    shift <<= pos;
-    return (bitboard & shift);
-}
-
-u64 setbit(u64 bitboard, int pos)
-{
-    u64 shift32 = 1;
-    shift32 <<= pos;
-    bitboard |= shift32;
-    return bitboard;
-}
-
-u64 unsetbit(u64 bitboard, int pos)
-{
-    u64 shift = 1;
-    shift <<= pos;
-    bitboard &= ~(shift);
-    return bitboard;
-}
-
-int getpos(int x, int y)
-{
-    return y*8 + (7 - x);
-}
 
 void Board::takePiece(std::pair<int, int> position)
 {
@@ -474,6 +444,7 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
         return false;
     }
     setCastleOrEnpas(nextCastleOrEnpasent());
+    enpasentCol = -1;
     int colorcode = 6;
     if (checkbit(getPieceColor(7), getpos(from.first, from.second))) {
         colorcode = 7;
@@ -512,9 +483,11 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
     }
     if (pcode == 0) { //enpasent
         if (from.second - to.second == 2) { //moving out 2 at first
-            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second + 1)));
-        } else if (from.second - to.second == -2) {
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second - 1)));
+            enpasentCol = 7 - from.first;
+        } else if (from.second - to.second == -2) {
+            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second + 1)));
+            enpasentCol = 7 - from.first;
         }
     }
     takePiece(to);
@@ -557,53 +530,87 @@ int getMultiplyColor(int x)
 void Board::makeMov(mov theMove)
 {
     setCastleOrEnpas(nextCastleOrEnpasent());
+    zorHash ^= TranspositionTables::getBlackHash();
+    if (enpasentCol > -1) {
+        zorHash ^= TranspositionTables::getEnpasentHash(enpasentCol);
+        enpasentCol = -1;
+    }
     if (theMove.take) {
         int oppcolor = getOppColor(theMove.colorcode);
         specTakePiece(theMove.takecode, oppcolor, theMove.takepos);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.takepos.first, theMove.takepos.second), theMove.takecode, oppcolor);
         materialEval = materialEval - getMultiplyColor(oppcolor)*Evaluation::getPosScore(theMove.takecode, oppcolor, theMove.takepos);
     }
     if (theMove.promote) {
         promotePawn(theMove.colorcode, theMove.from, theMove.to, theMove.procode);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.from.first, theMove.from.second), 0, theMove.colorcode);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.to.first, theMove.to.second), theMove.procode, theMove.colorcode);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.from);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.procode, theMove.colorcode, theMove.to);
     } else {
         makeMove(theMove.code, theMove.colorcode, theMove.from, theMove.to);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.from.first, theMove.from.second), theMove.code, theMove.colorcode);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.to.first, theMove.to.second), theMove.code, theMove.colorcode);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.from);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.to);
     }
     if (theMove.castle) {
         makeMove(1, theMove.colorcode, theMove.rookfrom, theMove.rookto);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.rookfrom.first, theMove.rookfrom.second), 1, theMove.colorcode);
+        zorHash ^= TranspositionTables::getSquareHash(getpos(theMove.rookto.first, theMove.rookto.second), 1, theMove.colorcode);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookfrom);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookto);
     }
     if (theMove.code == 5) {
         if (theMove.colorcode == 6) {
-            setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 0));
-            setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 7));
+            if (checkbit(getCastleOrEnpasent(), 0)) {
+                zorHash ^= TranspositionTables::getCastleHash(0);
+                setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 0));
+            }
+            if (checkbit(getCastleOrEnpasent(), 7)) {
+                zorHash ^= TranspositionTables::getCastleHash(1);
+                setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 7));
+            }
         } else {
-            setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 56));
-            setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 63));
+            if (checkbit(getCastleOrEnpasent(), 56)) {
+                zorHash ^= TranspositionTables::getCastleHash(2);
+                setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 56));
+            }
+            if (checkbit(getCastleOrEnpasent(), 63)) {
+                zorHash ^= TranspositionTables::getCastleHash(3);
+                setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 63));
+            }
         }
     }
     if (theMove.code == 1) { //rook moving = no castle
         if (theMove.from.second == 0 or theMove.from.second == 7) {
-            setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second)));
+            if (checkbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second))) {
+                zorHash ^= TranspositionTables::getCastleSquare(getpos(theMove.from.first, theMove.from.second));
+                setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second)));
+            }
         }
     }
     if (theMove.code == 0) { //enpasent
-        if (theMove.from.second - theMove.to.second == 2) { //moving out 2 at first
-            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second + 1)));
-        } else if (theMove.from.second - theMove.to.second == -2) {
-            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second - 1)));
+        if (theMove.to.second - theMove.from.second == 2) { //moving out 2 at first
+            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.to.first, theMove.to.second - 1)));
+            enpasentCol = 7 - theMove.to.first;
+        } else if (theMove.to.second - theMove.from.second == -2) {
+            setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.to.first, theMove.to.second + 1)));
+            enpasentCol = 7 - theMove.to.first;
         }
+    }
+    if (enpasentCol > -1) {
+        zorHash ^= TranspositionTables::getEnpasentHash(enpasentCol);
     }
 }
 
-void Board::unMakeMov(mov theMove, u64 oldCastleOrEnpas)
+void Board::unMakeMov(mov theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash)
 {
+    zorHash = oldHash;
     setCastleOrEnpas(oldCastleOrEnpas);
+    enpasentCol = lastEnpasent;
     if (theMove.promote) {
-        specTakePiece(theMove.code, theMove.colorcode, theMove.to);
+        specTakePiece(theMove.procode, theMove.colorcode, theMove.to);
         putPiece(0, theMove.colorcode, theMove.from);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.procode, theMove.colorcode, theMove.to);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.from);
@@ -632,4 +639,24 @@ void Board::setEvaluation(int eval)
 int Board::getEvaluation()
 {
     return materialEval;
+}
+
+void Board::setEnpasentCol(int x)
+{
+    enpasentCol = x;
+}
+
+int Board::getEnpasentCol()
+{
+    return enpasentCol;
+}
+
+void Board::setZorHash(u64 x)
+{
+    zorHash = x;
+}
+
+u64 Board::getZorHash()
+{
+    return zorHash;
 }

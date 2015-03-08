@@ -41,6 +41,8 @@ class Board
         u64 castleorenpasent; /**< Represents ability to castle and take enpasent */
         u64 pieceBB[8]; /**< Indexes 0 - 5 represent pawns, rooks, knights, bishops, queens and kings respectively. 6 represents white pieces, 7 black. */
         int materialEval;
+        u64 zorHash;
+        int enpasentCol;
 
     public:
         Board(std::string fen);
@@ -160,9 +162,13 @@ class Board
         void putPiece(int code, int colorcode, std::pair<int, int> position);
         void specTakePiece(int code, int colorcode, std::pair<int, int> position);
         void makeMov(mov theMove);
-        void unMakeMov(mov theMove, u64 oldCastleOrEnpas);
+        void unMakeMov(mov theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash);
         void setEvaluation(int eval);
         int getEvaluation();
+        void setEnpasentCol(int x);
+        int getEnpasentCol();
+        void setZorHash(u64 x);
+        u64 getZorHash();
 };
 
 #endif // BOARD_HPP_INCLUDED

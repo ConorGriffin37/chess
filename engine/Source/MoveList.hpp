@@ -15,8 +15,9 @@ class MoveList
         int position;
 
     public:
-        MoveList(Board &gameBoard, int colorcode);
-        std::string getMoveCode(mov);
+        bool kingTake;
+        MoveList(Board &gameBoard, int colorcode, mov bestMove);
+        void scoreMoves(mov bestMove);
         void scoreMoves();
         void addMove(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to);
         void addMoveTake(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to, int takecode);
@@ -32,6 +33,7 @@ class MoveList
         void getKingMoves(Board &gameBoard, int pos, int colorcode);
         std::pair<bool, mov> getNextMove();
         mov getMovN(int n);
+        std::string getMoveCode(mov x);
 };
 
 
