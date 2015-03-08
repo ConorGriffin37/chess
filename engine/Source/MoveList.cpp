@@ -27,6 +27,11 @@ MoveList::MoveList(Board& gameBoard, int colorcode, bool dontScore)
     generateMoves(gameBoard, colorcode);
 }
 
+MoveList::MoveList()
+{
+
+}
+
 int pieceScore[] = {1, 5, 3, 3, 9, 2};
 
 bool getEqual(mov x, mov y)

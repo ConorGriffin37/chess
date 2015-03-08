@@ -18,6 +18,7 @@ class MoveList
         bool kingTake;
         MoveList(Board &gameBoard, int colorcode, mov bestMove);
 	MoveList(Board& gameBoard, int colorcode, bool dontScore);
+        MoveList();
         void scoreMoves(mov bestMove);
         void scoreMoves();
         void addMove(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to);
