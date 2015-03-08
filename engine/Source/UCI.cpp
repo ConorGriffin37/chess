@@ -1,11 +1,9 @@
 #include "UCI.hpp"
 #include "Search.hpp"
 #include "Evaluation.hpp"
-#include "TranspositionTables.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 
 using namespace std;
@@ -15,8 +13,6 @@ void outbitboard(u64 n);
 bool UCI::quit = false;
 Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 int UCI::currentColor = 1;
-bool UCI::stopSearching = false;
-bool UCI::killSearch = false;
 
 bool UCI::waitForInput()
 {
@@ -30,18 +26,12 @@ bool UCI::waitForInput()
     } else if (command == "quit"){
         quit = true;
     } else if (command == "position"){
-        killSearch = true;
         sentPosition(input);
     } else if (command == "ucinewgame"){
-        killSearch = true;
         currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         currentColor = 1;
     } else if (command == "go"){
-        killSearch = true;
-        std::thread t1(&startCalculating, input);
-        std::thread t2(waitForInput);
-        t1.join();
-        t2.join();
+        startCalculating(input);
     } else if (command == "stop"){
         //tell engine to stop calculating, needs multithreading to work
     } else if (command == "ponderhit"){
@@ -111,7 +101,6 @@ bool UCI::sentPosition(string input)
             if (moveIn.length() == 5){
                 promote = moveIn[4];
             }
-            Board lastBoard = currentBoard;
             bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
             //outbitboard(currentBoard.getPieces());
             if (moveMade == false){ //move not valid
@@ -189,12 +178,8 @@ bool UCI::startCalculating(string input)
         }
     }
     //send information to engine for calculation at the current position
-    string bestMove;
-    for (int i = min(depth, 2); i <= depth; i++) {
-        bestMove = Search::RootAlphaBeta(currentBoard, currentColor, i);
-    }
+    string bestMove = Search::RootAlphaBeta(UCI::currentBoard, currentColor, depth);
     outputBestMove(bestMove);
-    TranspositionTables::setOld();
     return true;
 }
 
