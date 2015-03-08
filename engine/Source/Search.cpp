@@ -77,6 +77,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int maxScore = -10000000;
     bool canMove = false;
     mov bestOne;
     while (true) {
@@ -93,6 +94,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
                 }
                 if (score > alpha){
                     alpha = score;
+                    bestOne = get.second;
+                    maxScore = score;
+                } else if (score > maxScore) {
+                    maxScore = score;
                     bestOne = get.second;
                 }
             }
