@@ -15,7 +15,6 @@ void outbitboard(u64 n);
 bool UCI::quit = false;
 Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 int UCI::currentColor = 1;
-bool UCI::stopSearching = false;
 bool UCI::killSearch = false;
 
 bool UCI::waitForInput()
@@ -43,7 +42,7 @@ bool UCI::waitForInput()
         t1.join();
         t2.join();
     } else if (command == "stop"){
-        //tell engine to stop calculating, needs multithreading to work
+        killSearch = true;
     } else if (command == "ponderhit"){
         //used for pondering, not being implemented this sprint
     } else if (command == "debug"){
@@ -190,11 +189,22 @@ bool UCI::startCalculating(string input)
     }
     //send information to engine for calculation at the current position
     string bestMove;
-    for (int i = min(depth, 2); i <= depth; i++) {
-        bestMove = Search::RootAlphaBeta(currentBoard, currentColor, i);
+    int curDepth = min(depth, 2);
+    killSearch = false;
+    while ((curDepth <= depth) or (infinite)) {
+        if (killSearch == true) {
+            break;
+        }
+        string newBestMove = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
+        if (newBestMove != "") {
+            bestMove = newBestMove;
+        }
+        curDepth++;
     }
-    outputBestMove(bestMove);
-    TranspositionTables::setOld();
+    if (quit == false) {
+        outputBestMove(bestMove);
+        TranspositionTables::setOld();
+    }
     return true;
 }
 

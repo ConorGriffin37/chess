@@ -19,7 +19,6 @@ class UCI
         static int currentColor; /**< The player who is next to move. 1 for white, -1 for black */
     public:
         static bool quit; /**< A flag to be set to true when the quit command is received */
-        static bool stopSearching; /**< A flag to be set to true when the stop command is received */
         static bool killSearch; /**< A flag to be set to kill the current search */
         /**
 		 * @fn WaitForInput
