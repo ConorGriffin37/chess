@@ -139,3 +139,21 @@ void TranspositionTables::setOld()
         Table[i].ancient = true;
     }
 }
+
+
+std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int depth)
+{
+    if (depth == 0) {
+        return "";
+    }
+    mov principal = getBest(gameBoard.getZorHash());
+    MoveList movList;
+    if (principal.code != -1) {
+        gameBoard.makeMov(principal);
+        return movList.getMoveCode(principal) + " " + getPrincipalVariation(gameBoard, depth - 1);
+    }
+    return "";
+}
+
+
+

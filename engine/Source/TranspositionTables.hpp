@@ -35,6 +35,7 @@ class TranspositionTables
         static mov getBest(u64 signature);
         static void setEntry(u64 signature, mov bestmove, int depth, int score);
         static void setOld();
+        static std::string getPrincipalVariation(Board gameBoard, int depth);
 };
 
 
