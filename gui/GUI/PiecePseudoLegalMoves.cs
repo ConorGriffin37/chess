@@ -189,7 +189,7 @@ namespace GUI
                     if (KingRook.Colour == PieceColour.Black && KingRook.Type == PieceType.Rook) {
                         // Check squares in between rook and king
                         if (board.Squares [6].Piece == null && board.Squares [5].Piece == null) {
-                            if (BlackAttackBoard [6] == false && BlackAttackBoard [5] == false) {
+                            if (WhiteAttackBoard [6] == false && WhiteAttackBoard [5] == false) {
                                 // Finally, we can add the move
                                 king.PseudoLegalMoves.Add (6);
                                 WhiteAttackBoard [6] = true;

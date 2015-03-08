@@ -21,7 +21,7 @@ namespace GUI
         public virtual bool WhiteCastled { get; set; }
         public virtual PieceColour PlayerToMove { get; set; }
 
-        public readonly byte[] castleDestinations = { 2, 8, 56, 62 };
+        public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
 
         /**
          * @brief Default constructor.
