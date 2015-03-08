@@ -16,12 +16,9 @@ int getRealColor(int x)
     return 7;
 }
 
-string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
+pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
-    UCI::killSearch = false;
     //cout << "Depth : " << remainingDepth << endl;
-    gameBoard.setEvaluation(Evaluation::evaluateBoard(gameBoard));
-    gameBoard.setZorHash(TranspositionTables::getBoardHash(gameBoard, getRealColor(playerColor)));
     MoveList possibleMoves(gameBoard, getRealColor(playerColor), TranspositionTables::getBest(gameBoard.getZorHash()));
     mov curBestMove = possibleMoves.getMovN(0);
     int maxScore = -10000000;
@@ -48,10 +45,10 @@ string Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDept
         }
     }
     if ((UCI::quit) or (UCI::killSearch)){
-        return "";
+        return make_pair("", 0);
     }
     TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore);
-    return possibleMoves.getMoveCode(curBestMove);
+    return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
 
 int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor)

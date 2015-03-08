@@ -17,6 +17,14 @@ Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w K
 int UCI::currentColor = 1;
 bool UCI::killSearch = false;
 
+int getTheColor(int x)
+{
+    if (x == 1) {
+        return 6;
+    }
+    return 7;
+}
+
 bool UCI::waitForInput()
 {
     string input;
@@ -188,6 +196,8 @@ bool UCI::startCalculating(string input)
         }
     }
     //send information to engine for calculation at the current position
+    currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
+    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, getTheColor(currentColor)));
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
@@ -195,9 +205,20 @@ bool UCI::startCalculating(string input)
         if (killSearch == true) {
             break;
         }
-        string newBestMove = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
-        if (newBestMove != "") {
-            bestMove = newBestMove;
+        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
+        if (searchResult.first != "") {
+            string info = string("depth ") + to_string(curDepth) + " pv " + TranspositionTables::getPrincipalVariation(currentBoard, curDepth);
+            if (searchResult.second > 1000000) {
+                searchResult.second -= 1000000;
+                info += " score mate " + to_string(curDepth - searchResult.second);
+            } else if (searchResult.second < -1000000) {
+                searchResult.second += 1000000;
+                info += " score mate " + to_string(-1*(curDepth - (-1*searchResult.second)));
+            } else {
+                info += " score cp " + to_string(searchResult.second);
+            }
+            sendInfo(info);
+            bestMove = searchResult.first;
         }
         curDepth++;
     }

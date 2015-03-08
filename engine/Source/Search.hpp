@@ -24,7 +24,7 @@ class Search
 		 * @param remainingDepth The depth to search to
 		 * @return string String representing the best move
 		 */
-        static string RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth);
+        static pair<string, int> RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth);
         /**
 		 * @fn AlphaBeta
 		 * @brief Searches the game tree to a given depth
@@ -33,7 +33,7 @@ class Search
 		 * @param remainingDepth The depth to search to
 		 * @return int The score of the position
 		 */
-        static int AlphaBeta(Board& board, int alpha, int beta, int remainingDepth, int playerColor);
+        static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor);
 };
 
 #endif // SEARCH_H
