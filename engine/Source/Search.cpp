@@ -31,6 +31,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
         if (get.first) {
             gameBoard.makeMov(get.second);
             score = -AlphaBeta(gameBoard, -10000000, -maxScore, remainingDepth - 1, playerColor*-1);
+            gameBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
             //score = -AlphaBeta(gameBoard, -10000000, 10000000, remainingDepth - 1, playerColor*-1);
             //cout << "Move is " << possibleMoves.getMoveCode(get.second) << " and score is " << score << std::endl;
             if (score != illegal_move) {
@@ -39,7 +40,6 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
                     curBestMove = get.second;
                 }
             }
-            gameBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
         } else {
             break;
         }
@@ -82,10 +82,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (get.first) {
             gameBoard.makeMov(get.second);
             score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1);
+            gameBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
             if (score != illegal_move) {
                 canMove = true;
                 if (score >= beta){
-                    gameBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
                     TranspositionTables::setEntry(gameBoard.getZorHash(), get.second, remainingDepth, beta);
                     return beta;
                 }
@@ -98,7 +98,6 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
                     bestOne = get.second;
                 }
             }
-            gameBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
         } else {
             break;
         }
