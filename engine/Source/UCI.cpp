@@ -193,7 +193,7 @@ bool UCI::startCalculating(string input)
     
     //send information to engine for calculation at the current position
     currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
-    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((playerColor == 1) ? 6 : 7)));
+    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? 6 : 7)));
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
