@@ -18,14 +18,16 @@ int getRealColor(int x)
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
-    //cout << "Depth : " << remainingDepth << endl;
     MoveList possibleMoves(gameBoard, getRealColor(playerColor), TranspositionTables::getBest(gameBoard.getZorHash()));
+    
     mov curBestMove = possibleMoves.getMovN(0);
     int maxScore = -10000000;
     int score;
+    
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    
     while (true) {
         pair<bool, mov> get = possibleMoves.getNextMove();
         if (get.first) {
@@ -44,9 +46,11 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
             break;
         }
     }
+    
     if ((UCI::quit) or (UCI::killSearch)){
         return make_pair("", 0);
     }
+    
     TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore);
     return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
@@ -56,20 +60,19 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     if ((UCI::quit) or (UCI::killSearch)){
         return 0;
     }
+    
     if (remainingDepth == 0){
         if (gameBoard.inCheck(getRealColor(playerColor*-1))) {
             return -illegal_move;
         }
         return gameBoard.getEvaluation()*playerColor;
     }
-    //entry best = TranspositionTables::getBest(gameBoard.getZorHash());
-    //if (best.depth >= remainingDepth) {
-    //    return best.score;
-    //}
+    
     MoveList possibleMoves = MoveList(gameBoard, getRealColor(playerColor), TranspositionTables::getBest(gameBoard.getZorHash()));
     if (possibleMoves.kingTake) {
         return -illegal_move;
     }
+    
     int score;
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
@@ -77,6 +80,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     int maxScore = -10000000;
     bool canMove = false;
     mov bestOne;
+    
     while (true) {
         pair<bool, mov> get = possibleMoves.getNextMove();
         if (get.first) {
