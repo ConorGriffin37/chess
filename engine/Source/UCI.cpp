@@ -210,10 +210,10 @@ bool UCI::startCalculating(string input)
             string info = string("depth ") + to_string(curDepth) + " pv " + TranspositionTables::getPrincipalVariation(currentBoard, curDepth);
             if (searchResult.second > 1000000) {
                 searchResult.second -= 1000000;
-                info += " score mate " + to_string(curDepth - searchResult.second);
+                info += " score mate " + to_string((curDepth - searchResult.second)/2);
             } else if (searchResult.second < -1000000) {
                 searchResult.second += 1000000;
-                info += " score mate " + to_string(-1*(curDepth - (-1*searchResult.second)));
+                info += " score mate " + to_string(-1*((curDepth - (-1*searchResult.second))/2));
             } else {
                 info += " score cp " + to_string(searchResult.second);
             }
