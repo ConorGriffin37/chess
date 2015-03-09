@@ -3,31 +3,26 @@
 #include "MoveList.hpp"
 #include "UCI.hpp"
 #include "TranspositionTables.hpp"
+
 #include <iostream>
+
 #define illegal_move 10001108
 
 void outbitboard(u64 n);
 
-int getRealColor(int x)
-{
-    if (x == 1) {
-        return 6;
-    }
-    return 7;
-}
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
-    MoveList possibleMoves(gameBoard, getRealColor(playerColor), TranspositionTables::getBest(gameBoard.getZorHash()));
-    
+    MoveList possibleMoves(gameBoard, ((playerColor == 1) ? 6 : 7), TranspositionTables::getBest(gameBoard.getZorHash()));
+
     mov curBestMove = possibleMoves.getMovN(0);
     int maxScore = -10000000;
     int score;
-    
+
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
-    
+
     while (true) {
         pair<bool, mov> get = possibleMoves.getNextMove();
         if (get.first) {
@@ -46,11 +41,11 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
             break;
         }
     }
-    
+
     if ((UCI::quit) or (UCI::killSearch)){
         return make_pair("", 0);
     }
-    
+
     TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore);
     return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
@@ -60,19 +55,19 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     if ((UCI::quit) or (UCI::killSearch)){
         return 0;
     }
-    
+
     if (remainingDepth == 0){
-        if (gameBoard.inCheck(getRealColor(playerColor*-1))) {
+        if (gameBoard.inCheck(((playerColor*-1 == 1) ? 6 : 7))) {
             return -illegal_move;
         }
         return gameBoard.getEvaluation()*playerColor;
     }
-    
-    MoveList possibleMoves = MoveList(gameBoard, getRealColor(playerColor), TranspositionTables::getBest(gameBoard.getZorHash()));
+
+    MoveList possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? 6 : 7), TranspositionTables::getBest(gameBoard.getZorHash()));
     if (possibleMoves.kingTake) {
         return -illegal_move;
     }
-    
+
     int score;
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
@@ -80,7 +75,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     int maxScore = -10000000;
     bool canMove = false;
     mov bestOne;
-    
+
     while (true) {
         pair<bool, mov> get = possibleMoves.getNextMove();
         if (get.first) {
@@ -106,12 +101,14 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
             break;
         }
     }
+
     if (canMove == false) {
-        if (gameBoard.inCheck(getRealColor(playerColor))) {
+        if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7))) {
             return (-1000000 - remainingDepth);
         }
         return 0;
     }
+
     TranspositionTables::setEntry(gameBoard.getZorHash(), bestOne, remainingDepth, alpha);
     return alpha;
 }

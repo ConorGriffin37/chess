@@ -2,6 +2,7 @@
 #include "Search.hpp"
 #include "Evaluation.hpp"
 #include "TranspositionTables.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -17,13 +18,6 @@ Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w K
 int UCI::currentColor = 1;
 bool UCI::killSearch = false;
 
-int getTheColor(int x)
-{
-    if (x == 1) {
-        return 6;
-    }
-    return 7;
-}
 
 bool UCI::waitForInput()
 {
@@ -110,6 +104,7 @@ bool UCI::sentPosition(string input)
         currentColor = 1;
     }
     getline(ss, moves, ' ');
+    
     if (moves == "moves"){
         while (getline(ss, moveIn, ' ')){
             pair<int, int> startPosition = make_pair(moveIn[0] - 'a', moveIn[1] - '1');
@@ -195,12 +190,14 @@ bool UCI::startCalculating(string input)
             iss >> movetime;
         }
     }
+    
     //send information to engine for calculation at the current position
     currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
-    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, getTheColor(currentColor)));
+    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((playerColor == 1) ? 6 : 7)));
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
+    
     while ((curDepth <= depth) or (infinite)) {
         if (killSearch == true) {
             break;
@@ -222,6 +219,7 @@ bool UCI::startCalculating(string input)
         }
         curDepth++;
     }
+    
     if (quit == false) {
         outputBestMove(bestMove);
         TranspositionTables::setOld();
