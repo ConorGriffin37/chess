@@ -1,8 +1,9 @@
 #ifndef UCI_H
 #define UCI_H
 
-#include <string>
 #include "Board.hpp"
+
+#include <string>
 
 using namespace std;
 

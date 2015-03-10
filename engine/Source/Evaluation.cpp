@@ -236,7 +236,13 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
     int blackscore = 0;
     u64 bittest = 1;
     u64 colorboard = boardToEvaluate.getPieceColor(WHITE_CODE);
-    u64 piecesBoards[6] = {boardToEvaluate.getPiece(PAWN_CODE), boardToEvaluate.getPiece(ROOK_CODE), boardToEvaluate.getPiece(KNIGHT_CODE), boardToEvaluate.getPiece(BISHOP_CODE), boardToEvaluate.getPiece(QUEEN_CODE), boardToEvaluate.getPiece(KING_CODE)};
+    u64 piecesBoards[6] = { boardToEvaluate.getPiece(PAWN_CODE),
+                            boardToEvaluate.getPiece(ROOK_CODE),
+                            boardToEvaluate.getPiece(KNIGHT_CODE),
+                            boardToEvaluate.getPiece(BISHOP_CODE),
+                            boardToEvaluate.getPiece(QUEEN_CODE),
+                            boardToEvaluate.getPiece(KING_CODE) };
+
     for (int i = 0; i < 64; i++) {
         for (int x = PAWN_CODE; x < KING_CODE; x++) {
             if (piecesBoards[x] & bittest) {

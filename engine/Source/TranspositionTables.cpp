@@ -77,7 +77,7 @@ u64 TranspositionTables::getBoardHash(Board& gameBoard, int playerColor)
     u64 bittest = 1;
     u64 rethash = 0;
     for (int i = 0; i < 64; i++) {
-        for (int x = 0; x < 5; x++) {
+        for (int x = PAWN_CODE; x <= KING_CODE; x++) {
             if (bittest & gameBoard.getPiece(x)) {
                 if (bittest & gameBoard.getPieceColor(WHITE_CODE)) {
                     rethash ^= getSquareHash(i, x, WHITE_CODE);
@@ -158,7 +158,6 @@ std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int dept
     }
     return "";
 }
-
 
 
 

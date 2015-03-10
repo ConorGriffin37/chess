@@ -3,9 +3,10 @@
 
 using namespace std;
 
-#include <string>
 #include "Board.hpp"
 #include "Evaluation.hpp"
+
+#include <string>
 
 /**
  * @class Search
@@ -16,6 +17,7 @@ using namespace std;
 class Search
 {
     public:
+        static u64 nodes; /**< The number of nodes that have been searched */
         /**
 		 * @fn RootAlphaBeta
 		 * @brief Performs an Alpha-Beta search starting at the root node
@@ -34,7 +36,6 @@ class Search
 		 * @return int The score of the position
 		 */
         static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor);
-        static u64 nodes; /**< The number of nodes that have been searched */
 };
 
 #endif // SEARCH_H

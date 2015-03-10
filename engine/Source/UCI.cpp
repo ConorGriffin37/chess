@@ -212,11 +212,11 @@ bool UCI::startCalculating(string input)
             timeAfterSearch = chrono::system_clock::now();
             chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
             int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
-            
+
             string info = string("depth ") + to_string(curDepth);
             info += " nodes " + to_string(Search::nodes);
             info += " nps " + to_string(nodesPerSecond);
-            
+
             if (searchResult.second > MATE_SCORE) {
                 searchResult.second -= MATE_SCORE;
                 int plyCount = (curDepth - searchResult.second);
