@@ -104,7 +104,7 @@ bool UCI::sentPosition(string input)
         currentColor = 1;
     }
     getline(ss, moves, ' ');
-    
+
     if (moves == "moves"){
         while (getline(ss, moveIn, ' ')){
             pair<int, int> startPosition = make_pair(moveIn[0] - 'a', moveIn[1] - '1');
@@ -190,28 +190,34 @@ bool UCI::startCalculating(string input)
             iss >> movetime;
         }
     }
-    
+
     //send information to engine for calculation at the current position
     currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
     currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? 6 : 7)));
+
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
-    
+
     while ((curDepth <= depth) or (infinite)) {
         if (killSearch == true) {
             break;
         }
         pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
         if (searchResult.first != "") {
-            string info = string("depth ") + to_string(curDepth) + " pv " + TranspositionTables::getPrincipalVariation(currentBoard, curDepth);
+            string info = string("depth ") + to_string(curDepth);
             if (searchResult.second > 1000000) {
                 searchResult.second -= 1000000;
-                info += " score mate " + to_string((curDepth - searchResult.second)/2);
+                int plyCount = (curDepth - searchResult.second);
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
+                info += " score mate " + to_string(plyCount - (plyCount/2));
             } else if (searchResult.second < -1000000) {
                 searchResult.second += 1000000;
-                info += " score mate " + to_string(-1*((curDepth - (-1*searchResult.second))/2));
+                int plyCount = (curDepth + searchResult.second);
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
+                info += " score mate " + to_string(-1*((plyCount/2) + 1));
             } else {
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, curDepth);
                 info += " score cp " + to_string(searchResult.second);
             }
             sendInfo(info);
@@ -219,7 +225,7 @@ bool UCI::startCalculating(string input)
         }
         curDepth++;
     }
-    
+
     if (quit == false) {
         outputBestMove(bestMove);
         TranspositionTables::setOld();
