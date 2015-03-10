@@ -184,17 +184,17 @@ bool filesOpen[2][8] = { {false} };
 
 int Evaluation::CheckForDoublePawns(int colorCode, Board& evalBoard)
 {
-    u64 pawns = evalBoard.getPieceAndColor(0, colorCode);
+    u64 pawns = evalBoard.getPieceAndColor(PAWN_CODE, colorCode);
     int numPawns = popCount(pawns);
     int doublePawns = 0;
     for (int i = 0; i < 8; i++){
-        filesOpen[colorCode - 6][i] = false;
+        filesOpen[colorCode - WHITE_CODE][i] = false;
         pawns = pawns & RemoveRanks[i];
         int change = numPawns - popCount(pawns);
         if (change > 1){
             doublePawns++;
         } else if (change == 0){
-            filesOpen[colorCode - 6][i] = true;
+            filesOpen[colorCode - WHITE_CODE][i] = true;
         }
         numPawns = numPawns - change;
     }
@@ -203,14 +203,14 @@ int Evaluation::CheckForDoublePawns(int colorCode, Board& evalBoard)
 
 int Evaluation::rooksOnOpenFile(int colorCode, Board& evalBoard)
 {
-    u64 rooks = evalBoard.getPieceAndColor(1, colorCode);
+    u64 rooks = evalBoard.getPieceAndColor(ROOK_CODE, colorCode);
     int numRooks = popCount(rooks);
     int rooksOpen = 0;
     if (numRooks > 0){
         for (int i = 0; i < 8; i++){
             rooks = rooks & RemoveRanks[i];
             int change = numRooks - popCount(rooks);
-            if ((change > 0) and (filesOpen[colorCode - 6][i] == true)){
+            if ((change > 0) and (filesOpen[colorCode - WHITE_CODE][i] == true)){
                 rooksOpen++;
             }
             numRooks = numRooks - change;
@@ -221,10 +221,10 @@ int Evaluation::rooksOnOpenFile(int colorCode, Board& evalBoard)
 
 int Evaluation::GetMobilityScore(Board& evalBoard)
 {
-    int whiteDoublePawns = CheckForDoublePawns(6, evalBoard);
-    int blackDoublePawns = CheckForDoublePawns(7, evalBoard);
-    int whiteRooksOpen = rooksOnOpenFile(6, evalBoard);
-    int blackRooksOpen = rooksOnOpenFile(7, evalBoard);
+    int whiteDoublePawns = CheckForDoublePawns(WHITE_CODE, evalBoard);
+    int blackDoublePawns = CheckForDoublePawns(BLACK_CODE, evalBoard);
+    int whiteRooksOpen = rooksOnOpenFile(WHITE_CODE, evalBoard);
+    int blackRooksOpen = rooksOnOpenFile(BLACK_CODE, evalBoard);
     return (-15*(whiteDoublePawns-blackDoublePawns) + 40*(whiteRooksOpen-blackRooksOpen));
 }
 
@@ -235,10 +235,10 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
     int whitescore = 0;
     int blackscore = 0;
     u64 bittest = 1;
-    u64 colorboard = boardToEvaluate.getPieceColor(6);
-    u64 piecesBoards[6] = {boardToEvaluate.getPiece(0), boardToEvaluate.getPiece(1), boardToEvaluate.getPiece(2), boardToEvaluate.getPiece(3), boardToEvaluate.getPiece(4), boardToEvaluate.getPiece(5)};
+    u64 colorboard = boardToEvaluate.getPieceColor(WHITE_CODE);
+    u64 piecesBoards[6] = {boardToEvaluate.getPiece(PAWN_CODE), boardToEvaluate.getPiece(ROOK_CODE), boardToEvaluate.getPiece(KNIGHT_CODE), boardToEvaluate.getPiece(BISHOP_CODE), boardToEvaluate.getPiece(QUEEN_CODE), boardToEvaluate.getPiece(KING_CODE)};
     for (int i = 0; i < 64; i++) {
-        for (int x = 0; x < 5; x++) {
+        for (int x = PAWN_CODE; x < KING_CODE; x++) {
             if (piecesBoards[x] & bittest) {
                 if (colorboard & bittest) {
                     whitescore = whitescore + scores[x];
@@ -251,7 +251,7 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
                 }
             }
         }
-        if (piecesBoards[5] & bittest) {
+        if (piecesBoards[KING_CODE] & bittest) {
             if (colorboard & bittest) {
                 whitescore = whitescore + kingPositionalScores[0][0 /*stageOfGame(boardToEvaluate)*/][i];
             } else {
@@ -266,7 +266,7 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
 int Evaluation::numMinorPieces(int colorCode, Board& evalBoard)
 {
     int num = 0;
-    for (int i = 1; i < 4; i++){
+    for (int i = ROOK_CODE; i < QUEEN_CODE; i++){
         num += popCount(evalBoard.getPieceAndColor(i, colorCode));
     }
     return num;
@@ -274,20 +274,20 @@ int Evaluation::numMinorPieces(int colorCode, Board& evalBoard)
 
 int Evaluation::stageOfGame(Board& evalBoard)
 {
-    int numWhiteQueens = popCount(evalBoard.getPieceAndColor(4, 6));
-    int numBlackQueens = popCount(evalBoard.getPieceAndColor(4, 7));
+    int numWhiteQueens = popCount(evalBoard.getPieceAndColor(QUEEN_CODE, WHITE_CODE));
+    int numBlackQueens = popCount(evalBoard.getPieceAndColor(QUEEN_CODE, BLACK_CODE));
     if ((!numWhiteQueens) and (!numBlackQueens)){
         return 1;
     } else if ((numWhiteQueens) and (!numBlackQueens)){
-        if (numMinorPieces(6, evalBoard) <= 1){
+        if (numMinorPieces(WHITE_CODE, evalBoard) <= 1){
             return 1;
         }
     } else if ((!numWhiteQueens) and (numBlackQueens)){
-        if (numMinorPieces(7, evalBoard) <= 1){
+        if (numMinorPieces(BLACK_CODE, evalBoard) <= 1){
             return 1;
         }
     } else {
-        if ((numMinorPieces(6, evalBoard) <= 1) and (numMinorPieces(7, evalBoard) <= 1)){
+        if ((numMinorPieces(WHITE_CODE, evalBoard) <= 1) and (numMinorPieces(BLACK_CODE, evalBoard) <= 1)){
             return 1;
         }
     }
@@ -296,18 +296,18 @@ int Evaluation::stageOfGame(Board& evalBoard)
 
 int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position, Board& evalBoard)
 {
-    if (code == 5){
-        return kingPositionalScores[colorCode - 6][stageOfGame(evalBoard)][position.second*8 + (7 - position.first)];
+    if (code == KING_CODE){
+        return kingPositionalScores[colorCode - WHITE_CODE][stageOfGame(evalBoard)][position.second*8 + (7 - position.first)];
     } else {
-        return scores[code] + positionalScores[colorCode - 6][code][position.second*8 + (7 - position.first)];
+        return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position.second*8 + (7 - position.first)];
     }
 }
 
 int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position)
 {
-    if (code == 5){
-        return kingPositionalScores[colorCode - 6][0][position.second*8 + (7 - position.first)];
+    if (code == KING_CODE){
+        return kingPositionalScores[colorCode - WHITE_CODE][0][position.second*8 + (7 - position.first)];
     } else {
-        return scores[code] + positionalScores[colorCode - 6][code][position.second*8 + (7 - position.first)];
+        return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position.second*8 + (7 - position.first)];
     }
 }

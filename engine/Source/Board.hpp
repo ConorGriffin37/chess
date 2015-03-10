@@ -7,6 +7,21 @@
 #include <vector>
 #include <utility>
 
+#define ILLEGAL_MOVE 10001108
+#define NEGATIVE_INFINITY -10000000
+#define INFINITY 10000000
+#define MATE_SCORE 1000000
+
+#define PAWN_CODE 0
+#define ROOK_CODE 1
+#define KNIGHT_CODE 2
+#define BISHOP_CODE 3
+#define QUEEN_CODE 4
+#define KING_CODE 5
+#define WHITE_CODE 6
+#define BLACK_CODE 7
+
+
 typedef unsigned long long u64;
 
 struct mov
@@ -158,7 +173,7 @@ class Board
 		 * @param colorcode Check if the king of this color is in check
 		 * @return True for incheck, false otherwise.
 		 */
-        bool inCheck(int colorcode); //checks if the piece of a given color is in check
+        bool inCheck(int colorcode); //checks if the king of a given color is in check
         void putPiece(int code, int colorcode, std::pair<int, int> position);
         void specTakePiece(int code, int colorcode, std::pair<int, int> position);
         void makeMov(mov theMove);

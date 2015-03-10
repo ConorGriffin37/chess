@@ -1,6 +1,7 @@
 #include "Board.hpp"
 #include "Evaluation.hpp"
 #include "TranspositionTables.hpp"
+
 #include <iostream>
 
 void outbitboard(u64 n);
@@ -90,10 +91,7 @@ Board::Board(std::string fen)
 
 int Board::getColorCode(char p)
 {
-    if (p > 'a') {
-        return 7;
-    }
-    return 6;
+    return ((p > 'a') ? BLACK_CODE : WHITE_CODE);
 }
 
 int Board::getPieceCode(char p)
@@ -102,24 +100,24 @@ int Board::getPieceCode(char p)
         p = 'A' + (p - 'a');
     }
     if (p == 'P') {
-        return 0;
+        return PAWN_CODE;
     } else if (p == 'R') {
-        return 1;
+        return ROOK_CODE;
     } else if (p == 'N') {
-        return 2;
+        return KNIGHT_CODE;
     } else if (p == 'B') {
-        return 3;
+        return BISHOP_CODE;
     } else if (p == 'Q') {
-        return 4;
+        return QUEEN_CODE;
     } else if (p == 'K') {
-        return 5;
+        return KING_CODE;
     }
     return -1;
 }
 
 u64 Board::getPieces()
 {
-    return pieceBB[6] | pieceBB[7];
+    return pieceBB[WHITE_CODE] | pieceBB[BLACK_CODE];
 }
 
 u64 Board::getPiece(int code)
@@ -146,7 +144,7 @@ u64 Board::getCastleOrEnpasent()
 void Board::promotePawn(int colorcode, std::pair<int, int> from, std::pair<int, int> to, int code)
 {
     int ammount = from.second*8 + (7 - from.first);
-    pieceBB[0] = unsetbit(pieceBB[0], ammount);
+    pieceBB[PAWN_CODE] = unsetbit(pieceBB[PAWN_CODE], ammount);
     pieceBB[colorcode] = unsetbit(pieceBB[colorcode], ammount);
     ammount = to.second*8 + (7 - to.first);
     pieceBB[code] = setbit(pieceBB[code], ammount);
@@ -174,10 +172,10 @@ u64 Board::getAttacked(int colorcode)
 {
     u64 colorboard = getPieceColor(colorcode);
     u64 oppcolorboard;
-    if (colorcode == 6) {
-        oppcolorboard = getPieceColor(7);
+    if (colorcode == WHITE_CODE) {
+        oppcolorboard = getPieceColor(BLACK_CODE);
     } else {
-        oppcolorboard = getPieceColor(6);
+        oppcolorboard = getPieceColor(WHITE_CODE);
     }
     u64 bitest = 1;
     u64 attacked = 0;
@@ -185,8 +183,8 @@ u64 Board::getAttacked(int colorcode)
         int x = 7 - (i % 8);
         int y = i/8;
         if (colorboard & bitest) {
-            if (getPiece(0) & bitest) { //pawn
-                if (colorcode == 6) { //white
+            if (getPiece(PAWN_CODE) & bitest) { //pawn
+                if (colorcode == WHITE_CODE) { //white
                     if (x < 7) {
                         attacked = setbit(attacked, getpos(x + 1, y + 1));
                     }
@@ -201,7 +199,7 @@ u64 Board::getAttacked(int colorcode)
                         attacked = setbit(attacked, getpos(x - 1, y - 1));
                     }
                 }
-            } else if (getPiece(1) & bitest or getPiece(4) & bitest) { //rook and queen (partialy)
+            } else if (getPiece(ROOK_CODE) & bitest or getPiece(QUEEN_CODE) & bitest) { //rook and queen (partialy)
                 for (int j = x + 1; j < 8; j++) {
                     if (checkbit(colorboard, getpos(j, y))) {
                         break;
@@ -242,7 +240,7 @@ u64 Board::getAttacked(int colorcode)
                     }
                     attacked = setbit(attacked, getpos(x, j));
                 }
-            } else if (getPiece(2) & bitest) { //knight
+            } else if (getPiece(KNIGHT_CODE) & bitest) { //knight
                 if (x < 6) {
                     if (y < 7) {
                         if (checkbit(colorboard, getpos(x + 2, y + 1)) == false) {
@@ -291,7 +289,7 @@ u64 Board::getAttacked(int colorcode)
                         }
                     }
                 }
-            } else if (getPiece(5) & bitest) { //king
+            } else if (getPiece(KING_CODE) & bitest) { //king
                 if (x < 7) {
                     if (checkbit(colorboard, getpos(x + 1, y)) == false) {
                         attacked = setbit(attacked, getpos(x + 1, y));
@@ -333,7 +331,7 @@ u64 Board::getAttacked(int colorcode)
                     }
                 }
             }
-            if (getPiece(3) & bitest or getPiece(4) & bitest) { //bishop and queen partially
+            if (getPiece(BISHOP_CODE) & bitest or getPiece(QUEEN_CODE) & bitest) { //bishop and queen partially
                 for (int j = 1; j <= std::min(7 - x, 7 - y); j++) {
                     if (checkbit(colorboard, getpos(x + j, y + j))) {
                         break;
@@ -384,10 +382,10 @@ u64 Board::getAttacked(int colorcode)
 
 bool Board::inCheck(int colorcode)
 {
-    if (colorcode == 6) {
-        return (getAttacked(7) & getPieceAndColor(5, 6));
+    if (colorcode == WHITE_CODE) {
+        return (getAttacked(BLACK_CODE) & getPieceAndColor(KING_CODE, WHITE_CODE));
     }
-    return (getAttacked(6) & getPieceAndColor(5, 7));
+    return (getAttacked(WHITE_CODE) & getPieceAndColor(KING_CODE, BLACK_CODE));
 }
 
 void Board::setBB(int code, u64 value)
@@ -431,10 +429,7 @@ int Board::getPieceFromPos(int x, int y)
 
 int abs(int x)
 {
-    if (x < 0) {
-        return x*-1;
-    }
-    return x;
+    return ((x < 0) ? x*-1 : x);
 }
 
 bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, char promote)
@@ -445,19 +440,19 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
     }
     setCastleOrEnpas(nextCastleOrEnpasent());
     enpasentCol = -1;
-    int colorcode = 6;
-    if (checkbit(getPieceColor(7), getpos(from.first, from.second))) {
-        colorcode = 7;
+    int colorcode = WHITE_CODE;
+    if (checkbit(getPieceColor(BLACK_CODE), getpos(from.first, from.second))) {
+        colorcode = BLACK_CODE;
     }
-    if (pcode == 0 and from.first != to.first) {
+    if (pcode == PAWN_CODE and from.first != to.first) {
         if (checkbit(getPieces(), getpos(to.first, to.second)) == false) { //enpasent
             takePiece(std::make_pair(to.first, from.second));
             makeMove(pcode, colorcode, from, to);
             return true;
         }
     }
-    if (pcode == 5) {
-        if (colorcode == 6) {
+    if (pcode == KING_CODE) {
+        if (colorcode == WHITE_CODE) {
             setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 0));
             setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 7));
         } else {
@@ -467,21 +462,21 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
         if (abs(from.first - to.first) > 1) { //castling
             if (to.first == 6) { //"e1g1" or "e8g8"
                 makeMove(pcode, colorcode, from, to);
-                makeMove(1, colorcode, std::make_pair(7, from.second), std::make_pair(5, from.second));
+                makeMove(ROOK_CODE, colorcode, std::make_pair(7, from.second), std::make_pair(5, from.second));
                 return true;
             } else { //"e1c1" or "e8c8"
                 makeMove(pcode, colorcode, from, to);
-                makeMove(1, colorcode, std::make_pair(0, from.second), std::make_pair(3, from.second));
+                makeMove(ROOK_CODE, colorcode, std::make_pair(0, from.second), std::make_pair(3, from.second));
                 return true;
             }
         }
     }
-    if (pcode == 1) { //rook moving = no castle
+    if (pcode == ROOK_CODE) { //rook moving = no castle
         if (from.second == 0 or from.second == 7) {
             setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), getpos(from.first, from.second)));
         }
     }
-    if (pcode == 0) { //enpasent
+    if (pcode == PAWN_CODE) { //enpasent
         if (from.second - to.second == 2) { //moving out 2 at first
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second - 1)));
             enpasentCol = 7 - from.first;
@@ -513,18 +508,12 @@ void Board::specTakePiece(int code, int colorcode, std::pair<int, int> position)
 
 int getOppColor(int x)
 {
-    if (x == 6) {
-        return 7;
-    }
-    return 6;
+    return ((x == WHITE_CODE) ? BLACK_CODE : WHITE_CODE);
 }
 
 int getMultiplyColor(int x)
 {
-    if (x == 6) {
-        return 1;
-    }
-    return -1;
+    return ((x == WHITE_CODE) ? 1 : -1);
 }
 
 void Board::makeMov(mov theMove)
@@ -561,8 +550,8 @@ void Board::makeMov(mov theMove)
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookfrom);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookto);
     }
-    if (theMove.code == 5) {
-        if (theMove.colorcode == 6) {
+    if (theMove.code == KING_CODE) {
+        if (theMove.colorcode == WHITE_CODE) {
             if (checkbit(getCastleOrEnpasent(), 0)) {
                 zorHash ^= TranspositionTables::getCastleHash(0);
                 setCastleOrEnpas(unsetbit(getCastleOrEnpasent(), 0));
@@ -582,7 +571,7 @@ void Board::makeMov(mov theMove)
             }
         }
     }
-    if (theMove.code == 1) { //rook moving = no castle
+    if (theMove.code == ROOK_CODE) { //rook moving = no castle
         if (theMove.from.second == 0 or theMove.from.second == 7) {
             if (checkbit(getCastleOrEnpasent(), getpos(theMove.from.first, theMove.from.second))) {
                 zorHash ^= TranspositionTables::getCastleSquare(getpos(theMove.from.first, theMove.from.second));
@@ -590,7 +579,7 @@ void Board::makeMov(mov theMove)
             }
         }
     }
-    if (theMove.code == 0) { //enpasent
+    if (theMove.code == PAWN_CODE) { //enpasent
         if (theMove.to.second - theMove.from.second == 2) { //moving out 2 at first
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(theMove.to.first, theMove.to.second - 1)));
             enpasentCol = 7 - theMove.to.first;
@@ -611,7 +600,7 @@ void Board::unMakeMov(mov theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 o
     enpasentCol = lastEnpasent;
     if (theMove.promote) {
         specTakePiece(theMove.procode, theMove.colorcode, theMove.to);
-        putPiece(0, theMove.colorcode, theMove.from);
+        putPiece(PAWN_CODE, theMove.colorcode, theMove.from);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.procode, theMove.colorcode, theMove.to);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(theMove.code, theMove.colorcode, theMove.from);
     } else {
@@ -625,7 +614,7 @@ void Board::unMakeMov(mov theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 o
         materialEval = materialEval + getMultiplyColor(oppcolor)*Evaluation::getPosScore(theMove.takecode, oppcolor, theMove.takepos);
     }
     if (theMove.castle) {
-        makeMove(1, theMove.colorcode, theMove.rookto, theMove.rookfrom);
+        makeMove(ROOK_CODE, theMove.colorcode, theMove.rookto, theMove.rookfrom);
         materialEval = materialEval - getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookto);
         materialEval = materialEval + getMultiplyColor(theMove.colorcode)*Evaluation::getPosScore(1, theMove.colorcode, theMove.rookfrom);
     }

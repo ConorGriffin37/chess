@@ -1,7 +1,9 @@
 #include "Board.hpp"
-#include <algorithm>
 #include "TranspositionTables.hpp"
+#include "MoveList.hpp"
+
 #include <iostream>
+#include <algorithm>
 
 entry test;
 u64 TranspositionTables::zobrist[] = {0};
@@ -19,9 +21,11 @@ u64 rand64()
 }
 
 mov bad;
+entry badEntry;
 
 void TranspositionTables::initZobrist()
 {
+    badEntry.depth = -1;
     bad.code = -1;
     srand(1262340);
     for (int i = 0; i < 781; i++) {
@@ -33,7 +37,7 @@ void TranspositionTables::initZobrist()
 
 u64 TranspositionTables::getSquareHash(int pos, int code, int playerColor)
 {
-    if (playerColor == 6) {
+    if (playerColor == WHITE_CODE) {
         return zobrist[code*64 + pos];
     } else {
         return zobrist[code*64 + pos + 6*64];
@@ -75,16 +79,16 @@ u64 TranspositionTables::getBoardHash(Board& gameBoard, int playerColor)
     for (int i = 0; i < 64; i++) {
         for (int x = 0; x < 5; x++) {
             if (bittest & gameBoard.getPiece(x)) {
-                if (bittest & gameBoard.getPieceColor(6)) {
-                    rethash ^= getSquareHash(i, x, 6);
+                if (bittest & gameBoard.getPieceColor(WHITE_CODE)) {
+                    rethash ^= getSquareHash(i, x, WHITE_CODE);
                 } else {
-                    rethash ^= getSquareHash(i, x, 7);
+                    rethash ^= getSquareHash(i, x, BLACK_CODE);
                 }
             }
         }
         bittest <<= 1;
     }
-    if (playerColor == 7) {
+    if (playerColor == BLACK_CODE) {
         rethash ^= getBlackHash();
     }
     if (checkbit(gameBoard.getCastleOrEnpasent(), 0)) {
@@ -113,6 +117,7 @@ mov TranspositionTables::getBest(u64 signature)
     return bad;
 }
 
+
 void TranspositionTables::setEntry(u64 signature, mov bestmove, int depth, int score)
 {
     u64 key = signature & tab_mask;
@@ -140,7 +145,6 @@ void TranspositionTables::setOld()
     }
 }
 
-
 std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int depth)
 {
     if (depth == 0) {
@@ -154,6 +158,7 @@ std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int dept
     }
     return "";
 }
+
 
 
 

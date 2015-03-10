@@ -193,7 +193,7 @@ bool UCI::startCalculating(string input)
 
     //send information to engine for calculation at the current position
     currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
-    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? 6 : 7)));
+    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? WHITE_CODE : BLACK_CODE)));
 
     string bestMove;
     int curDepth = min(depth, 2);
@@ -206,13 +206,13 @@ bool UCI::startCalculating(string input)
         pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
         if (searchResult.first != "") {
             string info = string("depth ") + to_string(curDepth);
-            if (searchResult.second > 1000000) {
-                searchResult.second -= 1000000;
+            if (searchResult.second > MATE_SCORE) {
+                searchResult.second -= MATE_SCORE;
                 int plyCount = (curDepth - searchResult.second);
                 info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
                 info += " score mate " + to_string(plyCount - (plyCount/2));
-            } else if (searchResult.second < -1000000) {
-                searchResult.second += 1000000;
+            } else if (searchResult.second < -MATE_SCORE) {
+                searchResult.second += MATE_SCORE;
                 int plyCount = (curDepth + searchResult.second);
                 info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
                 info += " score mate " + to_string(-1*((plyCount/2) + 1));
