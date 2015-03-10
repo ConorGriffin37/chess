@@ -322,7 +322,7 @@ namespace GUI
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 676;
+			this.DefaultHeight = 707;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
@@ -334,6 +334,7 @@ namespace GUI
 			this.FlipBoardAction.Activated += new global::System.EventHandler (this.OnFlipBoard);
 			this.SetClockAction.Activated += new global::System.EventHandler (this.OnSetClock);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
+			this.BoardArea.ButtonPressEvent += new global::Gtk.ButtonPressEventHandler (this.OnPieceClick);
 			this.MoveEntry.Activated += new global::System.EventHandler (this.OnMoveEntry);
 		}
 	}

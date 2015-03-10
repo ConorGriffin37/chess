@@ -27,7 +27,7 @@ namespace GUI
         private static ImageSurface blackQueen;
         private static ImageSurface blackKing;
 
-        private static PointD[] pieceCoordinates = 
+        public static PointD[] pieceCoordinates = 
             new PointD[]{
                 // 8th rank
                 new PointD(40, 40),

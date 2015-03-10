@@ -7,9 +7,13 @@ using Cairo;
 
 namespace GUI
 {
+    public enum PieceSelectionState { None, Selected }
+
     public partial class MainWindow: Gtk.Window
     {
         ImageSurface boardBackground;
+        ImageSurface selectionBorder;
+        PieceSelectionState currentSelectionState = PieceSelectionState.None;
         Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*)).*$");
 
         Cairo.Context boardContext;
@@ -17,8 +21,14 @@ namespace GUI
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
             boardBackground = new ImageSurface ("img/board.png");
+            selectionBorder = new ImageSurface ("img/border.png");
             PieceDisplay.Init ();
             Build ();
+        }
+
+        public void InitWidgets()
+        {
+            BoardArea.AddEvents ((int)Gdk.EventMask.ButtonPressMask);
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -433,6 +443,43 @@ namespace GUI
         public void ClearEngineOutput()
         {
             EngineOutput.Buffer.Clear ();
+        }
+
+        protected void OnPieceClick (object o, ButtonPressEventArgs args)
+        {
+            Debug.Log (String.Format("BoardArea press at ({0}, {1})", args.Event.X, args.Event.Y));
+            if (currentSelectionState == PieceSelectionState.None) {
+                double transx = Math.Abs ((BoardArea.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
+
+                PointD clickLocation = new PointD (args.Event.X - transx, args.Event.Y - transx);
+                if (clickLocation.X < 30 || clickLocation.Y < 30
+                    || clickLocation.X > 522 || clickLocation.Y > 522)
+                    return;
+
+                PointD pieceLocation = PieceDisplay.pieceCoordinates [0];
+                foreach (PointD p in PieceDisplay.pieceCoordinates) {
+                    double x1 = p.X * 0.75;
+                    double y1 = p.Y * 0.75;
+                    double x2 = x1 + 61.5;
+                    double y2 = y1 + 61.5;
+                    if (x1 <= clickLocation.X && clickLocation.X <= x2) {
+                        if (y1 <= clickLocation.Y && clickLocation.Y <= y2) {
+                            pieceLocation = p;
+                            break;
+                        }
+                    }
+                }
+
+                boardContext = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
+                boardContext.Translate (transx, 0);
+                boardContext.Scale (0.75, 0.75);
+                selectionBorder.Show (boardContext, pieceLocation.X + 1, pieceLocation.Y + 1);
+                boardContext.Dispose ();
+                currentSelectionState = PieceSelectionState.Selected;
+            } else {
+                RedrawBoard ();
+                currentSelectionState = PieceSelectionState.None;
+            }
         }
     }
 }

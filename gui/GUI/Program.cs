@@ -32,6 +32,7 @@ namespace GUI
             win.ClearEngineInfo ();
             win.UpdateClock (WhiteClock);
             win.UpdateClock (BlackClock);
+            win.InitWidgets ();
             win.Show ();
             Application.Run ();
 
