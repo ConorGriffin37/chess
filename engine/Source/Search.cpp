@@ -7,13 +7,16 @@
 #include <iostream>
 
 void outbitboard(u64 n);
+u64 Search::nodes = 0;
 
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()));
+    nodes++;
 
     mov curBestMove = possibleMoves.getMovN(0);
+    int currMoveNumber = 0;
     int maxScore = NEGATIVE_INFINITY;
     int score;
 
@@ -24,6 +27,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     while (true) {
         pair<bool, mov> nextMove = possibleMoves.getNextMove();
         if (nextMove.first) {
+            UCI::sendInfo("currmove " + possibleMoves.getMoveCode(nextMove.second) + " currmovenumber " + to_string(++currMoveNumber));
             gameBoard.makeMov(nextMove.second);
             score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1);
             gameBoard.unMakeMov(nextMove.second, castle, enpasCol, lastHash);
@@ -40,6 +44,10 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
         }
     }
 
+    if (currMoveNumber == 0) {
+        UCI::killSearch = true;
+    }
+
     if ((UCI::quit) or (UCI::killSearch)){
         return make_pair("", 0);
     }
@@ -50,6 +58,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
 
 int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
 {
+    nodes++;
     if ((UCI::quit) or (UCI::killSearch)){
         return 0;
     }

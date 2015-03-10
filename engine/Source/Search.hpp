@@ -34,6 +34,7 @@ class Search
 		 * @return int The score of the position
 		 */
         static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor);
+        static u64 nodes; /**< The number of nodes that have been searched */
 };
 
 #endif // SEARCH_H
