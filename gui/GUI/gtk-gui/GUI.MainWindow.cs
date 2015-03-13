@@ -259,8 +259,6 @@ namespace GUI
 			this.hbox1.Add (this.EngineAuthorLabel);
 			global::Gtk.Box.BoxChild w15 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineAuthorLabel]));
 			w15.Position = 1;
-			w15.Expand = false;
-			w15.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.EngineDepthLabel = new global::Gtk.Label ();
 			this.EngineDepthLabel.Name = "EngineDepthLabel";
@@ -269,8 +267,6 @@ namespace GUI
 			this.hbox1.Add (this.EngineDepthLabel);
 			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineDepthLabel]));
 			w16.Position = 2;
-			w16.Expand = false;
-			w16.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
 			this.EngineNPSLabel = new global::Gtk.Label ();
 			this.EngineNPSLabel.Name = "EngineNPSLabel";
@@ -279,8 +275,6 @@ namespace GUI
 			this.hbox1.Add (this.EngineNPSLabel);
 			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNPSLabel]));
 			w17.Position = 3;
-			w17.Expand = false;
-			w17.Fill = false;
 			this.vbox1.Add (this.hbox1);
 			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox1]));
 			w18.Position = 2;
