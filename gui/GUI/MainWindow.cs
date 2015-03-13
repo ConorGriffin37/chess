@@ -15,7 +15,7 @@ namespace GUI
         ImageSurface selectionBorder;
         PieceSelectionState currentSelectionState = PieceSelectionState.None;
         Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*)).*$");
-
+        byte selectedPiece;
         Cairo.Context boardContext;
 
         public MainWindow () : base (Gtk.WindowType.Toplevel)
@@ -123,57 +123,6 @@ namespace GUI
                 }
             }
             chooser.Destroy ();
-        }
-
-        protected void OnMoveEntry (object sender, EventArgs e)
-        {
-            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
-                MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
-            }
-            string userMove = MoveEntry.Text;
-            MoveEntry.Text = "";
-            if (MainClass.CurrentGameStatus != GameStatus.Active &&
-                MainClass.CurrentGameStatus != GameStatus.Inactive) {
-                Console.Error.WriteLine ("(EE) Attempted move during finished game.");
-                MessageDialog errorDialog = new MessageDialog (
-                                                this,
-                                                DialogFlags.DestroyWithParent,
-                                                MessageType.Error,
-                                                ButtonsType.Ok,
-                                                "The game is over!");
-                errorDialog.Run ();
-                errorDialog.Destroy ();
-                return;
-            }
-
-            if (userMove.Length < 4) {
-                Console.Error.WriteLine ("(EE) Error making move.");
-                MessageDialog errorDialog = new MessageDialog (
-                                                this,
-                                                DialogFlags.DestroyWithParent,
-                                                MessageType.Error,
-                                                ButtonsType.Ok,
-                                                "Please enter a move.");
-                errorDialog.Run ();
-                errorDialog.Destroy ();
-                return;
-            }
-
-            try {
-                ParseAndMakeMove(userMove);
-            } catch(InvalidOperationException io) {
-                Console.Error.WriteLine ("(EE) Illegal move entered: " + io.Message);
-                MessageDialog errorDialog = new MessageDialog (
-                                                this,
-                                                DialogFlags.DestroyWithParent,
-                                                MessageType.Error,
-                                                ButtonsType.Ok,
-                                                "Illegal move entered.");
-                errorDialog.Run ();
-                errorDialog.Destroy ();
-                return;
-            }
         }
 
         protected void OnBoardExpose (object o, ExposeEventArgs args)
@@ -342,7 +291,9 @@ namespace GUI
             }
             MainClass.CurrentGameStatus = MainClass.CurrentBoard.CheckForMate ();
             if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
-                ShowGameOverDialog (MainClass.CurrentGameStatus);
+                Gtk.Application.Invoke(delegate {
+                    ShowGameOverDialog(MainClass.CurrentGameStatus);
+                });
             }
             Gtk.Application.Invoke (delegate {
                 MainClass.UpdateClock ();
@@ -448,27 +399,35 @@ namespace GUI
         protected void OnPieceClick (object o, ButtonPressEventArgs args)
         {
             Debug.Log (String.Format("BoardArea press at ({0}, {1})", args.Event.X, args.Event.Y));
-            if (currentSelectionState == PieceSelectionState.None) {
-                double transx = Math.Abs ((BoardArea.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
 
-                PointD clickLocation = new PointD (args.Event.X - transx, args.Event.Y - transx);
-                if (clickLocation.X < 30 || clickLocation.Y < 30
-                    || clickLocation.X > 522 || clickLocation.Y > 522)
-                    return;
+            double transx = Math.Abs ((BoardArea.Allocation.Width - (boardBackground.Width * 0.75))) / 2;
 
-                PointD pieceLocation = PieceDisplay.pieceCoordinates [0];
-                foreach (PointD p in PieceDisplay.pieceCoordinates) {
-                    double x1 = p.X * 0.75;
-                    double y1 = p.Y * 0.75;
-                    double x2 = x1 + 61.5;
-                    double y2 = y1 + 61.5;
-                    if (x1 <= clickLocation.X && clickLocation.X <= x2) {
-                        if (y1 <= clickLocation.Y && clickLocation.Y <= y2) {
-                            pieceLocation = p;
-                            break;
-                        }
+            PointD clickLocation = new PointD (args.Event.X - transx, args.Event.Y - transx);
+            if (clickLocation.X < 30 || clickLocation.Y < 30
+                || clickLocation.X > 522 || clickLocation.Y > 522)
+                return;
+
+            PointD pieceLocation = PieceDisplay.pieceCoordinates [0];
+            int pieceIndex = 0;
+            for (int i = 0; i < PieceDisplay.pieceCoordinates.Length; i++) {
+                PointD p = PieceDisplay.pieceCoordinates[i];
+                double x1 = p.X * 0.75;
+                double y1 = p.Y * 0.75;
+                double x2 = x1 + 61.5;
+                double y2 = y1 + 61.5;
+                if (x1 <= clickLocation.X && clickLocation.X <= x2) {
+                    if (y1 <= clickLocation.Y && clickLocation.Y <= y2) {
+                        pieceLocation = p;
+                        pieceIndex = i;
+                        break;
                     }
                 }
+            }
+
+            if (currentSelectionState == PieceSelectionState.None) {
+                if (MainClass.CurrentBoard.Squares [pieceIndex].Piece == null)
+                    return;
+                selectedPiece = (byte)pieceIndex;
 
                 boardContext = Gdk.CairoHelper.Create (BoardArea.GdkWindow);
                 boardContext.Translate (transx, 0);
@@ -477,7 +436,41 @@ namespace GUI
                 boardContext.Dispose ();
                 currentSelectionState = PieceSelectionState.Selected;
             } else {
-                RedrawBoard ();
+                if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                    MainClass.CancelEngineTask ();
+                    MainClass.CurrentEngine.StopAndIgnoreMove ();
+                }
+
+                if (MainClass.CurrentGameStatus != GameStatus.Active &&
+                    MainClass.CurrentGameStatus != GameStatus.Inactive) {
+                    Console.Error.WriteLine ("(EE) Attempted move during finished game.");
+                    MessageDialog errorDialog = new MessageDialog (
+                                                    this,
+                                                    DialogFlags.DestroyWithParent,
+                                                    MessageType.Error,
+                                                    ButtonsType.Ok,
+                                                    "The game is over!");
+                    errorDialog.Run ();
+                    errorDialog.Destroy ();
+                    return;
+                }
+
+                try {
+                    MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex);
+                } catch(InvalidOperationException) {
+                    Debug.Log ("Invalid move entered.");
+                }
+                Gtk.Application.Invoke(delegate {
+                    RedrawBoard();
+                });
+                MainClass.CurrentGameStatus = MainClass.CurrentBoard.CheckForMate ();
+                if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
+                    ShowGameOverDialog (MainClass.CurrentGameStatus);
+                }
+                Gtk.Application.Invoke (delegate {
+                    MainClass.UpdateClock ();
+                });
+
                 currentSelectionState = PieceSelectionState.None;
             }
         }
