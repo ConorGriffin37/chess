@@ -117,7 +117,9 @@ BOOST_AUTO_TEST_CASE(board_getPieceCode)
 
 
 int getLegalMoves(Board testBoard, int playerColor) {
-	MoveList possibleMoves = MoveList(testBoard, ((playerColor == 1) ? 6 : 7), true);
+    mov bad;
+    bad.code = -1;
+	MoveList possibleMoves = MoveList(testBoard, ((playerColor == 1) ? 6 : 7), bad);
 	u64 castle = testBoard.getCastleOrEnpasent();
     u64 lastHash = testBoard.getZorHash();
     int enpasCol = testBoard.getEnpasentCol();
@@ -153,7 +155,7 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
 {
 	cout << "Testing search" << endl;
 	Board testBoard = Board("k7/pppp4/8/8/8/8/8/K4R2 w - - 0 1");
-	BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4) == "f1f8"); //it should find the checkmate for white
+	BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4).first == "f1f8"); //it should find the checkmate for white
 }
 
 //Perft is good for verifying the correctness of the move generation, generate all the leaf nodes at a given depth from a known position.

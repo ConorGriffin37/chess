@@ -31,7 +31,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
             gameBoard.makeMov(nextMove.second);
             score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1);
             gameBoard.unMakeMov(nextMove.second, castle, enpasCol, lastHash);
-            //score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, INFINITY, remainingDepth - 1, playerColor*-1);
+            //score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -NEGATIVE_INFINITY, remainingDepth - 1, playerColor*-1);
             //cout << "Move is " << possibleMoves.getMoveCode(nextMove.second) << " and score is " << score << std::endl;
             if (score != ILLEGAL_MOVE) {
                 if (score > maxScore){
