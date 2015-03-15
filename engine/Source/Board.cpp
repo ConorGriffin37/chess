@@ -439,7 +439,10 @@ bool Board::getAttackedKing(int pos, u64 oppcolorboard)
     int opppos = bitScanForward(oppcolorboard & getPiece(KING_CODE));
     int x = 7 - (pos % 8);
     int diff = opppos - pos;
-    if (diff == 1 or diff == -1) {
+    if (diff == 1 and x > 0) {
+        return true;
+    }
+    if (diff == -1 and x < 7) {
         return true;
     }
     if (diff == 8 or diff == -8) {
