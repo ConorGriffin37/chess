@@ -163,24 +163,35 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
 u64 Perft(int depth, Board& gameBoard, int playerColor)
 {
     if (depth == 0) {
+        if (gameBoard.inCheck(((playerColor == 1) ? 7 : 6)) == true) {
+            return 0;
+        }
         return 1;
     }
-
+ 
     u64 nodes = 0;
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
-
+ 
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? 6 : 7), true);
+ 
+    if (possibleMoves.kingTake) {
+        return 0;
+    }
+ 
     int movNumber = possibleMoves.getMoveNumber();
+ 
     for (int i = 0; i < movNumber; i++) {
-        mov theMove = possibleMoves.getMovN(i);
+        u64 theMove = possibleMoves.getMovN(i);
         gameBoard.makeMov(theMove);
-        if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
+ 
+        //if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
             nodes += Perft(depth - 1, gameBoard, playerColor*-1);
-        }
+        //}
         gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash);
     }
+ 
     return nodes;
 }
 
