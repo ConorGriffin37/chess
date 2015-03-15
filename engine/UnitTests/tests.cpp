@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE api_tests
+#define BOOST_TEST_MODULE engine_tests
 #define BOOST_TEST_MAIN
 #define BOOST_TEST_LOG_LEVEL all
 
@@ -16,8 +16,11 @@
 
 using namespace std;
 
+void initMasks();
+
 BOOST_AUTO_TEST_CASE(UCI_sentPosition)
 {
+    initMasks();
     cout << "Testing sentPosition function" << endl;
     BOOST_CHECK(UCI::sentPosition("position startpos moves e3e2") == false);
     BOOST_CHECK(UCI::sentPosition("position startpos moves e2e4") == true);
@@ -86,7 +89,7 @@ BOOST_AUTO_TEST_CASE(board_simpleMakeMove)
     pair<int, int> startPosition = make_pair('e' - 'a', '2' - '1');
     pair<int, int> endPosition = make_pair('e' - 'a', '4' - '1');
     testBoard.simpleMakeMove(startPosition, endPosition, ' ');
-    BOOST_CHECK(testBoard.getPieceFromPos(4, 3) == 0); //pawn at e4
+    BOOST_CHECK(testBoard.getPieceFromPos(3*8 + (7 - 4)) == 0); //pawn at e4
 }
 
 BOOST_AUTO_TEST_CASE(board_takePiece)
@@ -94,7 +97,7 @@ BOOST_AUTO_TEST_CASE(board_takePiece)
     cout << "Testing takePiece function" << endl;
     Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     testBoard.takePiece(make_pair(0, 0));
-    BOOST_CHECK(testBoard.getPieceFromPos(0, 0) == -1); //piece has been removed
+    BOOST_CHECK(testBoard.getPieceFromPos(7) == -1); //piece has been removed
 }
 
 BOOST_AUTO_TEST_CASE(board_getPieceCode)
@@ -117,22 +120,20 @@ BOOST_AUTO_TEST_CASE(board_getPieceCode)
 
 
 int getLegalMoves(Board testBoard, int playerColor) {
-    mov bad;
-    bad.code = -1;
-	MoveList possibleMoves = MoveList(testBoard, ((playerColor == 1) ? 6 : 7), bad);
+	MoveList possibleMoves = MoveList(testBoard, ((playerColor == 1) ? 6 : 7), u64(0));
 	u64 castle = testBoard.getCastleOrEnpasent();
     u64 lastHash = testBoard.getZorHash();
     int enpasCol = testBoard.getEnpasentCol();
 	int legalMoves = 0;
 
 	while (true) {
-		pair<bool, mov> get = possibleMoves.getNextMove();
-		if (get.first) {
-			testBoard.makeMov(get.second);
+		u64 theMove = possibleMoves.getNextMove();
+		if (theMove) {
+			testBoard.makeMov(theMove);
 			if (testBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
                 legalMoves++;
 			}
-			testBoard.unMakeMov(get.second, castle, enpasCol, lastHash);
+			testBoard.unMakeMov(theMove, castle, enpasCol, lastHash);
 		} else {
 			break;
 		}
@@ -168,30 +169,30 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
         }
         return 1;
     }
- 
+
     u64 nodes = 0;
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
- 
+
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? 6 : 7), true);
- 
+
     if (possibleMoves.kingTake) {
         return 0;
     }
- 
+
     int movNumber = possibleMoves.getMoveNumber();
- 
+
     for (int i = 0; i < movNumber; i++) {
         u64 theMove = possibleMoves.getMovN(i);
         gameBoard.makeMov(theMove);
- 
+
         //if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
             nodes += Perft(depth - 1, gameBoard, playerColor*-1);
         //}
         gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash);
     }
- 
+
     return nodes;
 }
 
