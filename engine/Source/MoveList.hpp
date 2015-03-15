@@ -18,13 +18,14 @@
 class MoveList
 {
     private:
-        std::vector<mov> moves; /**< A vector containing the moves in the MoveList */
+        std::vector<u64> moves; /**< A vector containing the moves in the MoveList */
+        std::vector<int> scores; /**< A vector containing the scores of each move */
         int timesCalled; /**< The amount of moves that have been retrieved with getNextMove */
         int position; /**< The current position in the moves vector */
 
     public:
         bool kingTake; /**< Is the king taken by any of the generated moves (last move made was illegal) */
-        MoveList(Board &gameBoard, int colorcode, mov bestMove);
+        MoveList(Board &gameBoard, int colorcode, u64 bestMove);
         MoveList(Board& gameBoard, int colorcode, bool dontScore);
         MoveList();
         /**
@@ -33,8 +34,7 @@ class MoveList
 		 * @param bestMove The hash move from the transposition table
 		 * @return void
 		 */
-        void scoreMoves(mov bestMove);
-        void scoreMoves();
+        void scoreMoves(u64 bestMove);
         /**
 		 * @fn addMove
 		 * @brief Adds a move to the moves vector based on the given parameters
@@ -44,7 +44,7 @@ class MoveList
 		 * @param to A pair of ints representing the pieces final position
 		 * @return void
 		 */
-        void addMove(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to);
+        void addMove(int code, int colorcode, int from, int to);
         /**
 		 * @fn addMoveTake
 		 * @brief Adds a taking move to the moves vector based on the given parameters
@@ -55,7 +55,7 @@ class MoveList
 		 * @param takecode The piece code of the piece being taken
 		 * @return void
 		 */
-        void addMoveTake(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to, int takecode);
+        void addMoveTake(int code, int colorcode, int from, int to, int takecode);
         /**
 		 * @fn addMovePro
 		 * @brief Adds a promotion move to the moves vector based on the given parameters
@@ -66,7 +66,7 @@ class MoveList
 		 * @param takecode The piece code of the piece being promoted to
 		 * @return void
 		 */
-        void addMovePro(int code, int colorcode, std::pair<int, int> form, std::pair<int, int> to, int procode);
+        void addMovePro(int code, int colorcode, int from, int to, int procode);
         /**
 		 * @fn addMoveEnpas
 		 * @brief Adds an enpasent move to the moves vector based on the given parameters
@@ -77,7 +77,7 @@ class MoveList
 		 * @param takepos The position of the piece being taken en passent
 		 * @return void
 		 */
-        void addMoveEnpas(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to, std::pair<int, int> takepos);
+        void addMoveEnpas(int code, int colorcode, int from, int to, int takepos);
         /**
 		 * @fn addMoveTakePro
 		 * @brief Adds a taking and promotion move to the moves vector based on the given parameters
@@ -89,7 +89,7 @@ class MoveList
 		 * @param The piece code being promoted to
 		 * @return void
 		 */
-        void addMoveTakePro(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to, int takecode, int procode);
+        void addMoveTakePro(int code, int colorcode, int from, int to, int takecode, int procode);
         /**
 		 * @fn addMoveCastle
 		 * @brief Adds a castling move to the moves vector based on the given parameters
@@ -101,7 +101,7 @@ class MoveList
 		 * @param rookto A pair of ints representing the rooks final position
 		 * @return void
 		 */
-        void addMoveCastle(int code, int colorcode, std::pair<int, int> from, std::pair<int, int> to, std::pair<int, int> rookfrom, std::pair<int, int> rookto);
+        void addMoveCastle(int code, int colorcode, int from, int to, int rookfrom, int rookto);
         /**
 		 * @fn generateMoves
 		 * @brief Generates all the moves for a given board and color
@@ -162,14 +162,14 @@ class MoveList
 		 * @brief Returns the next move to make on the board
 		 * @return pair<bool, mov> The mov struct and a bool indicating whether there was a valid move to return
 		 */
-        std::pair<bool, mov> getNextMove();
+        u64 getNextMove();
         /**
 		 * @fn getMovN
 		 * @brief Returns the mov at position N in the moves vector
 		 * @param n The position in the vector to return the mov from
 		 * @return mov The mov at position n in the moves vector
 		 */
-        mov getMovN(int n);
+        u64 getMovN(int n);
         /**
 		 * @fn getMoveNumber
 		 * @brief Returns the number of pseudolegal moves that were generated
@@ -182,7 +182,7 @@ class MoveList
 		 * @param x The mov to generate the mov code for
 		 * @return string The move code for the given mov
 		 */
-        std::string getMoveCode(mov x);
+        std::string getMoveCode(u64 x);
 };
 
 

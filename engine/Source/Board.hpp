@@ -23,23 +23,20 @@
 
 typedef unsigned long long u64;
 
-struct mov
-{
-    int code;
-    int colorcode;
-    std::pair<int, int> from;
-    std::pair<int, int> to;
-    bool take = false;
-    bool promote = false;
-    bool enPas = false;
-    bool castle = false;
-    std::pair<int, int> rookfrom;
-    std::pair<int, int> rookto;
-    int procode;
-    int takecode;
-    std::pair<int, int> takepos;
-    int score;
-};
+//Move representation :
+//first 3 = code
+//next 3 = colorcode
+//next 6 = from
+//next 6 = to
+//next 1 = takebool
+//next 6 = takepos
+//next 3 = takecode
+//next 1 = promote
+//next 3 = promotecode
+//next 1 = castle
+//next 6 = castle from
+//next 5 = castle to
+//next 1 = enPasent flag
 
 /**
  * @class Board
@@ -102,13 +99,6 @@ class Board
 		 */
         u64 nextCastleOrEnpasent();
         /**
-		 * @fn getAttacked
-		 * @brief Returns all attacked squares for a certain color
-		 * @param colorcode 6 for white, 7 for black
-		 * @return u64 bitboard representing all attacked squares
-		 */
-        u64 getAttacked(int colorcode);
-        /**
 		 * @fn getPieceCode
 		 * @brief get the piece code from the FEN char notation
 		 * @param p FEN char notation
@@ -129,7 +119,7 @@ class Board
          * @param y (0 - 7) y coordinate
 		 * @return 0 - 5, 0 for pawns ect.
 		 */
-        int getPieceFromPos(int x, int y);
+        int getPieceFromPos(int pos);
         /**
 		 * @fn setBB
 		 * @brief Set pieceBB[code] to value
@@ -152,7 +142,7 @@ class Board
 		 * @param from Position the piece is in
 		 * @param to Position to move the piece to
 		 */
-        void makeMove(int code, int colorcode, std::pair <int, int> from, std::pair <int, int> to);
+        void makeMove(int code, int colorcode, int from, int to);
         /**
 		 * @fn simpleMakeMove
 		 * @brief Less effecient make move that requires less info.
@@ -170,7 +160,7 @@ class Board
 		 * @param to Position where the pawn is promoting
 		 * @param code Code for the piece the pawn is promoting to
 		 */
-        void promotePawn(int colorcode, std::pair <int, int> from, std::pair <int, int> to, int code);
+        void promotePawn(int colorcode, int from, int to, int code);
         /**
 		 * @fn takePiece
 		 * @brief Removes a piece from the given position
@@ -184,6 +174,12 @@ class Board
 		 * @return True for incheck, false otherwise.
 		 */
         bool inCheck(int colorcode);
+        u64 getAttacked(int colorcode);
+        bool getAttackedPawn(int colorcode, int pos, u64 oppcolorboard);
+        bool getAttackedKing(int pos, u64 oppcolorboard);
+        bool getAttackedKnight(int pos, u64 oppcolorboard);
+        bool getAttackedBishopQueen(int pos, u64 oppbisqueen);
+        bool getAttackedRookQueen(int pos, u64 opprookqueen);
         /**
 		 * @fn putPiece
 		 * @brief Puts a given piece in a given position
@@ -192,7 +188,7 @@ class Board
 		 * @param position A pair of integers idicating where to place the piece
 		 * @return void
 		 */
-        void putPiece(int code, int colorcode, std::pair<int, int> position);
+        void putPiece(int code, int colorcode, int position);
         /**
 		 * @fn specTakePiece
 		 * @brief Removes a given piece from a given position
@@ -201,14 +197,14 @@ class Board
 		 * @param position A pair of integers idicating the position of the piece
 		 * @return void
 		 */
-        void specTakePiece(int code, int colorcode, std::pair<int, int> position);
+        void specTakePiece(int code, int colorcode, int position);
         /**
 		 * @fn makeMov
 		 * @brief Makes a move given a mov struct
 		 * @param theMove A mov struct representing the given move
 		 * @return void
 		 */
-        void makeMov(mov theMove);
+        void makeMov(u64 theMove);
         /**
 		 * @fn unMakeMov
 		 * @brief UnMakes a move given a mov struct and the non reversible elements of a position
@@ -218,7 +214,7 @@ class Board
 		 * @param oldHash The zobrist hash before the move was made
 		 * @return void
 		 */
-        void unMakeMov(mov theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash);
+        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash);
         /**
 		 * @fn setEvaluation
 		 * @brief Sets the materialEval of the board to a given number

@@ -65,7 +65,7 @@ class Evaluation
 		 * @return int The score of the piece at the given position
 		 */
         static int getPosScore(int code, int colorCode, std::pair<int, int> position, Board& evalBoard);
-        static int getPosScore(int code, int colorCode, std::pair<int, int> position);
+        static int getPosScore(int code, int colorCode, int position);
         /**
 		 * @fn stageOfGame
 		 * @brief Returns whether a game is in middlegame or endgame

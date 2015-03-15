@@ -20,13 +20,8 @@ u64 rand64()
     return rand() ^ ((u64)rand() << 15) ^ ((u64)rand() << 30) ^ ((u64)rand() << 45) ^ ((u64)rand() << 60);
 }
 
-mov bad;
-entry badEntry;
-
 void TranspositionTables::initZobrist()
 {
-    badEntry.depth = -1;
-    bad.code = -1;
     srand(1262340);
     for (int i = 0; i < 781; i++) {
         u64 r = rand64();
@@ -109,16 +104,16 @@ u64 TranspositionTables::getBoardHash(Board& gameBoard, int playerColor)
     return rethash;
 }
 
-mov TranspositionTables::getBest(u64 signature)
+u64 TranspositionTables::getBest(u64 signature)
 {
     if (Table[signature & tab_mask].signature == signature) {
         return Table[signature & tab_mask].best;
     }
-    return bad;
+    return 0;
 }
 
 
-void TranspositionTables::setEntry(u64 signature, mov bestmove, int depth, int score)
+void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int score)
 {
     u64 key = signature & tab_mask;
     if (Table[key].depth < depth) {
@@ -145,19 +140,34 @@ void TranspositionTables::setOld()
     }
 }
 
+void TranspositionTables::initEntryCount()
+{
+    for (int i = 0; i < tab_size; i++) {
+        Table[i].depth = -1;
+    }
+}
+
+int TranspositionTables::getEntryCount()
+{
+    int TTcount = 0;
+    for (int i = 0; i < tab_size; i++) {
+        if (Table[i].depth > -1) {
+            TTcount++;
+        }
+    }
+    return TTcount;
+}
+
 std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int depth)
 {
     if (depth == 0) {
         return "";
     }
-    mov principal = getBest(gameBoard.getZorHash());
+    u64 principal = getBest(gameBoard.getZorHash());
     MoveList movList;
-    if (principal.code != -1) {
+    if (principal != 0) {
         gameBoard.makeMov(principal);
         return movList.getMoveCode(principal) + " " + getPrincipalVariation(gameBoard, depth - 1);
     }
     return "";
 }
-
-
-

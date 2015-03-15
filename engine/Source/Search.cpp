@@ -9,13 +9,12 @@
 void outbitboard(u64 n);
 u64 Search::nodes = 0;
 
-
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()));
     nodes++;
 
-    mov curBestMove = possibleMoves.getMovN(0);
+    u64 curBestMove = possibleMoves.getMovN(0);
     int currMoveNumber = 0;
     int maxScore = NEGATIVE_INFINITY;
     int score;
@@ -25,20 +24,20 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     int enpasCol = gameBoard.getEnpasentCol();
 
     while (true) {
-        pair<bool, mov> nextMove = possibleMoves.getNextMove();
-        if (nextMove.first) {
-            UCI::sendInfo("currmove " + possibleMoves.getMoveCode(nextMove.second) + " currmovenumber " + to_string(++currMoveNumber));
-            gameBoard.makeMov(nextMove.second);
-            score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1);
-            gameBoard.unMakeMov(nextMove.second, castle, enpasCol, lastHash);
-            //score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -NEGATIVE_INFINITY, remainingDepth - 1, playerColor*-1);
-            //cout << "Move is " << possibleMoves.getMoveCode(nextMove.second) << " and score is " << score << std::endl;
-            if (score != ILLEGAL_MOVE) {
+        u64 nextMove = possibleMoves.getNextMove();
+        if (nextMove != 0) {
+            gameBoard.makeMov(nextMove);
+            if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
+                UCI::sendInfo("currmove " + possibleMoves.getMoveCode(nextMove) + " currmovenumber " + to_string(++currMoveNumber));
+                score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1);
+                //score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, INFINITY, remainingDepth - 1, playerColor*-1);
+                //cout << "Move is " << possibleMoves.getMoveCode(nextMove.second) << " and score is " << score << std::endl;
                 if (score > maxScore){
                     maxScore = score;
-                    curBestMove = nextMove.second;
+                    curBestMove = nextMove;
                 }
             }
+            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash);
         } else {
             break;
         }
@@ -51,7 +50,6 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     if ((UCI::quit) or (UCI::killSearch)){
         return make_pair("", 0);
     }
-
     TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore);
     return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
@@ -81,34 +79,33 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     int enpasCol = gameBoard.getEnpasentCol();
     int maxScore = NEGATIVE_INFINITY;
     bool canMove = false;
-    mov bestMove;
+    u64 bestMove;
 
     while (true) {
-        pair<bool, mov> nextMove = possibleMoves.getNextMove();
-        if (nextMove.first) {
-            gameBoard.makeMov(nextMove.second);
+        u64 nextMove = possibleMoves.getNextMove();
+        if (nextMove != 0) {
+            gameBoard.makeMov(nextMove);
             score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1);
-            gameBoard.unMakeMov(nextMove.second, castle, enpasCol, lastHash);
+            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash);
             if (score != ILLEGAL_MOVE) {
                 canMove = true;
                 if (score >= beta){
-                    TranspositionTables::setEntry(gameBoard.getZorHash(), nextMove.second, remainingDepth, beta);
+                    TranspositionTables::setEntry(gameBoard.getZorHash(), nextMove, remainingDepth, beta);
                     return beta;
                 }
                 if (score > alpha){
                     alpha = score;
-                    bestMove = nextMove.second;
+                    bestMove = nextMove;
                     maxScore = score;
                 } else if (score > maxScore) {
                     maxScore = score;
-                    bestMove = nextMove.second;
+                    bestMove = nextMove;
                 }
             }
         } else {
             break;
         }
     }
-
     if (canMove == false) {
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE))) {
             return (-MATE_SCORE - remainingDepth);

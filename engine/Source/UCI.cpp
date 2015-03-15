@@ -15,7 +15,7 @@ using namespace std;
 void outbitboard(u64 n);
 
 bool UCI::quit = false;
-Board UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+Board UCI::currentBoard = Board();
 int UCI::currentColor = 1;
 bool UCI::killSearch = false;
 
@@ -238,8 +238,8 @@ bool UCI::startCalculating(string input)
     }
 
     if (quit == false) {
-        outputBestMove(bestMove);
         TranspositionTables::setOld();
+        outputBestMove(bestMove);
     }
     return true;
 }

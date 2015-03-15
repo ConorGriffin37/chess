@@ -309,11 +309,11 @@ int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> positio
     }
 }
 
-int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position)
+int Evaluation::getPosScore(int code, int colorCode, int position)
 {
     if (code == KING_CODE){
-        return kingPositionalScores[colorCode - WHITE_CODE][0][position.second*8 + (7 - position.first)];
+        return kingPositionalScores[colorCode - WHITE_CODE][0][position];
     } else {
-        return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position.second*8 + (7 - position.first)];
+        return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position];
     }
 }

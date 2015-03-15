@@ -14,7 +14,7 @@
 struct entry
 {
     u64 signature;
-    mov best;
+    u64 best;
     int depth;
     int score;
     bool ancient = false;
@@ -90,7 +90,7 @@ class TranspositionTables
 		 * @param signature The hash of the board to check
 		 * @return mov The best move the last time this board was evaluated
 		 */
-        static mov getBest(u64 signature);
+        static u64 getBest(u64 signature);
         /**
 		 * @fn setEntry
 		 * @brief Adds a new entry to the transposition table
@@ -100,7 +100,7 @@ class TranspositionTables
 		 * @param score The score of this position
 		 * @return void
 		 */
-        static void setEntry(u64 signature, mov bestmove, int depth, int score);
+        static void setEntry(u64 signature, u64 bestmove, int depth, int score);
         /**
 		 * @fn setOld
 		 * @brief Marks which entries in the transposition table are from a previous search
@@ -115,6 +115,8 @@ class TranspositionTables
 		 * @return void
 		 */
         static std::string getPrincipalVariation(Board gameBoard, int depth);
+        static void initEntryCount();
+        static int getEntryCount();
 };
 
 
