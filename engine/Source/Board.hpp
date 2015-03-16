@@ -179,11 +179,47 @@ class Board
 		 * @return True for incheck, false otherwise.
 		 */
         bool inCheck(int colorcode);
+        /**
+		 * @fn getAttacked
+		 * @brief Returns all the squares attacked by a certain color
+		 * @param colorcode Attacking color
+		 * @return bitboard of attacked squares
+		 */
         u64 getAttacked(int colorcode);
+        /**
+		 * @fn getAttackedPawn
+		 * @brief If the given square is attacked by a pawn
+		 * @param colorcode Defending color
+		 * @return true/false
+		 */
         bool getAttackedPawn(int colorcode, int pos, u64 oppcolorboard);
+        /**
+		 * @fn getAttackedKing
+		 * @brief If the given square is attacked by a King
+		 * @param colorcode Defending color
+		 * @return true/false
+		 */
         bool getAttackedKing(int pos, u64 oppcolorboard);
+        /**
+		 * @fn getAttackedKnight
+		 * @brief If the given square is attacked by a Knight
+		 * @param colorcode Defending color
+		 * @return true/false
+		 */
         bool getAttackedKnight(int pos, u64 oppcolorboard);
+        /**
+		 * @fn getAttackedBishopQueen
+		 * @brief If the given square is attacked by a Bishop or Queen
+		 * @param colorcode Defending color
+		 * @return true/false
+		 */
         bool getAttackedBishopQueen(int pos, u64 oppbisqueen);
+        /**
+		 * @fn getAttackedRookQueen
+		 * @brief If the given square is attacked by a Rook or Queen
+		 * @param colorcode Defending color
+		 * @return true/false
+		 */
         bool getAttackedRookQueen(int pos, u64 opprookqueen);
         /**
 		 * @fn putPiece
