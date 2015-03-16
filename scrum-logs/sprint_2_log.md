@@ -87,3 +87,56 @@ Scrum Log - Sprint 2
   * Testing of transpostion tables
 * Darragh:
   * Implemented additional UCI commands
+
+  **2015-3-9:**
+* Conor:
+  * Attempted returning score from TT table.
+* Darragh:
+  * Output principal variation
+ 
+  **2015-3-10:**
+* Terry:
+  * Investigation of click and drag movement. 
+* Darragh:
+  * Cleaned up search class.
+
+  **2015-3-11:**
+* Terry:
+  * Added ability to select a single square on the board
+* Darragh:
+  * Added more documentation
+  * Define statments for code clarity
+  * Output moves to mate correctly
+  * Added nodes output
+
+  **2015-3-12:**
+* Terry:
+  * Worked on click and click movement
+* Conor:
+  * Started work on new move represenation
+
+  **2015-3-13:**
+* Terry:
+  * Finished click and click movement
+* Conor:
+  * Changed move representation from mov struct to u64 to save time and space
+ 
+  **2015-3-14:**
+* Conor:
+  * Wrote new less expensive inCheck function
+* Darragh:
+  * Fixed unit tests
+ 
+  **2015-3-15:**
+* Conor:
+  * Debugged new inCheck function. Now passes all unit tests.
+* Darragh:
+  * Modified unit tests to work with new move format
+ 
+  **2015-3-16:**
+* Terry:
+  * Worked on material difference display.
+* Conor:
+  * Added new CaptureList class for qsearch
+* Darragh:
+  * Worked on qsearch
