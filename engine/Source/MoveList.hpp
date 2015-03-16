@@ -17,7 +17,7 @@
 
 class MoveList
 {
-    private:
+    protected:
         std::vector<u64> moves; /**< A vector containing the moves in the MoveList */
         std::vector<int> scores; /**< A vector containing the scores of each move */
         int timesCalled; /**< The amount of moves that have been retrieved with getNextMove */
@@ -44,7 +44,7 @@ class MoveList
 		 * @param to A pair of ints representing the pieces final position
 		 * @return void
 		 */
-        void addMove(int code, int colorcode, int from, int to);
+        virtual void addMove(int code, int colorcode, int from, int to);
         /**
 		 * @fn addMoveTake
 		 * @brief Adds a taking move to the moves vector based on the given parameters
@@ -66,7 +66,7 @@ class MoveList
 		 * @param takecode The piece code of the piece being promoted to
 		 * @return void
 		 */
-        void addMovePro(int code, int colorcode, int from, int to, int procode);
+        virtual void addMovePro(int code, int colorcode, int from, int to, int procode);
         /**
 		 * @fn addMoveEnpas
 		 * @brief Adds an enpasent move to the moves vector based on the given parameters
@@ -101,7 +101,7 @@ class MoveList
 		 * @param rookto A pair of ints representing the rooks final position
 		 * @return void
 		 */
-        void addMoveCastle(int code, int colorcode, int from, int to, int rookfrom, int rookto);
+        virtual void addMoveCastle(int code, int colorcode, int from, int to, int rookfrom, int rookto);
         /**
 		 * @fn generateMoves
 		 * @brief Generates all the moves for a given board and color
