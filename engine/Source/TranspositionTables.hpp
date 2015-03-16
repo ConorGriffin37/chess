@@ -8,8 +8,8 @@
 #include <utility>
 #include <string>
 
-#define tab_size 1048576 //4194304
-#define tab_mask 0b11111111111111111111 //1048576 in binary
+#define tab_size 2097152 //1048576
+#define tab_mask 0b111111111111111111111 //2097152 in binary
 
 struct entry
 {
@@ -17,6 +17,7 @@ struct entry
     u64 best;
     int depth;
     int score;
+    int type;
     bool ancient = false;
 };
 
@@ -90,7 +91,7 @@ class TranspositionTables
 		 * @param signature The hash of the board to check
 		 * @return mov The best move the last time this board was evaluated
 		 */
-        static u64 getBest(u64 signature);
+        static entry getBest(u64 signature);
         /**
 		 * @fn setEntry
 		 * @brief Adds a new entry to the transposition table
@@ -100,7 +101,7 @@ class TranspositionTables
 		 * @param score The score of this position
 		 * @return void
 		 */
-        static void setEntry(u64 signature, u64 bestmove, int depth, int score);
+        static void setEntry(u64 signature, u64 bestmove, int depth, int score, int type);
         /**
 		 * @fn setOld
 		 * @brief Marks which entries in the transposition table are from a previous search

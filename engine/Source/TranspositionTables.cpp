@@ -20,8 +20,12 @@ u64 rand64()
     return rand() ^ ((u64)rand() << 15) ^ ((u64)rand() << 30) ^ ((u64)rand() << 45) ^ ((u64)rand() << 60);
 }
 
+entry bad;
+
 void TranspositionTables::initZobrist()
 {
+    bad.depth = -1;
+    bad.best = 0;
     srand(1262340);
     for (int i = 0; i < 781; i++) {
         u64 r = rand64();
@@ -104,16 +108,15 @@ u64 TranspositionTables::getBoardHash(Board& gameBoard, int playerColor)
     return rethash;
 }
 
-u64 TranspositionTables::getBest(u64 signature)
+entry TranspositionTables::getBest(u64 signature)
 {
     if (Table[signature & tab_mask].signature == signature) {
-        return Table[signature & tab_mask].best;
+        return Table[signature & tab_mask];
     }
-    return 0;
+    return bad;
 }
 
-
-void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int score)
+void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int score, int type)
 {
     u64 key = signature & tab_mask;
     if (Table[key].depth < depth) {
@@ -121,6 +124,7 @@ void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int s
         Table[key].best = bestmove;
         Table[key].depth = depth;
         Table[key].score = score;
+        Table[key].type = type;
         Table[key].ancient = false;
     } else if (Table[key].ancient) {
         if (Table[key].signature != signature) {
@@ -128,6 +132,7 @@ void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int s
             Table[key].best = bestmove;
             Table[key].depth = depth;
             Table[key].score = score;
+            Table[key].type = type;
             Table[key].ancient = false;
         }
     }
@@ -163,7 +168,7 @@ std::string TranspositionTables::getPrincipalVariation(Board gameBoard, int dept
     if (depth == 0) {
         return "";
     }
-    u64 principal = getBest(gameBoard.getZorHash());
+    u64 principal = getBest(gameBoard.getZorHash()).best;
     MoveList movList;
     if (principal != 0) {
         gameBoard.makeMov(principal);

@@ -10,6 +10,9 @@
 #define ILLEGAL_MOVE 10001108
 #define NEGATIVE_INFINITY -10000000
 #define MATE_SCORE 1000000
+#define CUT_NODE 0
+#define ALL_NODE 1
+#define PV_NODE 2
 
 #define PAWN_CODE 0
 #define ROOK_CODE 1

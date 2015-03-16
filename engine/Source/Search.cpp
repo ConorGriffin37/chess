@@ -11,7 +11,7 @@ u64 Search::nodes = 0;
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
 {
-    MoveList possibleMoves(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()));
+    MoveList possibleMoves(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()).best);
     nodes++;
 
     u64 curBestMove = possibleMoves.getMovN(0);
@@ -50,7 +50,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     if ((UCI::quit) or (UCI::killSearch)){
         return make_pair("", 0);
     }
-    TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore);
+    TranspositionTables::setEntry(gameBoard.getZorHash(), curBestMove, remainingDepth, maxScore, PV_NODE);
     return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
 
@@ -67,8 +67,19 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         }
         return gameBoard.getEvaluation()*playerColor;
     }
-
-    MoveList possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()));
+    entry best = TranspositionTables::getBest(gameBoard.getZorHash());
+    if (best.depth >= remainingDepth) {
+        if (best.type == CUT_NODE) {
+            if (best.score >= beta) {
+                return best.score; //beta
+            }
+        } else if (best.type == ALL_NODE) {
+            if (best.score <= alpha) {
+                return alpha; //best.score;
+            }
+        }
+    }
+    MoveList possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), best.best);
     if (possibleMoves.kingTake) {
         return -ILLEGAL_MOVE;
     }
@@ -77,7 +88,6 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
-    int maxScore = NEGATIVE_INFINITY;
     bool canMove = false;
     u64 bestMove;
 
@@ -90,15 +100,11 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
             if (score != ILLEGAL_MOVE) {
                 canMove = true;
                 if (score >= beta){
-                    TranspositionTables::setEntry(gameBoard.getZorHash(), nextMove, remainingDepth, beta);
+                    TranspositionTables::setEntry(gameBoard.getZorHash(), nextMove, remainingDepth, beta, CUT_NODE);
                     return beta;
                 }
                 if (score > alpha){
                     alpha = score;
-                    bestMove = nextMove;
-                    maxScore = score;
-                } else if (score > maxScore) {
-                    maxScore = score;
                     bestMove = nextMove;
                 }
             }
@@ -113,6 +119,6 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         return 0;
     }
 
-    TranspositionTables::setEntry(gameBoard.getZorHash(), bestMove, remainingDepth, alpha);
+    TranspositionTables::setEntry(gameBoard.getZorHash(), bestMove, remainingDepth, alpha, ALL_NODE);
     return alpha;
 }
