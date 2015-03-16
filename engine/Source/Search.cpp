@@ -1,6 +1,7 @@
 #include "Search.hpp"
 #include "Board.hpp"
 #include "MoveList.hpp"
+#include "CaptureList.hpp"
 #include "UCI.hpp"
 #include "TranspositionTables.hpp"
 
@@ -65,7 +66,8 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (gameBoard.inCheck(((playerColor*-1 == 1) ? WHITE_CODE : BLACK_CODE))) {
             return -ILLEGAL_MOVE;
         }
-        return gameBoard.getEvaluation()*playerColor;
+        return qSearch(gameBoard, alpha, beta, playerColor);
+        //return gameBoard.getEvaluation()*playerColor;
     }
     entry best = TranspositionTables::getBest(gameBoard.getZorHash());
     if (best.depth >= remainingDepth) {
@@ -120,5 +122,48 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     }
 
     TranspositionTables::setEntry(gameBoard.getZorHash(), bestMove, remainingDepth, alpha, ALL_NODE);
+    return alpha;
+}
+
+int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
+{
+    int stand_pat = gameBoard.getEvaluation()*playerColor;
+
+    if (stand_pat >= beta) {
+        return beta;
+    }
+    if (alpha < stand_pat) {
+        alpha = stand_pat;
+    }
+
+    CaptureList possibleCaptures = CaptureList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE));
+    if (possibleCaptures.kingTake) {
+        return -ILLEGAL_MOVE;
+    }
+
+    int score;
+    u64 castle = gameBoard.getCastleOrEnpasent();
+    u64 lastHash = gameBoard.getZorHash();
+    int enpasCol = gameBoard.getEnpasentCol();
+
+    while (true) {
+        u64 nextCapture = possibleCaptures.getNextMove();
+        if (nextCapture != 0) {
+            gameBoard.makeMov(nextCapture);
+            score = -qSearch(gameBoard, -beta, -alpha, playerColor*-1);
+            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash);
+            if (score != ILLEGAL_MOVE) {
+                if (score >= beta){
+                    return beta;
+                }
+                if (score > alpha){
+                    alpha = score;
+                }
+            }
+        } else {
+            break;
+        }
+    }
+
     return alpha;
 }
