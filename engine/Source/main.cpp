@@ -42,10 +42,6 @@ int main()
 {
     initMasks();
     UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    CaptureList caps = CaptureList(UCI::currentBoard, 6);
-    for (int i = 0; i < caps.getMoveNumber(); i++) {
-        cout << caps.getMoveCode(caps.getMovN(i)) << endl;
-    }
     Evaluation::initpopCountOfByte();
     TranspositionTables::initZobrist();
     //TranspositionTables::initEntryCount();
