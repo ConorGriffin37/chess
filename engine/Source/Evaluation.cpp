@@ -208,7 +208,7 @@ int Evaluation::rooksOnOpenFile(int colorCode, Board& evalBoard)
     int rooksOpen = 0;
     if (numRooks > 0){
         for (int i = 0; i < 8; i++){
-            rooks = rooks & RemoveRanks[i];
+            rooks &= RemoveRanks[i];
             int change = numRooks - popCount(rooks);
             if ((change > 0) and (filesOpen[colorCode - WHITE_CODE][i] == true)){
                 rooksOpen++;
@@ -259,9 +259,9 @@ int Evaluation::evaluateBoard(Board& boardToEvaluate)
         }
         if (piecesBoards[KING_CODE] & bittest) {
             if (colorboard & bittest) {
-                whitescore = whitescore + kingPositionalScores[0][0 /*stageOfGame(boardToEvaluate)*/][i];
+                whitescore = whitescore + kingPositionalScores[0][stageOfGame(boardToEvaluate)][i];
             } else {
-                blackscore = blackscore + kingPositionalScores[1][0 /*stageOfGame(boardToEvaluate)*/][i];
+                blackscore = blackscore + kingPositionalScores[1][stageOfGame(boardToEvaluate)][i];
             }
         }
         bittest <<= 1;
