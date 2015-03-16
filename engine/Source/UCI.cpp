@@ -192,8 +192,9 @@ bool UCI::startCalculating(string input)
         }
     }
 
-    //send information to engine for calculation at the current position
+    //Set-up before search
     currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
+    currentBoard.stageOfGame = Evaluation::stageOfGame(currentBoard);
     currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? WHITE_CODE : BLACK_CODE)));
 
     string bestMove;
@@ -248,3 +249,4 @@ void UCI::sendInfo(string info)
 {
     cout << "info " << info << endl;
 }
+

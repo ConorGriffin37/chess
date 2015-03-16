@@ -300,19 +300,10 @@ int Evaluation::stageOfGame(Board& evalBoard)
     return 0;
 }
 
-int Evaluation::getPosScore(int code, int colorCode, std::pair<int, int> position, Board& evalBoard)
+int Evaluation::getPosScore(int code, int colorCode, int position, int gameStage)
 {
     if (code == KING_CODE){
-        return kingPositionalScores[colorCode - WHITE_CODE][stageOfGame(evalBoard)][position.second*8 + (7 - position.first)];
-    } else {
-        return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position.second*8 + (7 - position.first)];
-    }
-}
-
-int Evaluation::getPosScore(int code, int colorCode, int position)
-{
-    if (code == KING_CODE){
-        return kingPositionalScores[colorCode - WHITE_CODE][0][position];
+        return kingPositionalScores[colorCode - WHITE_CODE][gameStage][position];
     } else {
         return scores[code] + positionalScores[colorCode - WHITE_CODE][code][position];
     }

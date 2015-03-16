@@ -783,7 +783,7 @@ void Board::makeMov(u64 theMove)
         theMove >>= 3;
         specTakePiece(takecode, oppcolor, takepos);
         zorHash ^= TranspositionTables::getSquareHash(takepos, takecode, oppcolor);
-        materialEval = materialEval - getMultiplyColor(oppcolor)*Evaluation::getPosScore(takecode, oppcolor, takepos);
+        materialEval = materialEval - getMultiplyColor(oppcolor)*Evaluation::getPosScore(takecode, oppcolor, takepos, stageOfGame);
     } else {
         theMove >>= 10;
     }
@@ -794,15 +794,15 @@ void Board::makeMov(u64 theMove)
         promotePawn(colorcode, from, to, procode);
         zorHash ^= TranspositionTables::getSquareHash(from, 0, colorcode);
         zorHash ^= TranspositionTables::getSquareHash(to, procode, colorcode);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(procode, colorcode, to);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(procode, colorcode, to, stageOfGame);
     } else {
         theMove >>= 4;
         makeMove(code, colorcode, from, to);
         zorHash ^= TranspositionTables::getSquareHash(from, code, colorcode);
         zorHash ^= TranspositionTables::getSquareHash(to, code, colorcode);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, to);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, to, stageOfGame);
     }
     if (theMove & 1) {
         theMove >>= 1;
@@ -813,8 +813,8 @@ void Board::makeMov(u64 theMove)
         makeMove(1, colorcode, rookfrom, rookto);
         zorHash ^= TranspositionTables::getSquareHash(rookfrom, 1, colorcode);
         zorHash ^= TranspositionTables::getSquareHash(rookto, 1, colorcode);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookfrom);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookto);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookfrom, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookto, stageOfGame);
     }
     if (code == KING_CODE) {
         if (colorcode == WHITE_CODE) {
@@ -882,18 +882,18 @@ void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 o
         theMove >>= 3;
         specTakePiece(procode, colorcode, to);
         putPiece(PAWN_CODE, colorcode, from);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(procode, colorcode, to);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(procode, colorcode, to, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from, stageOfGame);
     } else {
         theMove >>= 4;
         makeMove(code, colorcode, to, from);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, to);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, to, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(code, colorcode, from, stageOfGame);
     }
     if (take) {
         int oppcolor = getOppColor(colorcode);
         putPiece(takecode, oppcolor, takepos);
-        materialEval = materialEval + getMultiplyColor(oppcolor)*Evaluation::getPosScore(takecode, oppcolor, takepos);
+        materialEval = materialEval + getMultiplyColor(oppcolor)*Evaluation::getPosScore(takecode, oppcolor, takepos, stageOfGame);
     }
     if (theMove & 1) {
         theMove >>= 1;
@@ -901,8 +901,8 @@ void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 o
         theMove >>= 6;
         int rookto = theMove & mask_6;
         makeMove(ROOK_CODE, colorcode, rookto, rookfrom);
-        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookto);
-        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookfrom);
+        materialEval = materialEval - getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookto, stageOfGame);
+        materialEval = materialEval + getMultiplyColor(colorcode)*Evaluation::getPosScore(1, colorcode, rookfrom, stageOfGame);
     }
 }
 

@@ -10,9 +10,6 @@
 #define ILLEGAL_MOVE 10001108
 #define NEGATIVE_INFINITY -10000000
 #define MATE_SCORE 1000000
-#define CUT_NODE 0
-#define ALL_NODE 1
-#define PV_NODE 2
 
 #define PAWN_CODE 0
 #define ROOK_CODE 1
@@ -22,6 +19,10 @@
 #define KING_CODE 5
 #define WHITE_CODE 6
 #define BLACK_CODE 7
+
+#define CUT_NODE 0
+#define ALL_NODE 1
+#define PV_NODE 2
 
 
 typedef unsigned long long u64;
@@ -59,6 +60,7 @@ class Board
         int enpasentCol; /**< The column where enpasant is available */
 
     public:
+        int stageOfGame; /**< Indicates whether the game is in middlegame or endgame. 0 for middlegame, 1 for endgame */
         Board(std::string fen);
         Board();
         /**
