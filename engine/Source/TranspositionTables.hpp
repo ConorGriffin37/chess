@@ -116,7 +116,17 @@ class TranspositionTables
 		 * @return void
 		 */
         static std::string getPrincipalVariation(Board gameBoard, int depth);
+        /**
+		 * @fn initEntryCount
+		 * @brief Initialises the entries in the transposition table so an entry count can be retrieved later
+		 * @return void
+		 */
         static void initEntryCount();
+        /**
+		 * @fn getEntryCount
+		 * @brief Counts the number of used entries in the transposition table
+		 * @return int The number of entries used in the TT
+		 */
         static int getEntryCount();
 };
 
