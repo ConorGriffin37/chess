@@ -19,6 +19,7 @@ namespace GUI
         int materialDifference = 0;
         Cairo.Context boardContext;
         byte[] pieceValues = { 1, 3, 3, 5, 8 }; // Pawn, Knight, Bishop, Rook, Queen
+        DateTime engineThinkCooldown = DateTime.Now;
 
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
@@ -216,6 +217,10 @@ namespace GUI
 
         protected void OnMakeEngineMove (object sender, EventArgs e)
         {
+            if ((DateTime.Now - engineThinkCooldown).Milliseconds < 500)
+                // Force a cooldown of 0.5 seconds between requests for the engine to think.
+                return;
+
             if (MainClass.CurrentEngine == null) {
                 Console.Error.WriteLine ("(EE) Engine not loaded.");
                 Gtk.Application.Invoke (delegate {
@@ -256,6 +261,8 @@ namespace GUI
                     return false;
                 });
             }
+
+            engineThinkCooldown = DateTime.Now;
         }
 
         private void ParseAndMakeMove(string move)
