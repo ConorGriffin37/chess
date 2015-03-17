@@ -13,6 +13,7 @@
 #include "../Source/Board.hpp"
 #include "../Source/Evaluation.hpp"
 #include "../Source/MoveList.hpp"
+#include "../Source/TranspositionTables.hpp"
 
 using namespace std;
 
@@ -21,6 +22,8 @@ void initMasks();
 BOOST_AUTO_TEST_CASE(UCI_sentPosition)
 {
     initMasks();
+    Evaluation::initpopCountOfByte();
+    TranspositionTables::initZobrist();
     cout << "Testing sentPosition function" << endl;
     BOOST_CHECK(UCI::sentPosition("position startpos moves e3e2") == false);
     BOOST_CHECK(UCI::sentPosition("position startpos moves e2e4") == true);
@@ -156,6 +159,9 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
 {
 	cout << "Testing search" << endl;
 	Board testBoard = Board("k7/pppp4/8/8/8/8/8/K4R2 w - - 0 1");
+    	testBoard.setEvaluation(Evaluation::evaluateBoard(testBoard));
+    	testBoard.stageOfGame = Evaluation::stageOfGame(testBoard);
+    	testBoard.setZorHash(TranspositionTables::getBoardHash(testBoard, 6));
 	BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4).first == "f1f8"); //it should find the checkmate for white
 }
 
@@ -212,3 +218,4 @@ BOOST_AUTO_TEST_CASE(perft_Test)
     testBoard = Board("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
     BOOST_CHECK(Perft(4, testBoard, 1) == 3894594);
 }
+
