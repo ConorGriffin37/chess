@@ -14,7 +14,7 @@ namespace GUI
         ImageSurface boardBackground;
         ImageSurface selectionBorder;
         PieceSelectionState currentSelectionState = PieceSelectionState.None;
-        Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*))(?=.*(score mate \d*)).*$");
+        Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score (?:cp|mate) [+\-0-9]*))(?=.*(pv [a-h12345678 ]*)).*$");
         byte selectedPiece;
         int materialDifference = 0;
         Cairo.Context boardContext;
@@ -217,7 +217,7 @@ namespace GUI
 
         protected void OnMakeEngineMove (object sender, EventArgs e)
         {
-            if ((DateTime.Now - engineThinkCooldown).Milliseconds < 500)
+            if ((DateTime.Now - engineThinkCooldown).TotalMilliseconds < 500)
                 // Force a cooldown of 0.5 seconds between requests for the engine to think.
                 return;
 
@@ -357,8 +357,9 @@ namespace GUI
             if (match.Success) {
                 EngineDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
                 EngineNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
-                string score = match.Groups [3].Value.Substring (9);
-                if (score != "0" || score != "") {
+                string score = match.Groups [3].Value.Substring (6);
+                if (score.StartsWith ("cp")) {
+                    score = score.Substring (3);
                     if (score.StartsWith ("-")) {
                         if (MainClass.CurrentBoard.PlayerToMove == PieceColour.White) {
                             score = "-" + score.Substring (1).PadLeft (2, '0');
@@ -381,9 +382,11 @@ namespace GUI
                             score = score.Insert (1, "0");
                         }
                     }
-                }
-                if (score == "") { // Only if engine is returning score in mates, not pawns
-                    score = match.Groups [5].Value.Substring (1);
+                } else if (score.StartsWith ("mate")) {
+                    score = score.Substring (5);
+                    if (score.StartsWith ("-"))
+                        score = score.Remove (0, 1);
+                    score = "M" + score;
                 }
                 string pv = match.Groups [4].Value.Substring (2);
                 TextIter iter = EngineOutput.GetIterAtLocation (0, 0);
