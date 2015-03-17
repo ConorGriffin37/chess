@@ -255,7 +255,9 @@ namespace GUI
                     if (x is InvalidOperationException) {
                         Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + x.Message);
                         MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
-                        ShowGameOverDialog (GameStatus.WhiteAdjudicate);
+                        Gtk.Application.Invoke(delegate {
+                            ShowGameOverDialog(MainClass.CurrentGameStatus);
+                        });
                         return true;
                     }
                     return false;
