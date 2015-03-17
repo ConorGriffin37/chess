@@ -16,6 +16,7 @@ namespace GUI
         PieceSelectionState currentSelectionState = PieceSelectionState.None;
         Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*)).*$");
         byte selectedPiece;
+        int materialDifference = 0;
         Cairo.Context boardContext;
 
         public MainWindow () : base (Gtk.WindowType.Toplevel)
@@ -29,6 +30,7 @@ namespace GUI
         public void InitWidgets()
         {
             BoardArea.AddEvents ((int)Gdk.EventMask.ButtonPressMask);
+            MaterialDifferenceLabel.Text = "Material is equal.";
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
@@ -487,6 +489,26 @@ namespace GUI
                 });
 
                 currentSelectionState = PieceSelectionState.None;
+            }
+        }
+
+        /**
+         * @fn UpdateMaterialDifference
+         * @brief Updates the material difference counter in the sidebar.
+         * 
+         * @param value the value of the piece just taken. Positive for white and negative for black
+         */
+        public void UpdateMaterialDifference(int value)
+        {
+            materialDifference += value;
+            if (materialDifference < 0) {
+                MaterialDifferenceLabel.Text = String.Format ("Black is {0} pawn{1} up.",
+                    Math.Abs (materialDifference), materialDifference < -1 ? "s" : "");
+            } else if (materialDifference > 0) {
+                MaterialDifferenceLabel.Text = String.Format ("White is {0} pawn{1} up.",
+                    Math.Abs (materialDifference), materialDifference > 1 ? "s" : "");
+            } else {
+                MaterialDifferenceLabel.Text = "Material is equal.";
             }
         }
     }
