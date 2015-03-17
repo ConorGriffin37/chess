@@ -14,7 +14,7 @@ namespace GUI
         ImageSurface boardBackground;
         ImageSurface selectionBorder;
         PieceSelectionState currentSelectionState = PieceSelectionState.None;
-        Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*)).*$");
+        Regex engineOutputRegex = new Regex (@"^(?=.*(depth \d*))(?=.*(nps \d*))(?=.*(score cp [+\-0-9]*))(?=.*(pv [a-h12345678 ]*))(?=.*(score mate \d*)).*$");
         byte selectedPiece;
         int materialDifference = 0;
         Cairo.Context boardContext;
@@ -347,7 +347,7 @@ namespace GUI
                 EngineDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
                 EngineNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
                 string score = match.Groups [3].Value.Substring (9);
-                if (score != "0") {
+                if (score != "0" || score != "") {
                     if (score.StartsWith ("-")) {
                         if (MainClass.CurrentBoard.PlayerToMove == PieceColour.White) {
                             score = "-" + score.Substring (1).PadLeft (2, '0');
@@ -370,6 +370,9 @@ namespace GUI
                             score = score.Insert (1, "0");
                         }
                     }
+                }
+                if (score == "") { // Only if engine is returning score in mates, not pawns
+                    score = match.Groups [5].Value.Substring (1);
                 }
                 string pv = match.Groups [4].Value.Substring (2);
                 TextIter iter = EngineOutput.GetIterAtLocation (0, 0);
