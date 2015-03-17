@@ -18,6 +18,7 @@ namespace GUI
         byte selectedPiece;
         int materialDifference = 0;
         Cairo.Context boardContext;
+        byte[] pieceValues = { 1, 3, 3, 5, 8 }; // Pawn, Knight, Bishop, Rook, Queen
 
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
@@ -93,6 +94,7 @@ namespace GUI
                 ShowGameOverDialog (currentStatus);
             }
             MainClass.ResetClock ();
+            UpdateMaterialDifference (MainClass.CurrentBoard);
         }
 
         protected void OnLoadEngine (object sender, EventArgs e)
@@ -498,12 +500,20 @@ namespace GUI
         /**
          * @fn UpdateMaterialDifference
          * @brief Updates the material difference counter in the sidebar.
-         * 
-         * @param value the value of the piece just taken. Positive for white and negative for black
          */
-        public void UpdateMaterialDifference(int value)
+        public void UpdateMaterialDifference(Board board)
         {
-            materialDifference += value;
+            int materialDifference = 0;
+            foreach (Square sq in board.Squares) {
+                if (sq.Piece != null) {
+                    if (sq.Piece.Type != PieceType.King && sq.Piece.Colour == PieceColour.White) {
+                        materialDifference += pieceValues [(int)(sq.Piece.Type)];
+                    } else if (sq.Piece.Type != PieceType.King && sq.Piece.Colour == PieceColour.Black) {
+                        materialDifference -= pieceValues [(int)(sq.Piece.Type)];
+                    }
+                }
+            }
+
             if (materialDifference < 0) {
                 MaterialDifferenceLabel.Text = String.Format ("Black is {0} pawn{1} up.",
                     Math.Abs (materialDifference), materialDifference < -1 ? "s" : "");

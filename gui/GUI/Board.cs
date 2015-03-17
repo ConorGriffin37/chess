@@ -24,7 +24,6 @@ namespace GUI
         public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
         public readonly byte[] pawnPromotionDestinations = { 0, 1, 2, 3, 4, 5, 6, 7,
                                                              56, 57, 58, 59, 60, 61, 62, 63 };
-        public readonly byte[] pieceValues = { 1, 3, 3, 5, 8 }; // Pawn, Knight, Bishop, Rook, Queen
 
         /**
          * @brief Default constructor.
@@ -171,48 +170,32 @@ namespace GUI
                     BlackCastled = true;
                 }
             } else {
-                // This value holds the total change in material throughout the move
-                int materialChange = 0;
-                if (Squares [destination].Piece != null) {
-                    if (movingPiece.Colour == PieceColour.White) {
-                        materialChange += pieceValues [(int)(Squares [destination].Piece.Type)];
-                    } else {
-                        materialChange -= pieceValues [(int)(Squares [destination].Piece.Type)];
-                    }
-                }
-
                 switch (promoteTo) {
                     case PieceType.Bishop:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
                         Squares [source].Piece = null;
-                        materialChange += movingPiece.Colour == PieceColour.White ? 3 : -3;
                         break;
                     case PieceType.Knight:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Knight);
                         Squares [source].Piece = null;
-                        materialChange += movingPiece.Colour == PieceColour.White ? 3 : -3;
                         break;
                     case PieceType.Rook:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Rook);
                         Squares [source].Piece = null;
-                        materialChange += movingPiece.Colour == PieceColour.White ? 5 : -5;
                         break;
                     case PieceType.Queen:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Queen);
                         Squares [source].Piece = null;
-                        materialChange += movingPiece.Colour == PieceColour.White ? 8 : -8;
                         break;
                     default:
                         Squares [destination].Piece = movingPiece;
                         Squares [source].Piece = null;
                         break;
                 }
-
-                if (materialChange != 0) {
-                    Gtk.Application.Invoke (delegate {
-                        MainClass.win.UpdateMaterialDifference (materialChange);
-                    });
-                }
+                        
+                Gtk.Application.Invoke (delegate {
+                    MainClass.win.UpdateMaterialDifference (new Board(this));
+                });
             }
 
             if (PlayerToMove == PieceColour.White) {
