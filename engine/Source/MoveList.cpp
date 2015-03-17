@@ -54,8 +54,8 @@ std::string MoveList::getMoveCode(u64 x)
     int to = (x >> 12) & dmask_6;
     std::string ret = "";
     ret = ret + char('a' + (7 - (from % 8))) + char('1' + from/8) + char('a' + (7 - (to % 8))) + char('1' + to/8);
-    if (checkbit(x, 29)) {
-        ret = ret + promotecodes[(x >> 30) & dmask_3];
+    if (checkbit(x, 28)) {
+        ret = ret + promotecodes[(x >> 29) & dmask_3];
     }
     return ret;
 }
