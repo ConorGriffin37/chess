@@ -68,6 +68,9 @@ namespace GUI
             if (castlingPossibilities.Length == 4) {
                 output.BlackCastled = false;
                 output.WhiteCastled = false;
+            } else if (castlingPossibilities == "-") {
+                output.BlackCastled = true;
+                output.WhiteCastled = true;
             } else if (castlingPossibilities.Length < 4) {
                 foreach (char c in castlingPossibilities) {
                     if (Char.IsLower (c)) {
@@ -76,9 +79,6 @@ namespace GUI
                         output.WhiteCastled = false;
                     }
                 }
-            } else if (castlingPossibilities == "-") {
-                output.BlackCastled = true;
-                output.WhiteCastled = true;
             } else
                 throw new ArgumentException ("Bad FEN field: Castling possibilities.", "fen");
 
@@ -153,7 +153,7 @@ namespace GUI
                 }
             }
 
-            if (position < 64)
+            if (position > 64)
                 throw new ArgumentException ("FEN string passed to parser too long.", "fen");
 
             return output;

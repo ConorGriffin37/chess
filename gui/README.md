@@ -1,46 +1,35 @@
 Chess GUI
 =========
 
-GUI for the chess project.
+GUI for the chess project. Currently runs on Linux, Windows, and OSX (unstable).
 
 ## Dependencies ##
 
 This engine requires the latest versions of the following software:
 * The Mono Runtme
 * GTK+
-* NUnit
+* MonoDevelop(AKA Xamarin Studio)/Visual Studio
 * Doxygen
 
 ## How to Install ##
 
-From the directory in which this file is located, run the following commands:
-```bash
-$ ./autogen.sh && make
-```
+To install, open up GUI.sln in MonoDevelop or Visual Studio and build within the IDE. If you 
+wish to run tests, you must build with the "Debug" option selected instead of "Release".
 
 Then, to run the main program, run the following:
 ```bash
-$ cd ./GUI/bin/Debug/
+$ cd <chess_dir_location>/gui/GUI/bin/Debug/
 $ ./GUI.exe
 ```
 
 To run the unit tests:
 ```bash
-$ cd ./Test/bin/Debug/
-$ nunit-console ./test.dll
+$ cd <chess_dir_location>/gui/Test/bin/Debug/
+$ nunit-console4 ./Test.dll
 ```
 
 And, finally, to compile documentation:
 ```bash
+$ cd <chess_dir_location>/gui/
 $ doxygen Doxyfile
-```
-
-## Troubleshooting ##
-
-If you get an error while running `autogen.sh` stating that NUnit cannot be found then you 
-can 
-(assuming you have NUnit installed) run the following command to get pkg-config to recognise 
-NUnit:
-```bash
-$ sudo ln -s /usr/lib/pkgconfig/mono-nunit.pc /usr/lib/pkgconfig/nunit.pc
 ```

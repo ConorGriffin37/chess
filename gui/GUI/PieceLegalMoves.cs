@@ -29,21 +29,24 @@ namespace GUI
                 if (currentPiece == null)
                     continue;
                 currentPiece.LegalMoves = new List<byte> ();
+                if (currentPiece.Colour != board.PlayerToMove)
+                    continue;
                 foreach (byte pseudoLegalMove in currentPiece.PseudoLegalMoves) {
+                    Piece capturedPiece;
                     // Make a move on the temp board
-                    tempBoard.MakeMove (i, pseudoLegalMove);
+                    capturedPiece = tempBoard.MakeMove (i, pseudoLegalMove);
                     // Check to see if own king is in check after that move.
                     // If it is simply undo the move. Else, add it to the list
                     // of legal moves for that piece and then undo.
                     if (currentPiece.Colour == PieceColour.White &&
                         tempBoard.WhiteCheck) {
-                        tempBoard.UndoMove (i, pseudoLegalMove);
+                        tempBoard.UndoMove (i, pseudoLegalMove, capturedPiece);
                     } else if (currentPiece.Colour == PieceColour.Black &&
                                tempBoard.BlackCheck) {
-                        tempBoard.UndoMove (i, pseudoLegalMove);
+                        tempBoard.UndoMove (i, pseudoLegalMove, capturedPiece);
                     } else {
                         currentPiece.LegalMoves.Add (pseudoLegalMove);
-                        tempBoard.UndoMove (i, pseudoLegalMove);
+                        tempBoard.UndoMove (i, pseudoLegalMove, capturedPiece);
                     }
                 }
             }

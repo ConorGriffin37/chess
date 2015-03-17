@@ -6,20 +6,24 @@ namespace GUI
     public enum PieceColour { White, Black };
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
     // The colour before the game result indicates which colour has lost.
-    public enum GameStatus { Unfinished, Stalemate, WhiteCheckmate,
-        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate };
+    public enum GameStatus { Inactive, Active, Stalemate, WhiteCheckmate,
+        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime };
 
     /**
      * @brief Representation of the board as a whole.
      */
     public class Board
     {
-        public Square[] Squares { get; private set; }
-        public bool BlackCheck { get; set; }
-        public bool WhiteCheck { get; set; }
-        public bool BlackCastled { get; set; }
-        public bool WhiteCastled { get; set; }
-        public PieceColour PlayerToMove { get; set; }
+        public virtual Square[] Squares { get; protected set; }
+        public virtual bool BlackCheck { get; set; }
+        public virtual bool WhiteCheck { get; set; }
+        public virtual bool BlackCastled { get; set; }
+        public virtual bool WhiteCastled { get; set; }
+        public virtual PieceColour PlayerToMove { get; set; }
+
+        public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
+        public readonly byte[] pawnPromotionDestinations = { 0, 1, 2, 3, 4, 5, 6, 7,
+                                                             56, 57, 58, 59, 60, 61, 62, 63 };
 
         /**
          * @brief Default constructor.
@@ -126,6 +130,9 @@ namespace GUI
             if (movingPiece == null)
                 return false;
 
+            if (movingPiece.Colour != PlayerToMove)
+                return false;
+
             if (movingPiece.LegalMoves.Contains (destination))
                 return true;
 
@@ -145,8 +152,53 @@ namespace GUI
                 throw new InvalidOperationException ("Invalid move entered.");
             }
             Piece movingPiece = Squares [source].Piece;
-            Squares [destination].Piece = movingPiece;
-            Squares [source].Piece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                (source == 4 || source == 60) &&
+                Array.IndexOf (castleDestinations, destination) != -1) {
+                Square castleRookSquare = destination - source > 0 ?
+                    Squares [destination + 1] : Squares [destination - 2];
+                Squares [destination].Piece = movingPiece;
+                Squares [source].Piece = null;
+                Squares [destination - source > 0 ?
+                    destination - 1 :
+                    destination + 1].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastled = true;
+                } else {
+                    BlackCastled = true;
+                }
+            } else {
+                switch (promoteTo) {
+                    case PieceType.Bishop:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Knight:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Knight);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Rook:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Rook);
+                        Squares [source].Piece = null;
+                        break;
+                    case PieceType.Queen:
+                        Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Queen);
+                        Squares [source].Piece = null;
+                        break;
+                    default:
+                        Squares [destination].Piece = movingPiece;
+                        Squares [source].Piece = null;
+                        break;
+                }
+                        
+                Gtk.Application.Invoke (delegate {
+                    MainClass.win.UpdateMaterialDifference (new Board(this));
+                });
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {
@@ -167,8 +219,28 @@ namespace GUI
                              PieceType? originalPromoteTo = null)
         {
             Piece movingPiece = Squares [originalDestination].Piece;
-            Squares [originalSource].Piece = movingPiece;
-            Squares [originalDestination].Piece = null;
+
+            // Special rules for castling
+            if (movingPiece.Type == PieceType.King &&
+                Array.IndexOf (castleDestinations, originalDestination) != -1) {
+                Square castleRookSquare = originalDestination - originalSource > 0 ?
+                    Squares [originalDestination - 1] : Squares [originalDestination + 1];
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = null;
+                Squares [originalDestination - originalSource > 0 ?
+                    originalDestination + 1 :
+                    originalDestination - 2].Piece = castleRookSquare.Piece;
+                castleRookSquare.Piece = null;
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastled = false;
+                } else {
+                    BlackCastled = false;
+                }
+            } else {
+                Squares [originalSource].Piece = movingPiece;
+                Squares [originalDestination].Piece = null;
+            }
+
             if (PlayerToMove == PieceColour.White) {
                 PlayerToMove = PieceColour.Black;
             } else {
@@ -199,12 +271,13 @@ namespace GUI
                 return GameStatus.WhiteCheckmate;
             } else if (legalMoveCountBlack == 0 && BlackCheck) {
                 return GameStatus.BlackCheckmate;
-            } else if ((legalMoveCountWhite == 0 || legalMoveCountBlack == 0) &&
+            } else if (((legalMoveCountWhite == 0 && PlayerToMove == PieceColour.White) ||
+                (legalMoveCountBlack == 0 && PlayerToMove == PieceColour.Black)) &&
                 !WhiteCheck && !BlackCheck) {
                 return GameStatus.Stalemate;
             }
 
-            return GameStatus.Unfinished;
+            return GameStatus.Active;
         }
 
         public Piece PieceAt(int square)
@@ -270,12 +343,13 @@ namespace GUI
 
                 // If at end of row (but not the last one), append '/'.
                 // Also append the blank square count if not 0
-                if (i != 63 && i % 8 == 7) {
+                if (i % 8 == 7) {
                     if (blankCounter > 0) {
                         fen += blankCounter.ToString ();
                         blankCounter = 0;
                     }
-                    fen += '/';
+                    if (i != 63)
+                        fen += '/';
                 }
             }
             fen += ' ';
