@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-#include "../Source/UCI.hpp"
-#include "../Source/Search.hpp"
-#include "../Source/Board.hpp"
+#include "UCI.hpp"
+#include "Search.hpp"
+#include "Board.hpp"
 
 using namespace std;
 
