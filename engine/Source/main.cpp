@@ -1,8 +1,14 @@
 #include <iostream>
 #include "UCI.hpp"
 #include "Search.hpp"
+#include "MoveList.hpp"
+#include "CaptureList.hpp"
+#include "TranspositionTables.hpp"
 
 using namespace std;
+
+void initMasks();
+int bitScanForward(u64 bb);
 
 char gets(u64 x)
 {
@@ -34,12 +40,17 @@ void outbitboard(u64 n)
 
 int main()
 {
-    UCI uciObject;
+    initMasks();
+    UCI::currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    Evaluation::initpopCountOfByte();
+    TranspositionTables::initZobrist();
+    //TranspositionTables::initEntryCount();
     while (true){
-        uciObject.waitForInput();
-        if (uciObject.quit == true){
+        UCI::waitForInput();
+        if (UCI::quit == true){
             break;
         }
     }
+    //std::cout << TranspositionTables::getEntryCount() << std::endl;
     return 0;
 }

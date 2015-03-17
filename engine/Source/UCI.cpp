@@ -1,13 +1,24 @@
 #include "UCI.hpp"
 #include "Search.hpp"
+#include "Evaluation.hpp"
+#include "TranspositionTables.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
 void outbitboard(u64 n);
+
+bool UCI::quit = false;
+Board UCI::currentBoard = Board();
+int UCI::currentColor = 1;
+bool UCI::killSearch = false;
+
 
 bool UCI::waitForInput()
 {
@@ -21,14 +32,20 @@ bool UCI::waitForInput()
     } else if (command == "quit"){
         quit = true;
     } else if (command == "position"){
+        killSearch = true;
         sentPosition(input);
     } else if (command == "ucinewgame"){
+        killSearch = true;
         currentBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         currentColor = 1;
     } else if (command == "go"){
-        startCalculating(input);
+        killSearch = true;
+        std::thread t1(&startCalculating, input);
+        std::thread t2(waitForInput);
+        t1.join();
+        t2.join();
     } else if (command == "stop"){
-        //tell engine to stop calculating, needs multithreading to work
+        killSearch = true;
     } else if (command == "ponderhit"){
         //used for pondering, not being implemented this sprint
     } else if (command == "debug"){
@@ -88,6 +105,7 @@ bool UCI::sentPosition(string input)
         currentColor = 1;
     }
     getline(ss, moves, ' ');
+
     if (moves == "moves"){
         while (getline(ss, moveIn, ' ')){
             pair<int, int> startPosition = make_pair(moveIn[0] - 'a', moveIn[1] - '1');
@@ -96,6 +114,7 @@ bool UCI::sentPosition(string input)
             if (moveIn.length() == 5){
                 promote = moveIn[4];
             }
+            Board lastBoard = currentBoard;
             bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
             //outbitboard(currentBoard.getPieces());
             if (moveMade == false){ //move not valid
@@ -172,10 +191,57 @@ bool UCI::startCalculating(string input)
             iss >> movetime;
         }
     }
-    //send information to engine for calculation at the current position
-    Search searchClass;
-    string bestMove = searchClass.RootAlphaBeta(currentBoard, currentColor, depth);
-    outputBestMove(bestMove);
+
+    //Set-up before search
+    currentBoard.setEvaluation(Evaluation::evaluateBoard(currentBoard));
+    currentBoard.stageOfGame = Evaluation::stageOfGame(currentBoard);
+    currentBoard.setZorHash(TranspositionTables::getBoardHash(currentBoard, ((currentColor == 1) ? WHITE_CODE : BLACK_CODE)));
+
+    string bestMove;
+    int curDepth = min(depth, 2);
+    killSearch = false;
+    Search::nodes = 0;
+    chrono::time_point<chrono::system_clock> timeBeforeSearch, timeAfterSearch;
+    timeBeforeSearch = chrono::system_clock::now();
+
+    while ((curDepth <= depth) or (infinite)) {
+        if (killSearch == true) {
+            break;
+        }
+        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
+        if (searchResult.first != "") {
+            timeAfterSearch = chrono::system_clock::now();
+            chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
+            int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
+
+            string info = string("depth ") + to_string(curDepth);
+            info += " nodes " + to_string(Search::nodes);
+            info += " nps " + to_string(nodesPerSecond);
+
+            if (searchResult.second > MATE_SCORE) {
+                searchResult.second -= MATE_SCORE;
+                int plyCount = (curDepth - searchResult.second);
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
+                info += " score mate " + to_string(plyCount - (plyCount/2));
+            } else if (searchResult.second < -MATE_SCORE) {
+                searchResult.second += MATE_SCORE;
+                int plyCount = (curDepth + searchResult.second);
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, plyCount);
+                info += " score mate " + to_string(-1*((plyCount/2) + 1));
+            } else {
+                info += " pv " + TranspositionTables::getPrincipalVariation(currentBoard, curDepth);
+                info += " score cp " + to_string(searchResult.second);
+            }
+            sendInfo(info);
+            bestMove = searchResult.first;
+        }
+        curDepth++;
+    }
+
+    if (quit == false) {
+        TranspositionTables::setOld();
+        outputBestMove(bestMove);
+    }
     return true;
 }
 
@@ -183,3 +249,4 @@ void UCI::sendInfo(string info)
 {
     cout << "info " << info << endl;
 }
+
