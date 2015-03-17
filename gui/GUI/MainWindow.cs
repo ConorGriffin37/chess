@@ -416,6 +416,7 @@ namespace GUI
 
             PointD pieceLocation = PieceDisplay.pieceCoordinates [0];
             int pieceIndex = 0;
+
             for (int i = 0; i < PieceDisplay.pieceCoordinates.Length; i++) {
                 PointD p = PieceDisplay.pieceCoordinates[i];
                 double x1 = p.X * 0.75;
@@ -425,7 +426,7 @@ namespace GUI
                 if (x1 <= clickLocation.X && clickLocation.X <= x2) {
                     if (y1 <= clickLocation.Y && clickLocation.Y <= y2) {
                         pieceLocation = p;
-                        pieceIndex = i;
+                        pieceIndex = MainClass.BoardOrientation == PieceColour.White ? i : Math.Abs (i - 63);
                         break;
                     }
                 }
