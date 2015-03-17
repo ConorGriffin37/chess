@@ -455,8 +455,23 @@ namespace GUI
                     return;
                 }
 
+                // Handle pawn promotion
+                PieceType? promoteTo = null;
+                if (MainClass.CurrentBoard.Squares [selectedPiece].Piece.Type == PieceType.Pawn &&
+                   MainClass.CurrentBoard.IsMoveValid (selectedPiece, (byte)pieceIndex) &&
+                   Array.IndexOf (MainClass.CurrentBoard.pawnPromotionDestinations, (byte)pieceIndex) != -1) {
+                    PawnPromotionDialog dialog = new PawnPromotionDialog ();
+                    if (dialog.Run () == (int)Gtk.ResponseType.Ok) {
+                        promoteTo = dialog.PromoteTo;
+                    } else {
+                        dialog.Destroy ();
+                        return;
+                    }
+                    dialog.Destroy ();
+                }
+
                 try {
-                    MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex);
+                    MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
                 } catch(InvalidOperationException) {
                     Debug.Log ("Invalid move entered.");
                 }

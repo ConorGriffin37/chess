@@ -22,6 +22,8 @@ namespace GUI
         public virtual PieceColour PlayerToMove { get; set; }
 
         public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
+        public readonly byte[] pawnPromotionDestinations = { 0, 1, 2, 3, 4, 5, 6, 7,
+                                                             56, 57, 58, 59, 60, 61, 62, 63 };
 
         /**
          * @brief Default constructor.
