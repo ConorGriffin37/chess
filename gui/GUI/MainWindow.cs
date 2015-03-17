@@ -218,14 +218,16 @@ namespace GUI
         {
             if (MainClass.CurrentEngine == null) {
                 Console.Error.WriteLine ("(EE) Engine not loaded.");
-                MessageDialog errorDialog = new MessageDialog (
-                                                this,
-                                                DialogFlags.DestroyWithParent,
-                                                MessageType.Error,
-                                                ButtonsType.Ok,
-                                                "Please load an engine first.");
-                errorDialog.Run ();
-                errorDialog.Destroy ();
+                Gtk.Application.Invoke (delegate {
+                    MessageDialog errorDialog = new MessageDialog (
+                                                    this,
+                                                    DialogFlags.DestroyWithParent,
+                                                    MessageType.Error,
+                                                    ButtonsType.Ok,
+                                                    "Please load an engine first.");
+                    errorDialog.Run ();
+                    errorDialog.Destroy ();
+                });
                 return;
             }
 
