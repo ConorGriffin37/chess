@@ -343,12 +343,13 @@ namespace GUI
 
                 // If at end of row (but not the last one), append '/'.
                 // Also append the blank square count if not 0
-                if (i != 63 && i % 8 == 7) {
+                if (i % 8 == 7) {
                     if (blankCounter > 0) {
                         fen += blankCounter.ToString ();
                         blankCounter = 0;
                     }
-                    fen += '/';
+                    if (i != 63)
+                        fen += '/';
                 }
             }
             fen += ' ';
