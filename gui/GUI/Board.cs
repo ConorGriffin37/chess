@@ -155,6 +155,7 @@ namespace GUI
 
             // Special rules for castling
             if (movingPiece.Type == PieceType.King &&
+                (source == 4 || source == 60) &&
                 Array.IndexOf (castleDestinations, destination) != -1) {
                 Square castleRookSquare = destination - source > 0 ?
                     Squares [destination + 1] : Squares [destination - 2];
