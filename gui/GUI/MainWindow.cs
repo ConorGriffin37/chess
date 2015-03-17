@@ -387,8 +387,9 @@ namespace GUI
                 } else if (score.StartsWith ("mate")) {
                     score = score.Substring (5);
                     if (score.StartsWith ("-"))
-                        score = score.Remove (0, 1);
-                    score = "M" + score;
+                        score = score.Insert (1, "M");
+                    else
+                        score = score.Insert (0, "M");
                 }
                 string pv = match.Groups [4].Value.Substring (2);
                 TextIter iter = EngineOutput.GetIterAtLocation (0, 0);
