@@ -127,7 +127,9 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
 
 int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
 {
-    int stand_pat = (gameBoard.getEvaluation() + Evaluation::GetMobilityScore(gameBoard))*playerColor;
+    //int stand_pat = (gameBoard.getEvaluation() + Evaluation::GetMobilityScore(gameBoard))*playerColor;
+    int stand_pat = gameBoard.getEvaluation()*playerColor;
+
 
     if (stand_pat >= beta) {
         return beta;
