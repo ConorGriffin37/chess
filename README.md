@@ -39,3 +39,4 @@ For testing the engine and the GUI, we recommend the following third-party progr
 	* Make engine play move in response to a user move (i.e. “game” mode)
 	* Toolbar below menu bar for quick access to common functions (new game, flip board, etc.)
 	* Analysis mode, get an engine to analyse a position
+	* Variation boards
