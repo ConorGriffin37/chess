@@ -639,21 +639,7 @@ void Board::setCastleOrEnpas(u64 value)
 
 u64 Board::nextCastleOrEnpasent()
 {
-    u64 last = getCastleOrEnpasent();
-    u64 next = 0;
-    if (checkbit(last, 63)) {
-        next = setbit(next, 63);
-    }
-    if (checkbit(last, 56)) {
-        next = setbit(next, 56);
-    }
-    if (checkbit(last, 0)) {
-        next = setbit(next, 0);
-    }
-    if (checkbit(last, 7)) {
-        next = setbit(next, 7);
-    }
-    return next;
+    return getCastleOrEnpasent() & CASTLE_OR_ENPASENT_BASIC;
 }
 
 int Board::getPieceFromPos(int pos)
