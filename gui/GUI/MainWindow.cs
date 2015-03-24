@@ -243,9 +243,11 @@ namespace GUI
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
             MainClass.CurrentEngine.SendPosition (currentFEN);
             MainClass.CurrentEngine.WaitUntilReady ();
+            string time = (MainClass.StrengthType == StrengthMeasure.Depth) ? "depth " : "movetime ";
+            time += (MainClass.StrengthType == StrengthMeasure.Depth) ? MainClass.StrengthValue : MainClass.StrengthValue * 1000;
             try {
                 var engineMoveTask = Task.Factory.StartNew<string> (
-                                         () => MainClass.CurrentEngine.Go ("depth 7"),
+                                         () => MainClass.CurrentEngine.Go (time),
                                          MainClass.EngineStopTokenSource.Token
                                      )
                     .ContinueWith (task => ParseAndMakeMove (task.Result),
@@ -539,6 +541,18 @@ namespace GUI
             } else {
                 MaterialDifferenceLabel.Text = "Material is equal.";
             }
+        }
+
+        protected void OnSetEngineStrength (object sender, EventArgs e)
+        {
+            EngineStrengthDialog dialog = new EngineStrengthDialog ();
+
+            if (dialog.Run() == (int)ResponseType.Ok) {
+                MainClass.StrengthType = dialog.Measure;
+                MainClass.StrengthValue = dialog.Value;
+                Debug.Log ("New engine strength: " + dialog.Measure + " " + dialog.Value);
+            }
+            dialog.Destroy ();
         }
     }
 }

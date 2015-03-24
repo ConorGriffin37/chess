@@ -14,6 +14,8 @@ namespace GUI
         public static ChessClock BlackClock { get; private set; }
         public static MainWindow win { get; private set; }
         public static PieceColour BoardOrientation { get; set; }
+        public static StrengthMeasure StrengthType { get; set; }
+        public static int StrengthValue { get; set; }
 
         public static void Main (string[] args)
         {
@@ -26,6 +28,8 @@ namespace GUI
             BoardOrientation = PieceColour.White;
             WhiteClock = new ChessClock (PieceColour.White, new TimeSpan (0, 30, 0));
             BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
+            StrengthType = StrengthMeasure.Depth;
+            StrengthValue = 7;
 
             Application.Init ();
             win = new MainWindow ();

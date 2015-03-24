@@ -75,6 +75,7 @@ namespace GUI
             Helper.SynchronousInvoke (delegate {
                 MainClass.win.ClearEngineOutput();
             });
+            Debug.Log ("go " + time);
             engine.Write("go " + time);
             IsThinking = true;
             if (time != "infinite") {
