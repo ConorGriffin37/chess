@@ -1,6 +1,7 @@
 #include "MoveList.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 void outbitboard(u64 n);
 bool checkbit(u64 bitboard, int pos);
@@ -25,6 +26,22 @@ MoveList::MoveList(Board& gameBoard, int colorcode, bool dontScore)
     position = 0;
     kingTake = false;
     generateMoves(gameBoard, colorcode);
+}
+
+MoveList::MoveList(Board& gameBoard, int colorcode, std::vector<std::string> restrictedMoves)
+{
+    timesCalled = 0;
+    position = 0;
+    kingTake = false;
+    generateMoves(gameBoard, colorcode);
+    std::sort(restrictedMoves.begin(), restrictedMoves.begin() + restrictedMoves.size());
+    std::vector<u64> newMoves(moves);
+    moves.clear();
+    for (unsigned int i = 0; i < newMoves.size(); i++) {
+        if (std::binary_search(restrictedMoves.begin(), restrictedMoves.end(), getMoveCode(newMoves[i]))) {
+            moves.push_back(newMoves[i]);
+        }
+    }
 }
 
 MoveList::MoveList()

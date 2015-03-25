@@ -24,9 +24,10 @@ class Search
 		 * @param gameBoard The game to search
 		 * @param playerColor An int representing the color of the player to make a move for. 1 for white, -1 for black
 		 * @param remainingDepth The depth to search to
-		 * @return string String representing the best move
+		 * @param searchMoves a list of moves to search (if moves to search are being restricted)
+		 * @return string, int String representing the best move and integer representing the score in centipawns
 		 */
-        static pair<string, int> RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth);
+        static pair<string, int> RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth, std::vector<std::string> searchMoves);
         /**
 		 * @fn AlphaBeta
 		 * @brief Searches the game tree to a given depth
@@ -37,8 +38,8 @@ class Search
 		 */
         static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor);
         /**
-         	 * @fn qSearch
-         	 * @brief Performs a quiescence search on a given position
+         * @fn qSearch
+         * @brief Performs a quiescence search on a given position
 		 * @param gameBoard The game to search
 		 * @param playerColor An int representing the color of the player to make a move for. 1 for white, -1 for black
 		 * @return int The score of the position

@@ -27,6 +27,7 @@ class MoveList
         bool kingTake; /**< Is the king taken by any of the generated moves (last move made was illegal) */
         MoveList(Board &gameBoard, int colorcode, u64 bestMove);
         MoveList(Board& gameBoard, int colorcode, bool dontScore);
+        MoveList(Board& gameBoard, int colorcode, std::vector<std::string> restrictedMoves);
         MoveList();
         /**
 		 * @fn scoreMoves

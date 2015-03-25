@@ -131,17 +131,17 @@ bool UCI::sentPosition(string input)
 bool UCI::startCalculating(string input)
 {
     vector<string> searchMoves; //a restricted list of moves to search
-    bool ponder = false; //whether to ponder on the current position or not
-    int wtime = -1; //time on whites clock in mseconds
-    int btime = -1; //time on blacks clock in mseconds
-    int winc = -1; //whites increment per move in mseconds
-    int binc = -1; //blacks increment per move in mseconds
-    int movestogo = -1; //number of moves left until the next time control
-    int depth = 5; //search only to a certain depth
-    int nodes = -1; //number of nodes to search
-    int mate = -1; //search for a mate in x moves
-    int movetime = -1; //time allowed for the move in mseconds
-    bool infinite = false; //search untill given the stop command
+    bool ponder = false;        //whether to ponder on the current position or not
+    int wtime = -1;             //time on whites clock in mseconds
+    int btime = -1;             //time on blacks clock in mseconds
+    int winc = -1;              //whites increment per move in mseconds
+    int binc = -1;              //blacks increment per move in mseconds
+    int movestogo = -1;         //number of moves left until the next time control
+    int depth = 10;              //search only to a certain depth
+    int nodes = -1;             //number of nodes to search
+    int mate = -1;              //search for a mate in x moves
+    int movetime = -1;          //time allowed for the move in mseconds
+    bool infinite = false;      //search untill given the stop command
     string token;
     stringstream ss(input);
     while (getline(ss, token, ' ')){
@@ -208,12 +208,14 @@ bool UCI::startCalculating(string input)
         if (killSearch == true) {
             break;
         }
-        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
-        if (searchResult.first != "") {
-            timeAfterSearch = chrono::system_clock::now();
-            chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
-            int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
 
+        timeAfterSearch = chrono::system_clock::now();
+        chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
+
+        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth, searchMoves);
+
+        if (searchResult.first != "") {
+            int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
             string info = string("depth ") + to_string(curDepth);
             info += " nodes " + to_string(Search::nodes);
             info += " nps " + to_string(nodesPerSecond);
@@ -235,6 +237,15 @@ bool UCI::startCalculating(string input)
             sendInfo(info);
             bestMove = searchResult.first;
         }
+
+        if ((elapsed_seconds.count() > movetime) and (movetime > 0)) {
+            break;
+        }
+
+        if ((Search::nodes > nodes) and (nodes > 0)) {
+            break;
+        }
+
         curDepth++;
     }
 

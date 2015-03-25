@@ -10,9 +10,14 @@
 void outbitboard(u64 n);
 u64 Search::nodes = 0;
 
-pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth)
+pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth, std::vector<string> searchMoves)
 {
-    MoveList possibleMoves(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()).best);
+    MoveList possibleMoves;
+    if (searchMoves.size() == 0) {
+        possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()).best);
+    } else {
+        possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), searchMoves);
+    }
     nodes++;
 
     u64 curBestMove = possibleMoves.getMovN(0);
