@@ -17,7 +17,8 @@ using namespace std;
 class Search
 {
     public:
-        static u64 nodes; /**< The number of nodes that have been searched */
+        static u64 nodes; /**< The number of nodes that have been searched at a given depth*/
+        static u64 totalNodes; /** < The total number of nodes searched */
         /**
 		 * @fn RootAlphaBeta
 		 * @brief Performs an Alpha-Beta search starting at the root node

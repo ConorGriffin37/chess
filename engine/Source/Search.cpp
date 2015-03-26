@@ -9,6 +9,7 @@
 
 void outbitboard(u64 n);
 u64 Search::nodes = 0;
+u64 Search::totalNodes = 0;
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth, std::vector<string> searchMoves)
 {

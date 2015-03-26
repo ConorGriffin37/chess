@@ -200,9 +200,10 @@ bool UCI::startCalculating(string input)
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
-    Search::nodes = 0;
+    Search::totalNodes = 0;
     chrono::time_point<chrono::system_clock> timeBeforeSearch, timeAfterSearch;
     timeBeforeSearch = chrono::system_clock::now();
+    int lastSearched = 0;
 
     while ((curDepth <= depth) or (infinite)) {
         if (killSearch == true) {
@@ -212,13 +213,16 @@ bool UCI::startCalculating(string input)
         timeAfterSearch = chrono::system_clock::now();
         chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
 
+        Search::nodes = 0;
         pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth, searchMoves);
+        Search::totalNodes = Search::totalNodes + Search::nodes;
 
         if (searchResult.first != "") {
-            int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
+            int nodesPerSecond = int(double(Search::totalNodes )/elapsed_seconds.count());
             string info = string("depth ") + to_string(curDepth);
-            info += " nodes " + to_string(Search::nodes);
+            info += " nodes " + to_string(Search::totalNodes);
             info += " nps " + to_string(nodesPerSecond);
+            cout << "Branching factor : " << double(Search::nodes)/double(lastSearched) << std::endl;
 
             if (searchResult.second > MATE_SCORE) {
                 searchResult.second -= MATE_SCORE;
@@ -237,12 +241,12 @@ bool UCI::startCalculating(string input)
             sendInfo(info);
             bestMove = searchResult.first;
         }
-
+        lastSearched = Search::nodes;
         if ((elapsed_seconds.count() > movetime) and (movetime > 0)) {
             break;
         }
 
-        if ((Search::nodes > nodes) and (nodes > 0)) {
+        if ((Search::totalNodes  > nodes) and (nodes > 0)) {
             break;
         }
 
