@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 680">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 690">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -105,6 +105,41 @@
         <property name="ShortLabel" translatable="yes">Set Engine Strength</property>
         <signal name="Activated" handler="OnSetEngineStrength" />
       </action>
+      <action id="GameModeAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Game Mode</property>
+        <property name="ShortLabel" translatable="yes">Game Mode</property>
+      </action>
+      <action id="OnePlayerAction">
+        <property name="Type">Radio</property>
+        <property name="Label" translatable="yes">Player vs Engine</property>
+        <property name="ShortLabel" translatable="yes">Player vs Engine</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">True</property>
+        <property name="Value">0</property>
+        <property name="Group">GameModeGroup</property>
+        <signal name="Activated" handler="OnOnePlayerSet" />
+      </action>
+      <action id="TwoPlayerAction">
+        <property name="Type">Radio</property>
+        <property name="Label" translatable="yes">Player vs Player</property>
+        <property name="ShortLabel" translatable="yes">Player vs Player</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <property name="Value">0</property>
+        <property name="Group">GameModeGroup</property>
+        <signal name="Activated" handler="OnTwoPlayerSet" />
+      </action>
+      <action id="EnginesAction">
+        <property name="Type">Radio</property>
+        <property name="Label" translatable="yes">Engine vs Engine</property>
+        <property name="ShortLabel" translatable="yes">Engine vs Engine</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <property name="Value">0</property>
+        <property name="Group">GameModeGroup</property>
+        <signal name="Activated" handler="OnEnginesSet" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -128,6 +163,11 @@
               </node>
               <node type="Menu" action="GameAction">
                 <node type="Menuitem" action="SetClockAction" />
+                <node type="Menu" action="GameModeAction">
+                  <node type="Menuitem" action="OnePlayerAction" />
+                  <node type="Menuitem" action="TwoPlayerAction" />
+                  <node type="Menuitem" action="EnginesAction" />
+                </node>
               </node>
               <node type="Menu" action="EngineAction">
                 <node type="Menuitem" action="LoadEngineAction" />

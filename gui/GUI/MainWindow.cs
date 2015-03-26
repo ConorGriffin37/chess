@@ -562,5 +562,20 @@ namespace GUI
             }
             dialog.Destroy ();
         }
+
+        protected void OnOnePlayerSet (object sender, EventArgs e)
+        {
+            MainClass.CurrentMode = GameMode.OnePlayer;
+        }
+
+        protected void OnTwoPlayerSet (object sender, EventArgs e)
+        {
+            MainClass.CurrentMode = GameMode.TwoPlayer;
+        }
+
+        protected void OnEnginesSet (object sender, EventArgs e)
+        {
+            MainClass.CurrentMode = GameMode.Engines;
+        }
     }
 }
