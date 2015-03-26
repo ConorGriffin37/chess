@@ -236,6 +236,13 @@ namespace GUI
                 return;
             }
 
+            EngineMove ();
+
+            engineThinkCooldown = DateTime.Now;
+        }
+
+        void EngineMove()
+        {
             if (MainClass.CurrentEngine.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
@@ -247,9 +254,9 @@ namespace GUI
             time += (MainClass.StrengthType == StrengthMeasure.Depth) ? MainClass.StrengthValue : MainClass.StrengthValue * 1000;
             try {
                 var engineMoveTask = Task.Factory.StartNew<string> (
-                                         () => MainClass.CurrentEngine.Go (time),
-                                         MainClass.EngineStopTokenSource.Token
-                                     )
+                    () => MainClass.CurrentEngine.Go (time),
+                    MainClass.EngineStopTokenSource.Token
+                )
                     .ContinueWith (task => ParseAndMakeMove (task.Result),
                         MainClass.EngineStopTokenSource.Token);
             } catch(AggregateException ae) {
@@ -265,8 +272,6 @@ namespace GUI
                     return false;
                 });
             }
-
-            engineThinkCooldown = DateTime.Now;
         }
 
         private void ParseAndMakeMove(string move)
@@ -512,6 +517,9 @@ namespace GUI
                 });
 
                 currentSelectionState = PieceSelectionState.None;
+
+                if (MainClass.CurrentEngine != null && MainClass.CurrentMode == GameMode.OnePlayer)
+                    EngineMove ();
             }
         }
 

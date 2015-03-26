@@ -4,6 +4,8 @@ using System.Threading;
 
 namespace GUI
 {
+    public enum GameMode { OnePlayer, TwoPlayer, Engines };
+
     class MainClass
     {
         public static Board CurrentBoard { get; set; }
@@ -16,6 +18,7 @@ namespace GUI
         public static PieceColour BoardOrientation { get; set; }
         public static StrengthMeasure StrengthType { get; set; }
         public static int StrengthValue { get; set; }
+        public static GameMode CurrentMode { get; set; }
 
         public static void Main (string[] args)
         {
@@ -30,6 +33,7 @@ namespace GUI
             BlackClock = new ChessClock (PieceColour.Black, new TimeSpan (0, 30, 0));
             StrengthType = StrengthMeasure.Depth;
             StrengthValue = 7;
+            CurrentMode = GameMode.OnePlayer;
 
             Application.Init ();
             win = new MainWindow ();
