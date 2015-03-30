@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace GUI
 {
@@ -57,7 +58,7 @@ namespace GUI
             string output;
             try {
                 var readTask = childProcess.StandardOutput.ReadLineAsync();
-                readTask.Wait(1000);
+                readTask.Wait(500);
                 if(readTask.IsCompleted) {
                     output = readTask.Result;
                 } else {
@@ -65,6 +66,7 @@ namespace GUI
                 }
             } catch(InvalidOperationException ex) {
                 Console.Error.WriteLine ("(EE) Error receiving data from engine: " + ex.Message);
+                Thread.Sleep (1000);
                 return null;
             } catch (Exception ex) {
                 Console.Error.WriteLine ("(EE) Error receiving data from engine: " + ex.Message);

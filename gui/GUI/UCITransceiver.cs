@@ -81,7 +81,6 @@ namespace GUI
 
             string response;
             do {
-                Debug.Log("poll");
                 if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
                     Debug.Log ("Engine task cancelled.");
                     MainClass.ResetEngineStopTokenSource();
