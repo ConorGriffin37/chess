@@ -21,3 +21,11 @@ Scrum Log - Sprint 3
 * Darragh:
   * Started on implementation of threefold repetition
  
+**2015-03-30:**
+* Terry:
+  * Added analyse mode.
+  * Fixed bug with cancelling the engine process.
+* Conor:
+  * Added killer move heuristic
+* Darragh:
+  * Implemented 50 move rule
