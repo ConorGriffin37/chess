@@ -56,7 +56,16 @@ namespace GUI
         {
             string output;
             try {
-                output = childProcess.StandardOutput.ReadLine();
+                var readTask = childProcess.StandardOutput.ReadLineAsync();
+                readTask.Wait(1000);
+                if(readTask.IsCompleted) {
+                    output = readTask.Result;
+                } else {
+                    return null;
+                }
+            } catch(InvalidOperationException ex) {
+                Console.Error.WriteLine ("(EE) Error receiving data from engine: " + ex.Message);
+                return null;
             } catch (Exception ex) {
                 Console.Error.WriteLine ("(EE) Error receiving data from engine: " + ex.Message);
                 throw new InvalidOperationException ("Child process not running.");

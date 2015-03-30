@@ -57,7 +57,6 @@
       </action>
       <action id="AboutAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;a</property>
         <property name="Label" translatable="yes">_About</property>
         <property name="ShortLabel" translatable="yes">_About</property>
         <signal name="Activated" handler="OnAbout" />
@@ -140,6 +139,13 @@
         <property name="Group">GameModeGroup</property>
         <signal name="Activated" handler="OnEnginesSet" />
       </action>
+      <action id="AnalysePositionAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;a</property>
+        <property name="Label" translatable="yes">_Analyse Position</property>
+        <property name="ShortLabel" translatable="yes">_Analyse Position</property>
+        <signal name="Activated" handler="OnAnalyseMove" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -156,11 +162,6 @@
               <node type="Menu" action="FileAction">
                 <node type="Menuitem" action="QuitAction" />
               </node>
-              <node type="Menu" action="BoardAction">
-                <node type="Menuitem" action="ResetBoardAction1" />
-                <node type="Menuitem" action="FlipBoardAction" />
-                <node type="Menuitem" action="LoadFENAction" />
-              </node>
               <node type="Menu" action="GameAction">
                 <node type="Menuitem" action="SetClockAction" />
                 <node type="Menu" action="GameModeAction">
@@ -169,10 +170,16 @@
                   <node type="Menuitem" action="EnginesAction" />
                 </node>
               </node>
+              <node type="Menu" action="BoardAction">
+                <node type="Menuitem" action="ResetBoardAction1" />
+                <node type="Menuitem" action="FlipBoardAction" />
+                <node type="Menuitem" action="LoadFENAction" />
+              </node>
               <node type="Menu" action="EngineAction">
                 <node type="Menuitem" action="LoadEngineAction" />
                 <node type="Menuitem" action="MakeEngineMoveAction" />
                 <node type="Menuitem" action="SetEngineStrengthAction" />
+                <node type="Menuitem" action="AnalysePositionAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="AboutAction" />

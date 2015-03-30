@@ -21,6 +21,8 @@ namespace GUI
         byte[] pieceValues = { 1, 3, 3, 5, 8 }; // Pawn, Knight, Bishop, Rook, Queen
         DateTime engineThinkCooldown = DateTime.Now;
 
+        Task engineThinkTask;
+
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
             boardBackground = new ImageSurface ("img/board.png");
@@ -247,13 +249,14 @@ namespace GUI
                 MainClass.CancelEngineTask ();
                 MainClass.CurrentEngine.StopAndIgnoreMove ();
             }
+
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
             MainClass.CurrentEngine.SendPosition (currentFEN);
             MainClass.CurrentEngine.WaitUntilReady ();
             string time = (MainClass.StrengthType == StrengthMeasure.Depth) ? "depth " : "movetime ";
             time += (MainClass.StrengthType == StrengthMeasure.Depth) ? MainClass.StrengthValue : MainClass.StrengthValue * 1000;
             try {
-                var engineMoveTask = Task.Factory.StartNew<string> (
+                engineThinkTask = Task.Factory.StartNew<string> (
                     () => MainClass.CurrentEngine.Go (time),
                     MainClass.EngineStopTokenSource.Token
                 )
@@ -576,6 +579,42 @@ namespace GUI
         protected void OnEnginesSet (object sender, EventArgs e)
         {
             MainClass.CurrentMode = GameMode.Engines;
+        }
+
+        protected void OnAnalyseMove (object sender, EventArgs e)
+        {
+            if ((DateTime.Now - engineThinkCooldown).TotalMilliseconds < 500)
+                // Force a cooldown of 0.5 seconds between requests for the engine to think.
+                return;
+
+            if (MainClass.CurrentEngine == null) {
+                Console.Error.WriteLine ("(EE) Engine not loaded.");
+                Gtk.Application.Invoke (delegate {
+                    MessageDialog errorDialog = new MessageDialog (
+                                                    this,
+                                                    DialogFlags.DestroyWithParent,
+                                                    MessageType.Error,
+                                                    ButtonsType.Ok,
+                                                    "Please load an engine first.");
+                    errorDialog.Run ();
+                    errorDialog.Destroy ();
+                });
+                return;
+            }
+            if (MainClass.CurrentEngine.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.CurrentEngine.StopAndIgnoreMove ();
+            }
+
+            string currentFEN = MainClass.CurrentBoard.ToFEN ();
+            MainClass.CurrentEngine.SendPosition (currentFEN);
+            MainClass.CurrentEngine.WaitUntilReady ();
+            engineThinkTask = Task.Factory.StartNew<string> (
+                                     () => MainClass.CurrentEngine.Go ("infinite"),
+                                     MainClass.EngineStopTokenSource.Token
+                                 );
+
+            engineThinkCooldown = DateTime.Now;
         }
     }
 }

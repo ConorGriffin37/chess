@@ -78,31 +78,30 @@ namespace GUI
             Debug.Log ("go " + time);
             engine.Write("go " + time);
             IsThinking = true;
-            if (time != "infinite") {
-                string response;
-                do {
-                    if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
-                        Debug.Log ("Engine task cancelled.");
-                        MainClass.ResetEngineStopTokenSource();
-                        return null;
+
+            string response;
+            do {
+                Debug.Log("poll");
+                if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
+                    Debug.Log ("Engine task cancelled.");
+                    MainClass.ResetEngineStopTokenSource();
+                    return null;
+                }
+                response = engine.Read ();
+                if(response == null) continue;
+                Debug.Log(response);
+                Helper.SynchronousInvoke(delegate {
+                    MainClass.win.LogEngineOutput(response);
+                });
+                if (response.StartsWith ("bestmove")) {
+                    IsThinking = false;
+                    if(response.Substring(9).Length > 4) {
+                        return response.Substring (9, 5);
+                    } else {
+                        return response.Substring (9, 4);
                     }
-                    response = engine.Read ();
-                    Debug.Log(response);
-                    Helper.SynchronousInvoke(delegate {
-                        MainClass.win.LogEngineOutput(response);
-                    });
-                    if (response.StartsWith ("bestmove")) {
-                        IsThinking = false;
-                        if(response.Substring(9).Length > 4) {
-                            return response.Substring (9, 5);
-                        } else {
-                            return response.Substring (9, 4);
-                        }
-                    }
-                } while(response != null);
-                throw new TimeoutException ("Engine has stopped responding.");
-            }
-            return null;
+                }
+            } while(true);
         }
 
         public string StopAndGetBestMove()
@@ -144,12 +143,15 @@ namespace GUI
         {
             engine.Write("stop");
             IsThinking = false;
+            /*
             // Wait until the EngineStopTokenSource has been reset.
             // This indicates that the task has in fact stopped and we can now proceed as normal.
             while (MainClass.EngineStopTokenSource.IsCancellationRequested)
                 continue;
+            */
             WaitUntilReady ();
             Debug.Log ("Engine stopped and ready for new input.");
+            MainClass.ResetEngineStopTokenSource ();
         }
     }
 }

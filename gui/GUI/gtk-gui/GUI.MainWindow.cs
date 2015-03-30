@@ -44,6 +44,8 @@ namespace GUI
 		
 		private global::Gtk.RadioAction EnginesAction;
 		
+		private global::Gtk.Action AnalysePositionAction;
+		
 		private global::Gtk.VBox vbox1;
 		
 		private global::Gtk.MenuBar MenuBar;
@@ -115,7 +117,7 @@ namespace GUI
 			w1.Add (this.LoadEngineAction, "<Primary><Mod2>e");
 			this.AboutAction = new global::Gtk.Action ("AboutAction", global::Mono.Unix.Catalog.GetString ("_About"), null, null);
 			this.AboutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_About");
-			w1.Add (this.AboutAction, "<Primary><Mod2>a");
+			w1.Add (this.AboutAction, null);
 			this.ResetBoardAction = new global::Gtk.Action ("ResetBoardAction", global::Mono.Unix.Catalog.GetString ("Reset Board"), null, null);
 			this.ResetBoardAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Reset Board");
 			w1.Add (this.ResetBoardAction, null);
@@ -149,9 +151,12 @@ namespace GUI
 			this.TwoPlayerAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Player vs Player");
 			w1.Add (this.TwoPlayerAction, null);
 			this.EnginesAction = new global::Gtk.RadioAction ("EnginesAction", global::Mono.Unix.Catalog.GetString ("Engine vs Engine"), null, null, 0);
-			this.EnginesAction.Group = this.TwoPlayerAction.Group;
+			this.EnginesAction.Group = this.OnePlayerAction.Group;
 			this.EnginesAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Engine vs Engine");
 			w1.Add (this.EnginesAction, null);
+			this.AnalysePositionAction = new global::Gtk.Action ("AnalysePositionAction", global::Mono.Unix.Catalog.GetString ("_Analyse Position"), null, null);
+			this.AnalysePositionAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Analyse Position");
+			w1.Add (this.AnalysePositionAction, "<Primary>a");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "GUI.MainWindow";
@@ -162,7 +167,7 @@ namespace GUI
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='FlipBoardAction' action='FlipBoardAction'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='GameAction' action='GameAction'><menuitem name='SetClockAction' action='SetClockAction'/><menu name='GameModeAction' action='GameModeAction'><menuitem name='OnePlayerAction' action='OnePlayerAction'/><menuitem name='TwoPlayerAction' action='TwoPlayerAction'/><menuitem name='EnginesAction' action='EnginesAction'/></menu></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/><menuitem name='SetEngineStrengthAction' action='SetEngineStrengthAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='GameAction' action='GameAction'><menuitem name='SetClockAction' action='SetClockAction'/><menu name='GameModeAction' action='GameModeAction'><menuitem name='OnePlayerAction' action='OnePlayerAction'/><menuitem name='TwoPlayerAction' action='TwoPlayerAction'/><menuitem name='EnginesAction' action='EnginesAction'/></menu></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='FlipBoardAction' action='FlipBoardAction'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/><menuitem name='SetEngineStrengthAction' action='SetEngineStrengthAction'/><menuitem name='AnalysePositionAction' action='AnalysePositionAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.MenuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/MenuBar")));
 			this.MenuBar.Name = "MenuBar";
 			this.vbox1.Add (this.MenuBar);
@@ -359,6 +364,7 @@ namespace GUI
 			this.OnePlayerAction.Activated += new global::System.EventHandler (this.OnOnePlayerSet);
 			this.TwoPlayerAction.Activated += new global::System.EventHandler (this.OnTwoPlayerSet);
 			this.EnginesAction.Activated += new global::System.EventHandler (this.OnEnginesSet);
+			this.AnalysePositionAction.Activated += new global::System.EventHandler (this.OnAnalyseMove);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.BoardArea.ButtonPressEvent += new global::Gtk.ButtonPressEventHandler (this.OnPieceClick);
 		}
