@@ -29,6 +29,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int halfMoveNumber = gameBoard.halfMoveClock;
 
     while (true) {
         u64 nextMove = possibleMoves.getNextMove();
@@ -44,7 +45,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
                     curBestMove = nextMove;
                 }
             }
-            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash);
+            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash, halfMoveNumber);
         } else {
             break;
         }
@@ -96,6 +97,8 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int halfMoveNumber = gameBoard.halfMoveClock;
+
     bool canMove = false;
     u64 bestMove;
 
@@ -104,7 +107,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (nextMove != 0) {
             gameBoard.makeMov(nextMove);
             score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1);
-            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash);
+            gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash, halfMoveNumber);
             if (score != ILLEGAL_MOVE) {
                 canMove = true;
                 if (score >= beta){
@@ -124,6 +127,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE))) {
             return (-MATE_SCORE - remainingDepth);
         }
+        return 0;
+    }
+
+    if (gameBoard.halfMoveClock >= 100) {
         return 0;
     }
 
@@ -153,13 +160,14 @@ int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int halfMoveNumber = gameBoard.halfMoveClock;
 
     while (true) {
         u64 nextCapture = possibleCaptures.getNextMove();
         if (nextCapture != 0) {
             gameBoard.makeMov(nextCapture);
             score = -qSearch(gameBoard, -beta, -alpha, playerColor*-1);
-            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash);
+            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash, halfMoveNumber);
             if (score != ILLEGAL_MOVE) {
                 if (score >= beta){
                     return beta;

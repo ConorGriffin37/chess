@@ -56,7 +56,7 @@ const u64 dmask_6 = 0b111111;
 
 void MoveList::scoreMoves(u64 bestMove)
 {
-    for (int i = 0; i < moves.size(); i++) {
+    for (unsigned int i = 0; i < moves.size(); i++) {
         if (moves[i] == bestMove) {
             scores[i] = scores[i] + 5000;
         }
@@ -658,8 +658,8 @@ u64 MoveList::getNextMove()
     timesCalled++;
     if (timesCalled <= 5) {
         int bestscore = -1;
-        int best;
-        for (int i = 0; i < moves.size(); i++) {
+        int best = 0;
+        for (unsigned int i = 0; i < moves.size(); i++) {
             if (scores[i] > bestscore) {
                 bestscore = scores[i];
                 best = i;
@@ -672,7 +672,7 @@ u64 MoveList::getNextMove()
             return moves[best];
         }
     }
-    for (int i = position; i < moves.size(); i++) {
+    for (unsigned int i = position; i < moves.size(); i++) {
         position++;
         if (scores[i] > -1) {
             return moves[i];

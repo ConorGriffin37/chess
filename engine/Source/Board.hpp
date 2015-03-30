@@ -26,6 +26,8 @@
 
 #define CASTLE_OR_ENPASENT_BASIC 0b1000000100000000000000000000000000000000000000000000000010000001
 
+#define MAX_DEPTH 20
+
 
 typedef unsigned long long u64;
 
@@ -62,6 +64,7 @@ class Board
         int enpasentCol; /**< The column where enpasant is available */
 
     public:
+        int halfMoveClock; /**< A counter used to indicate the number of halfmoves since the last irreversible move for 50 move rule*/
         int stageOfGame; /**< Indicates whether the game is in middlegame or endgame. 0 for middlegame, 1 for endgame */
         Board(std::string fen);
         Board();
@@ -257,7 +260,7 @@ class Board
 		 * @param oldHash The zobrist hash before the move was made
 		 * @return void
 		 */
-        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash);
+        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber);
         /**
 		 * @fn setEvaluation
 		 * @brief Sets the materialEval of the board to a given number
