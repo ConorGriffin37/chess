@@ -60,6 +60,7 @@ namespace GUI
 			this.QueenButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Queen"));
 			this.QueenButton.CanFocus = true;
 			this.QueenButton.Name = "QueenButton";
+			this.QueenButton.Active = true;
 			this.QueenButton.DrawIndicator = true;
 			this.QueenButton.UseUnderline = true;
 			this.QueenButton.Group = new global::GLib.SList (global::System.IntPtr.Zero);

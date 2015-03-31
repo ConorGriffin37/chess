@@ -19,10 +19,13 @@ namespace GUI
         public string EngineAuthor { get; private set; }
         public bool IsThinking { get; private set; }
 
-        public UCITransceiver (string engineFilename)
+        private int number;
+
+        public UCITransceiver (string engineFilename, int number)
         {
             try {
                 engine = new Engine(engineFilename);
+                this.number = number;
             } catch(FileNotFoundException) {
                 throw new ArgumentException ("Bad engine filename provided.", "engineFilename");
             }
@@ -43,7 +46,7 @@ namespace GUI
                 } else if(response == "uciok") {
                     // We don't require Helper.SynchronousInvoke() in Init() because
                     // it will always run in the main thread.
-                    MainClass.win.LogEngineNameAndAuthor(EngineName, EngineAuthor);
+                    MainClass.win.LogEngineNameAndAuthor(number, EngineName, EngineAuthor);
                     return;
                 }
             } while(response != null);
@@ -75,33 +78,32 @@ namespace GUI
             Helper.SynchronousInvoke (delegate {
                 MainClass.win.ClearEngineOutput();
             });
+            Debug.Log ("go " + time);
             engine.Write("go " + time);
             IsThinking = true;
-            if (time != "infinite") {
-                string response;
-                do {
-                    if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
-                        Debug.Log ("Engine task cancelled.");
-                        MainClass.ResetEngineStopTokenSource();
-                        return null;
+
+            string response;
+            do {
+                if(MainClass.EngineStopTokenSource.IsCancellationRequested) {
+                    Debug.Log ("Engine task cancelled.");
+                    MainClass.ResetEngineStopTokenSource();
+                    return null;
+                }
+                response = engine.Read ();
+                if(response == null) continue;
+                Debug.Log(response);
+                Helper.SynchronousInvoke(delegate {
+                    MainClass.win.LogEngineOutput(response, number);
+                });
+                if (response.StartsWith ("bestmove")) {
+                    IsThinking = false;
+                    if(response.Substring(9).Length > 4) {
+                        return response.Substring (9, 5);
+                    } else {
+                        return response.Substring (9, 4);
                     }
-                    response = engine.Read ();
-                    Debug.Log(response);
-                    Helper.SynchronousInvoke(delegate {
-                        MainClass.win.LogEngineOutput(response);
-                    });
-                    if (response.StartsWith ("bestmove")) {
-                        IsThinking = false;
-                        if(response.Substring(9).Length > 4) {
-                            return response.Substring (9, 5);
-                        } else {
-                            return response.Substring (9, 4);
-                        }
-                    }
-                } while(response != null);
-                throw new TimeoutException ("Engine has stopped responding.");
-            }
-            return null;
+                }
+            } while(true);
         }
 
         public string StopAndGetBestMove()
@@ -143,12 +145,15 @@ namespace GUI
         {
             engine.Write("stop");
             IsThinking = false;
+            /*
             // Wait until the EngineStopTokenSource has been reset.
             // This indicates that the task has in fact stopped and we can now proceed as normal.
             while (MainClass.EngineStopTokenSource.IsCancellationRequested)
                 continue;
+            */
             WaitUntilReady ();
             Debug.Log ("Engine stopped and ready for new input.");
+            MainClass.ResetEngineStopTokenSource ();
         }
     }
 }

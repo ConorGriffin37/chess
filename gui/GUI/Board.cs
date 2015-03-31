@@ -17,8 +17,10 @@ namespace GUI
         public virtual Square[] Squares { get; protected set; }
         public virtual bool BlackCheck { get; set; }
         public virtual bool WhiteCheck { get; set; }
-        public virtual bool BlackCastled { get; set; }
-        public virtual bool WhiteCastled { get; set; }
+        public virtual bool BlackCastledR { get; set; }
+        public virtual bool WhiteCastledR { get; set; }
+        public virtual bool BlackCastledL { get; set; }
+        public virtual bool WhiteCastledL { get; set; }
         public virtual PieceColour PlayerToMove { get; set; }
 
         public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
@@ -35,8 +37,10 @@ namespace GUI
             BlackCheck = false;
             WhiteCheck = false;
             // For castling, default to true and change based on position
-            BlackCastled = true;
-            WhiteCastled = true;
+            BlackCastledR = true;
+            WhiteCastledR = true;
+            BlackCastledL = true;
+            WhiteCastledL = true;
             PlayerToMove = PieceColour.White;
 
             if (empty) {
@@ -46,8 +50,10 @@ namespace GUI
                     Squares [i] = new Square ();
                 }
             } else {
-                BlackCastled = false;
-                WhiteCastled = false;
+                BlackCastledR = false;
+                WhiteCastledR = false;
+                BlackCastledL = false;
+                WhiteCastledL = false;
 
                 Squares = new Square[64];
                 // Initialise empty squares
@@ -99,8 +105,10 @@ namespace GUI
             }
             BlackCheck = other.BlackCheck;
             WhiteCheck = other.WhiteCheck;
-            BlackCastled = other.BlackCastled;
-            WhiteCastled = other.WhiteCastled;
+            BlackCastledL = other.BlackCastledL;
+            WhiteCastledL = other.WhiteCastledL;
+            BlackCastledR = other.BlackCastledR;
+            WhiteCastledR = other.WhiteCastledR;
             PlayerToMove = other.PlayerToMove;
         }
 
@@ -153,6 +161,29 @@ namespace GUI
             }
             Piece movingPiece = Squares [source].Piece;
 
+            // Forbid castling if the king moves.
+            if (movingPiece.Type == PieceType.King) {
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastledR = true;
+                    WhiteCastledL = true;
+                } else {
+                    BlackCastledR = true;
+                    BlackCastledL = true;
+                }
+            }
+
+            if (movingPiece.Type == PieceType.Rook) {
+                if (source == 0) {
+                    BlackCastledL = false;
+                } else if (source == 7) {
+                    BlackCastledR = false;
+                } else if (source == 56) {
+                    WhiteCastledL = false;
+                } else if (source == 63) {
+                    WhiteCastledR = false;
+                }
+            }
+
             // Special rules for castling
             if (movingPiece.Type == PieceType.King &&
                 (source == 4 || source == 60) &&
@@ -165,11 +196,6 @@ namespace GUI
                     destination - 1 :
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
-                if (movingPiece.Colour == PieceColour.White) {
-                    WhiteCastled = true;
-                } else {
-                    BlackCastled = true;
-                }
             } else {
                 switch (promoteTo) {
                     case PieceType.Bishop:
@@ -215,41 +241,48 @@ namespace GUI
          * Undoes a move by doing the complete reverse of MakeMove and then
          * regenerating legal moves.
          */
-        public void UndoMove(byte originalSource, byte originalDestination,
+
+        public void UndoMove(byte originalSource, byte originalDestination, bool[] lastCastles,
                              PieceType? originalPromoteTo = null)
         {
-            Piece movingPiece = Squares [originalDestination].Piece;
+            Piece movingPiece = Squares[originalDestination].Piece;
 
             // Special rules for castling
             if (movingPiece.Type == PieceType.King &&
-                Array.IndexOf (castleDestinations, originalDestination) != -1) {
+                Array.IndexOf(castleDestinations, originalDestination) != -1)
+            {
                 Square castleRookSquare = originalDestination - originalSource > 0 ?
-                    Squares [originalDestination - 1] : Squares [originalDestination + 1];
-                Squares [originalSource].Piece = movingPiece;
-                Squares [originalDestination].Piece = null;
-                Squares [originalDestination - originalSource > 0 ?
+                    Squares[originalDestination - 1] : Squares[originalDestination + 1];
+                Squares[originalSource].Piece = movingPiece;
+                Squares[originalDestination].Piece = null;
+                Squares[originalDestination - originalSource > 0 ?
                     originalDestination + 1 :
                     originalDestination - 2].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
-                if (movingPiece.Colour == PieceColour.White) {
-                    WhiteCastled = false;
-                } else {
-                    BlackCastled = false;
-                }
-            } else {
-                Squares [originalSource].Piece = movingPiece;
-                Squares [originalDestination].Piece = null;
+                BlackCastledR = lastCastles[0];
+                WhiteCastledR = lastCastles[1];
+                BlackCastledL = lastCastles[2];
+                WhiteCastledL = lastCastles[3];
+            }
+            else
+            {
+                Squares[originalSource].Piece = movingPiece;
+                Squares[originalDestination].Piece = null;
             }
 
-            if (PlayerToMove == PieceColour.White) {
+            if (PlayerToMove == PieceColour.White)
+            {
                 PlayerToMove = PieceColour.Black;
-            } else {
+            }
+            else
+            {
                 PlayerToMove = PieceColour.White;
             }
-            PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
-            PieceLegalMoves.GenerateLegalMoves (this);
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves(this);
+            PieceLegalMoves.GenerateLegalMoves(this);
         }
 
+        
         public GameStatus CheckForMate()
         {
             int legalMoveCountWhite = 0;
@@ -362,11 +395,15 @@ namespace GUI
             fen += ' ';
 
             // Castling availability
-            if (!WhiteCastled)
-                fen += "KQ";
-            if (!BlackCastled)
-                fen += "kq";
-            if (WhiteCastled && BlackCastled)
+            if (!WhiteCastledR)
+                fen += "K";
+            if (!WhiteCastledL)
+                fen += "Q";
+            if (!BlackCastledR)
+                fen += "k";
+            if (!BlackCastledL)
+                fen += "q";
+            if (WhiteCastledR && BlackCastledR && WhiteCastledL && BlackCastledL)
                 fen += '-';
             fen += ' ';
 
