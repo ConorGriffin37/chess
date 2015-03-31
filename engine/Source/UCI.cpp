@@ -110,7 +110,7 @@ bool UCI::sentPosition(string input)
         while (getline(ss, moveIn, ' ')){
             pair<int, int> startPosition = make_pair(moveIn[0] - 'a', moveIn[1] - '1');
             pair<int, int> endPosition = make_pair(moveIn[2] - 'a', moveIn[3] - '1');
-            if ((startPosition.first != endPosition.first) and (startPosition.second != endPosition.second)) { //If the startPosition is the same as the end position it is a null move
+            if ((startPosition.first != endPosition.first) or (startPosition.second != endPosition.second)) { //If the startPosition is the same as the end position it is a null move
                 char promote = ' ';
                 if (moveIn.length() == 5){
                     promote = moveIn[4];
