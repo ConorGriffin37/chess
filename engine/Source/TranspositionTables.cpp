@@ -149,6 +149,11 @@ void TranspositionTables::setOpen(u64 zorHash)
     Table[key].signature = zorHash;
 }
 
+void TranspositionTables::unSetOpen(u64 zorHash)
+{
+    Table[zorHash & tab_mask].open = false;
+}
+
 bool TranspositionTables::isOpen(u64 zorHash)
 {
     u64 key = zorHash & tab_mask;

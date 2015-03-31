@@ -151,6 +151,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         }
     }
     if (canMove == false) {
+        TranspositionTables::unSetOpen(lastHash);
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE))) {
             return (-MATE_SCORE - remainingDepth);
         }
@@ -158,6 +159,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     }
 
     if (gameBoard.halfMoveClock >= 100) {
+        TranspositionTables::unSetOpen(lastHash);
         return 0;
     }
 

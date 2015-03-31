@@ -143,6 +143,7 @@ class TranspositionTables
 		 * @return bool Whether the position is open or not
 		 */
         static bool isOpen(u64 zorHash);
+        static void unSetOpen(u64 zorHash);
 };
 
 
