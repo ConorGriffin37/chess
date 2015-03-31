@@ -19,8 +19,10 @@ namespace GUI
         public override Square[] Squares { get; protected set; }
         public override bool BlackCheck { get; set; }
         public override bool WhiteCheck { get; set; }
-        public override bool BlackCastled { get; set; }
-        public override bool WhiteCastled { get; set; }
+        public override bool BlackCastledR { get; set; }
+        public override bool WhiteCastledR { get; set; }
+        public override bool BlackCastledL { get; set; }
+        public override bool WhiteCastledL { get; set; }
         public override PieceColour PlayerToMove { get; set; }
 
         public DummyBoard (Board other)
@@ -34,8 +36,10 @@ namespace GUI
             }
             BlackCheck = other.BlackCheck;
             WhiteCheck = other.WhiteCheck;
-            BlackCastled = other.BlackCastled;
-            WhiteCastled = other.WhiteCastled;
+            BlackCastledR = other.BlackCastledR;
+            WhiteCastledR = other.WhiteCastledR;
+            BlackCastledL = other.BlackCastledR;
+            WhiteCastledL = other.WhiteCastledR;
             PlayerToMove = other.PlayerToMove;
         }
 

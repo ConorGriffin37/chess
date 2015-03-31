@@ -66,17 +66,25 @@ namespace GUI
             }
 
             if (castlingPossibilities.Length == 4) {
-                output.BlackCastled = false;
-                output.WhiteCastled = false;
+                output.BlackCastledR = false;
+                output.WhiteCastledR = false;
+                output.BlackCastledL = false;
+                output.WhiteCastledL = false;
             } else if (castlingPossibilities == "-") {
-                output.BlackCastled = true;
-                output.WhiteCastled = true;
+                output.BlackCastledR = true;
+                output.WhiteCastledR = true;
+                output.BlackCastledL = true;
+                output.WhiteCastledL = true;
             } else if (castlingPossibilities.Length < 4) {
                 foreach (char c in castlingPossibilities) {
-                    if (Char.IsLower (c)) {
-                        output.BlackCastled = false;
-                    } else {
-                        output.WhiteCastled = false;
+                    if (c == 'q') {
+                        output.BlackCastledL = false;
+                    } else if (c == 'Q') {
+                        output.WhiteCastledL = false;
+                    } else if (c == 'K') {
+                        output.WhiteCastledR = false;
+                    } else if (c == 'k') {
+                        output.BlackCastledR = false;
                     }
                 }
             } else

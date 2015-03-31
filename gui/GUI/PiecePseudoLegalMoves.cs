@@ -145,37 +145,41 @@ namespace GUI
         {
             if (king.HasMoved)
                 return;
-            if (king.Colour == PieceColour.White && (board.WhiteCastled || board.WhiteCheck))
+            if (king.Colour == PieceColour.White && board.WhiteCheck)
                 return;
-            if (king.Colour == PieceColour.Black && (board.BlackCastled || board.BlackCheck))
+            if (king.Colour == PieceColour.Black && board.BlackCheck)
                 return;
 
             if (king.Colour == PieceColour.White) {
-                Piece KingRook = board.Squares [63].Piece;
-                if (KingRook != null) {
-                    // Check that KingRook is in fact a rook and of the correct colour
-                    if (KingRook.Colour == PieceColour.White && KingRook.Type == PieceType.Rook) {
-                        // Check squares in between rook and king
-                        if (board.Squares [62].Piece == null && board.Squares [61].Piece == null) {
-                            if (BlackAttackBoard [62] == false && BlackAttackBoard [61] == false) {
-                                // Finally, we can add the move
-                                king.PseudoLegalMoves.Add (62);
-                                WhiteAttackBoard [62] = true;
+                if (board.WhiteCastledR == false) {
+                    Piece KingRook = board.Squares[63].Piece;
+                    if (KingRook != null) {
+                        // Check that KingRook is in fact a rook and of the correct colour
+                        if (KingRook.Colour == PieceColour.White && KingRook.Type == PieceType.Rook) {
+                            // Check squares in between rook and king
+                            if (board.Squares[62].Piece == null && board.Squares[61].Piece == null) {
+                                if (BlackAttackBoard[62] == false && BlackAttackBoard[61] == false) {
+                                    // Finally, we can add the move
+                                    king.PseudoLegalMoves.Add(62);
+                                    WhiteAttackBoard[62] = true;
+                                }
                             }
                         }
                     }
                 }
 
                 Piece QueenRook = board.Squares [56].Piece;
-                if (QueenRook != null) {
-                    // Check that QueenRook is in fact a rook and of the correct colour
-                    if (QueenRook.Colour == PieceColour.White && QueenRook.Type == PieceType.Rook) {
-                        // Check squares in between rook and king
-                        if (board.Squares [57].Piece == null && board.Squares [58].Piece == null && board.Squares[59].Piece == null) {
-                            if (BlackAttackBoard [57] == false && BlackAttackBoard [58] == false && BlackAttackBoard[59] == false) {
-                                // Finally, we can add the move
-                                king.PseudoLegalMoves.Add (58);
-                                WhiteAttackBoard [58] = true;
+                if (board.WhiteCastledL == false) {
+                    if (QueenRook != null) {
+                        // Check that QueenRook is in fact a rook and of the correct colour
+                        if (QueenRook.Colour == PieceColour.White && QueenRook.Type == PieceType.Rook) {
+                            // Check squares in between rook and king
+                            if (board.Squares[57].Piece == null && board.Squares[58].Piece == null && board.Squares[59].Piece == null) {
+                                if (BlackAttackBoard[57] == false && BlackAttackBoard[58] == false && BlackAttackBoard[59] == false) {
+                                    // Finally, we can add the move
+                                    king.PseudoLegalMoves.Add(58);
+                                    WhiteAttackBoard[58] = true;
+                                }
                             }
                         }
                     }
@@ -184,30 +188,34 @@ namespace GUI
 
             if (king.Colour == PieceColour.Black) {
                 Piece KingRook = board.Squares [7].Piece;
-                if (KingRook != null) {
-                    // Check that KingRook is in fact a rook and of the correct colour
-                    if (KingRook.Colour == PieceColour.Black && KingRook.Type == PieceType.Rook) {
-                        // Check squares in between rook and king
-                        if (board.Squares [6].Piece == null && board.Squares [5].Piece == null) {
-                            if (WhiteAttackBoard [6] == false && WhiteAttackBoard [5] == false) {
-                                // Finally, we can add the move
-                                king.PseudoLegalMoves.Add (6);
-                                WhiteAttackBoard [6] = true;
+                if (board.BlackCastledL == false) {
+                    if (KingRook != null) {
+                        // Check that KingRook is in fact a rook and of the correct colour
+                        if (KingRook.Colour == PieceColour.Black && KingRook.Type == PieceType.Rook) {
+                            // Check squares in between rook and king
+                            if (board.Squares[6].Piece == null && board.Squares[5].Piece == null) {
+                                if (WhiteAttackBoard[6] == false && WhiteAttackBoard[5] == false) {
+                                    // Finally, we can add the move
+                                    king.PseudoLegalMoves.Add(6);
+                                    WhiteAttackBoard[6] = true;
+                                }
                             }
                         }
                     }
                 }
 
                 Piece QueenRook = board.Squares [0].Piece;
-                if (QueenRook != null) {
-                    // Check that QueenRook is in fact a rook and of the correct colour
-                    if (QueenRook.Colour == PieceColour.Black && QueenRook.Type == PieceType.Rook) {
-                        // Check squares in between rook and king
-                        if (board.Squares [1].Piece == null && board.Squares [2].Piece == null && board.Squares[3].Piece == null) {
-                            if (WhiteAttackBoard [1] == false && WhiteAttackBoard [2] == false && WhiteAttackBoard[3] == false) {
-                                // Finally, we can add the move
-                                king.PseudoLegalMoves.Add (2);
-                                BlackAttackBoard [2] = true;
+                if (board.BlackCastledR == false) {
+                    if (QueenRook != null) {
+                        // Check that QueenRook is in fact a rook and of the correct colour
+                        if (QueenRook.Colour == PieceColour.Black && QueenRook.Type == PieceType.Rook) {
+                            // Check squares in between rook and king
+                            if (board.Squares[1].Piece == null && board.Squares[2].Piece == null && board.Squares[3].Piece == null) {
+                                if (WhiteAttackBoard[1] == false && WhiteAttackBoard[2] == false && WhiteAttackBoard[3] == false) {
+                                    // Finally, we can add the move
+                                    king.PseudoLegalMoves.Add(2);
+                                    BlackAttackBoard[2] = true;
+                                }
                             }
                         }
                     }
