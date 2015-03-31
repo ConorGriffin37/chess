@@ -18,6 +18,7 @@ struct entry
     int depth;
     int score;
     int type;
+    bool open = false;
     bool ancient = false;
 };
 
@@ -128,6 +129,20 @@ class TranspositionTables
 		 * @return int The number of entries used in the TT
 		 */
         static int getEntryCount();
+        /**
+		 * @fn setOpen
+		 * @brief Sets a position to "open" for repetition checking
+		 * @param zorHash the Zorbrist hash of the board
+		 * @return void
+		 */
+        static void setOpen(u64 zorHash);
+        /**
+		 * @fn isOpen
+		 * @brief Checks if a position is open for repetition checking
+		 * @param zorHash the Zorbrist hash of the board
+		 * @return bool Whether the position is open or not
+		 */
+        static bool isOpen(u64 zorHash);
 };
 
 

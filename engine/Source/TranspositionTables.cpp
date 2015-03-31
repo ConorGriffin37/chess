@@ -121,6 +121,7 @@ void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int s
     u64 key = signature & tab_mask;
     if (Table[key].depth < depth) {
         Table[key].signature = signature;
+        Table[key].open = false;
         Table[key].best = bestmove;
         Table[key].depth = depth;
         Table[key].score = score;
@@ -129,6 +130,7 @@ void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int s
     } else if (Table[key].ancient) {
         if (Table[key].signature != signature) {
             Table[key].signature = signature;
+            Table[key].open = false;
             Table[key].best = bestmove;
             Table[key].depth = depth;
             Table[key].score = score;
@@ -136,6 +138,20 @@ void TranspositionTables::setEntry(u64 signature, u64 bestmove, int depth, int s
             Table[key].ancient = false;
         }
     }
+}
+
+void TranspositionTables::setOpen(u64 zorHash)
+{
+    u64 key = zorHash & tab_mask;
+    Table[key].open = true;
+    Table[key].ancient = false;
+    Table[key].signature = zorHash;
+}
+
+bool TranspositionTables::isOpen(u64 zorHash)
+{
+    u64 key = zorHash & tab_mask;
+    return (((Table[key].open == true) and (Table[key].ancient == false)) and (Table[key].signature == zorHash));
 }
 
 void TranspositionTables::setOld()

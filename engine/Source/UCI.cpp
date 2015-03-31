@@ -116,6 +116,7 @@ bool UCI::sentPosition(string input)
                     promote = moveIn[4];
                 }
                 bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
+                TranspositionTables::setOpen(currentBoard.getZorHash());
                 //outbitboard(currentBoard.getPieces());
                 if (moveMade == false){ //move not valid
                     return false;

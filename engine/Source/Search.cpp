@@ -77,6 +77,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         return 0;
     }
 
+    if (TranspositionTables::isOpen(gameBoard.getZorHash())) {
+        return 0;
+    }
+
     if (remainingDepth <= 0){
         if (gameBoard.inCheck(((playerColor*-1 == 1) ? WHITE_CODE : BLACK_CODE))) {
             return -ILLEGAL_MOVE;
@@ -113,13 +117,15 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     if (allowNullMove) {
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
             gameBoard.setCastleOrEnpas(gameBoard.nextCastleOrEnpasent());
-            int eval = -AlphaBeta(gameBoard, -beta, -beta+1, remainingDepth-1-NULL_MOVE_REDUCTION, playerColor*-1, false);
+            int eval = -AlphaBeta(gameBoard, -beta, -beta + 1, remainingDepth - 1 - NULL_MOVE_REDUCTION, playerColor*-1, false);
             gameBoard.setCastleOrEnpas(castle);
             if (eval >= beta) {
                 return eval;
             }
         }
     }
+
+    TranspositionTables::setOpen(gameBoard.getZorHash());
 
     while (true) {
         u64 nextMove = possibleMoves.getNextMove();
@@ -148,6 +154,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE))) {
             return (-MATE_SCORE - remainingDepth);
         }
+        return 0;
+    }
+
+    if (gameBoard.halfMoveClock >= 100) {
         return 0;
     }
 
@@ -200,3 +210,4 @@ int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
 
     return alpha;
 }
+
