@@ -1,6 +1,8 @@
 #include "MoveList.hpp"
+#include "Search.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 void outbitboard(u64 n);
 bool checkbit(u64 bitboard, int pos);
@@ -8,23 +10,37 @@ u64 setbit(u64 bitboard, int pos);
 u64 unsetbit(u64 bitboard, int pos);
 int getpos(int x, int y);
 
-MoveList::MoveList(Board& gameBoard, int colorcode, u64 bestMove)
+MoveList::MoveList(Board& gameBoard, int colorcode, u64 bestMove, u64 killerMove)
 {
-    timesCalled = 0;
+    done = false;
     position = 0;
     kingTake = false;
     generateMoves(gameBoard, colorcode);
-    if (bestMove != 0) {
-        scoreMoves(bestMove);
-    }
+    scoreMoves(bestMove, killerMove);
 }
 
 MoveList::MoveList(Board& gameBoard, int colorcode, bool dontScore)
 {
-    timesCalled = 0;
+    done = false;
     position = 0;
     kingTake = false;
     generateMoves(gameBoard, colorcode);
+}
+
+MoveList::MoveList(Board& gameBoard, int colorcode, std::vector<std::string> restrictedMoves)
+{
+    done = false;
+    position = 0;
+    kingTake = false;
+    generateMoves(gameBoard, colorcode);
+    std::sort(restrictedMoves.begin(), restrictedMoves.begin() + restrictedMoves.size());
+    std::vector<u64> newMoves(moves);
+    moves.clear();
+    for (unsigned int i = 0; i < newMoves.size(); i++) {
+        if (std::binary_search(restrictedMoves.begin(), restrictedMoves.end(), getMoveCode(newMoves[i]))) {
+            moves.push_back(newMoves[i]);
+        }
+    }
 }
 
 MoveList::MoveList()
@@ -37,11 +53,14 @@ int pieceScore[] = {1, 5, 3, 3, 9, 2};
 const u64 dmask_3 = 0b111;
 const u64 dmask_6 = 0b111111;
 
-void MoveList::scoreMoves(u64 bestMove)
+void MoveList::scoreMoves(u64 bestMove, u64 killerMove)
 {
-    for (int i = 0; i < moves.size(); i++) {
+    for (unsigned int i = 0; i < moves.size(); i++) {
         if (moves[i] == bestMove) {
             scores[i] = scores[i] + 5000;
+        }
+        if (moves[i] == killerMove) {
+            scores[i] = scores[i] + 20;
         }
     }
 }
@@ -638,11 +657,10 @@ void MoveList::generateMoves(Board &gameBoard, int colorcode)
 
 u64 MoveList::getNextMove()
 {
-    timesCalled++;
-    if (timesCalled <= 5) {
+    if (done == false) {
         int bestscore = -1;
-        int best;
-        for (int i = 0; i < moves.size(); i++) {
+        int best = 0;
+        for (unsigned int i = 0; i < moves.size(); i++) {
             if (scores[i] > bestscore) {
                 bestscore = scores[i];
                 best = i;
@@ -651,11 +669,14 @@ u64 MoveList::getNextMove()
         if (bestscore == -1) {
             return 0;
         } else {
+            if (bestscore == 10) {
+                done = true;
+            }
             scores[best] = -1;
             return moves[best];
         }
     }
-    for (int i = position; i < moves.size(); i++) {
+    for (unsigned int i = position; i < moves.size(); i++) {
         position++;
         if (scores[i] > -1) {
             return moves[i];

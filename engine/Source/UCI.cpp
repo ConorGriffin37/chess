@@ -110,15 +110,17 @@ bool UCI::sentPosition(string input)
         while (getline(ss, moveIn, ' ')){
             pair<int, int> startPosition = make_pair(moveIn[0] - 'a', moveIn[1] - '1');
             pair<int, int> endPosition = make_pair(moveIn[2] - 'a', moveIn[3] - '1');
-            char promote = ' ';
-            if (moveIn.length() == 5){
-                promote = moveIn[4];
-            }
-            Board lastBoard = currentBoard;
-            bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
-            //outbitboard(currentBoard.getPieces());
-            if (moveMade == false){ //move not valid
-                return false;
+            if ((startPosition.first != endPosition.first) or (startPosition.second != endPosition.second)) { //If the startPosition is the same as the end position it is a null move
+                char promote = ' ';
+                if (moveIn.length() == 5){
+                    promote = moveIn[4];
+                }
+                bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
+                TranspositionTables::setOpen(currentBoard.getZorHash());
+                //outbitboard(currentBoard.getPieces());
+                if (moveMade == false){ //move not valid
+                    return false;
+                }
             }
             currentColor = currentColor*-1;
         }
@@ -131,17 +133,17 @@ bool UCI::sentPosition(string input)
 bool UCI::startCalculating(string input)
 {
     vector<string> searchMoves; //a restricted list of moves to search
-    bool ponder = false; //whether to ponder on the current position or not
-    int wtime = -1; //time on whites clock in mseconds
-    int btime = -1; //time on blacks clock in mseconds
-    int winc = -1; //whites increment per move in mseconds
-    int binc = -1; //blacks increment per move in mseconds
-    int movestogo = -1; //number of moves left until the next time control
-    int depth = 5; //search only to a certain depth
-    int nodes = -1; //number of nodes to search
-    int mate = -1; //search for a mate in x moves
-    int movetime = -1; //time allowed for the move in mseconds
-    bool infinite = false; //search untill given the stop command
+    bool ponder = false;        //whether to ponder on the current position or not
+    int wtime = -1;             //time on whites clock in mseconds
+    int btime = -1;             //time on blacks clock in mseconds
+    int winc = -1;              //whites increment per move in mseconds
+    int binc = -1;              //blacks increment per move in mseconds
+    int movestogo = -1;         //number of moves left until the next time control
+    int depth = 10;              //search only to a certain depth
+    u64 nodes = -1;             //number of nodes to search
+    int mate = -1;              //search for a mate in x moves
+    int movetime = -1;          //time allowed for the move in mseconds
+    bool infinite = false;      //search untill given the stop command
     string token;
     stringstream ss(input);
     while (getline(ss, token, ' ')){
@@ -200,23 +202,29 @@ bool UCI::startCalculating(string input)
     string bestMove;
     int curDepth = min(depth, 2);
     killSearch = false;
-    Search::nodes = 0;
+    Search::totalNodes = 0;
     chrono::time_point<chrono::system_clock> timeBeforeSearch, timeAfterSearch;
     timeBeforeSearch = chrono::system_clock::now();
+    int lastSearched = 0;
 
-    while ((curDepth <= depth) or (infinite)) {
+    while (((curDepth <= depth) or (infinite)) and (curDepth < MAX_DEPTH)) {
         if (killSearch == true) {
             break;
         }
-        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth);
-        if (searchResult.first != "") {
-            timeAfterSearch = chrono::system_clock::now();
-            chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
-            int nodesPerSecond = int(double(Search::nodes)/elapsed_seconds.count());
 
+        timeAfterSearch = chrono::system_clock::now();
+        chrono::duration<double> elapsed_seconds = timeAfterSearch-timeBeforeSearch;
+
+        Search::nodes = 0;
+        pair<string, int> searchResult = Search::RootAlphaBeta(currentBoard, currentColor, curDepth, searchMoves);
+        Search::totalNodes = Search::totalNodes + Search::nodes;
+
+        if (searchResult.first != "") {
+            int nodesPerSecond = int(double(Search::totalNodes )/elapsed_seconds.count());
             string info = string("depth ") + to_string(curDepth);
-            info += " nodes " + to_string(Search::nodes);
+            info += " nodes " + to_string(Search::totalNodes);
             info += " nps " + to_string(nodesPerSecond);
+            cout << "Branching factor : " << double(Search::nodes)/double(lastSearched) << std::endl;
 
             if (searchResult.second > MATE_SCORE) {
                 searchResult.second -= MATE_SCORE;
@@ -235,11 +243,21 @@ bool UCI::startCalculating(string input)
             sendInfo(info);
             bestMove = searchResult.first;
         }
+        lastSearched = Search::nodes;
+        if ((elapsed_seconds.count() > movetime) and (movetime > 0)) {
+            break;
+        }
+
+        if ((Search::totalNodes  > nodes) and (nodes > 0)) {
+            break;
+        }
+
         curDepth++;
     }
 
     if (quit == false) {
         TranspositionTables::setOld();
+        Search::clearKiller();
         outputBestMove(bestMove);
     }
     return true;
@@ -249,4 +267,3 @@ void UCI::sendInfo(string info)
 {
     cout << "info " << info << endl;
 }
-

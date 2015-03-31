@@ -1,7 +1,9 @@
 #include "Board.hpp"
 #include "Evaluation.hpp"
 #include "TranspositionTables.hpp"
+
 #include <iostream>
+#include <sstream>
 
 void outbitboard(u64 n);
 int getOppColor(int x);
@@ -67,48 +69,61 @@ Board::Board(std::string fen)
     if (fen == "") {
         return;
     }
+
     castleorenpasent = 0;
     enpasentCol = -1;
     for (int i = 0; i < 8; i++) {
         pieceBB[i] = 0;
     }
-    int pos = 63;
-    int section = 0;
-    int lastone = 0;
-    for (int i = 0; i < fen.length(); i++) {
-        if (fen[i] == ' ') {
-            section++;
-        } else {
-            if (section == 0) {
-                int x = getPieceCode(fen[i]);
-                if (x == -1) {
-                    if (isdigit(fen[i])) {
-                        pos = pos - (fen[i] - '0');
-                    }
-                } else {
-                    pieceBB[x] = setbit(pieceBB[x], pos);
-                    pieceBB[getColorCode(fen[i])] = setbit(pieceBB[getColorCode(fen[i])], pos);
-                    pos--;
-                }
-            } else if (section == 2) {
-                if (fen[i] == 'K') {
-                    castleorenpasent = setbit(castleorenpasent, 7);
-                } else if (fen[i] == 'Q') {
-                    castleorenpasent = setbit(castleorenpasent, 0);
-                } else if (fen[i] == 'k') {
-                    castleorenpasent = setbit(castleorenpasent, 56);
-                } else if (fen[i] == 'q') {
-                    castleorenpasent = setbit(castleorenpasent, 63);
-                }
-            } else if (section == 3) {
-                if (isdigit(fen[i])) {
-                    castleorenpasent = setbit(castleorenpasent, (8*(fen[i] - '1') + lastone));
-                    enpasentCol = lastone;
-                } else {
-                    lastone = ('h' - fen[i]);
-                }
+    std::stringstream ss(fen);
+    std::string boardRepresentation;
+    std::getline(ss, boardRepresentation, ' ');
+
+    int square = 63;
+    for (unsigned int i = 0; i < boardRepresentation.length(); i++) {
+        int pieceCode = getPieceCode(boardRepresentation[i]);
+        if (pieceCode == -1) {
+            if (isdigit(boardRepresentation[i])) {
+                square = square - (boardRepresentation[i] - '0');
             }
+        } else {
+            pieceBB[pieceCode] = setbit(pieceBB[pieceCode], square);
+            pieceBB[getColorCode(boardRepresentation[i])] = setbit(pieceBB[getColorCode(boardRepresentation[i])], square);
+            square--;
         }
+    }
+
+    std::string activeColor;
+    std::getline(ss, activeColor, ' ');
+    //Active color is handled by UCI currently, could be rewritten in the future
+
+    std::string castlingAvailability;
+    std::getline(ss, castlingAvailability, ' ');
+    for (unsigned int i = 0; i < castlingAvailability.length(); i++) {
+        if (castlingAvailability[i] == 'K') {
+            castleorenpasent = setbit(castleorenpasent, 7);
+        } else if (castlingAvailability[i] == 'Q') {
+            castleorenpasent = setbit(castleorenpasent, 0);
+        } else if (castlingAvailability[i] == 'k') {
+            castleorenpasent = setbit(castleorenpasent, 56);
+        } else if (castlingAvailability[i] == 'q') {
+            castleorenpasent = setbit(castleorenpasent, 63);
+        }
+    }
+
+    std::string enpassentSquare;
+    std::getline(ss, enpassentSquare, ' ');
+    if (enpassentSquare != "-") {
+        enpasentCol = 'h' - enpassentSquare[0];
+        castleorenpasent = setbit(castleorenpasent, (8*(enpassentSquare[1] - '1') + enpasentCol));
+    }
+
+    halfMoveClock = 0;
+    std::string halfMoveClockString;
+    std::getline(ss, halfMoveClockString, ' ');
+    if (halfMoveClockString != "-") {
+        std::istringstream iss(halfMoveClockString);
+        iss >> halfMoveClock;
     }
 }
 
@@ -599,7 +614,6 @@ bool Board::getAttackedRookQueen(int pos, u64 opprookqueen)
 
 bool Board::inCheck(int colorcode)
 {
-    u64 colorboard = getPieceColor(colorcode);
     u64 oppcolorboard;
     if (colorcode == WHITE_CODE) {
         oppcolorboard = getPieceColor(BLACK_CODE);
@@ -639,21 +653,7 @@ void Board::setCastleOrEnpas(u64 value)
 
 u64 Board::nextCastleOrEnpasent()
 {
-    u64 last = getCastleOrEnpasent();
-    u64 next = 0;
-    if (checkbit(last, 63)) {
-        next = setbit(next, 63);
-    }
-    if (checkbit(last, 56)) {
-        next = setbit(next, 56);
-    }
-    if (checkbit(last, 0)) {
-        next = setbit(next, 0);
-    }
-    if (checkbit(last, 7)) {
-        next = setbit(next, 7);
-    }
-    return next;
+    return getCastleOrEnpasent() & CASTLE_OR_ENPASENT_BASIC;
 }
 
 int Board::getPieceFromPos(int pos)
@@ -673,6 +673,10 @@ int abs(int x)
 
 bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, char promote)
 {
+    halfMoveClock++;
+    if (checkbit(getPieces(), getpos(to.first, to.second)) == true) {
+        halfMoveClock = 0;
+    }
     int pcode = getPieceFromPos(getpos(from.first, from.second));
     if (pcode == -1) {
         return false;
@@ -685,6 +689,7 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
     }
     if (pcode == PAWN_CODE and from.first != to.first) {
         if (checkbit(getPieces(), getpos(to.first, to.second)) == false) { //enpasent
+            halfMoveClock = 0;
             takePiece(std::make_pair(to.first, from.second));
             makeMove(pcode, colorcode, getpos(from.first, from.second), getpos(to.first, to.second));
             return true;
@@ -716,6 +721,7 @@ bool Board::simpleMakeMove(std::pair <int, int> from, std::pair <int, int> to, c
         }
     }
     if (pcode == PAWN_CODE) { //enpasent
+        halfMoveClock = 0;
         if (from.second - to.second == 2) { //moving out 2 at first
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), getpos(from.first, from.second - 1)));
             enpasentCol = 7 - from.first;
@@ -760,6 +766,7 @@ u64 mask_6 = 0b111111;
 
 void Board::makeMov(u64 theMove)
 {
+    halfMoveClock++;
     int code = theMove & mask_3;
     theMove >>= 3;
     int colorcode = theMove & mask_3;
@@ -775,6 +782,7 @@ void Board::makeMov(u64 theMove)
         enpasentCol = -1;
     }
     if (theMove & 1) {
+        halfMoveClock = 0;
         int oppcolor = getOppColor(colorcode);
         theMove >>= 1;
         int takepos = theMove & mask_6;
@@ -788,6 +796,7 @@ void Board::makeMov(u64 theMove)
         theMove >>= 10;
     }
     if (theMove & 1) {
+        halfMoveClock = 0;
         theMove >>= 1;
         int procode = theMove & mask_3;
         theMove >>= 3;
@@ -844,6 +853,7 @@ void Board::makeMov(u64 theMove)
         }
     }
     if (code == PAWN_CODE) { //enpasent
+        halfMoveClock = 0;
         if (to - from == 16) { //moving out 2 at first
             setCastleOrEnpas(setbit(getCastleOrEnpasent(), to - 8));
             enpasentCol = to % 8;
@@ -857,11 +867,12 @@ void Board::makeMov(u64 theMove)
     }
 }
 
-void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash)
+void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber)
 {
     zorHash = oldHash;
     setCastleOrEnpas(oldCastleOrEnpas);
     enpasentCol = lastEnpasent;
+    halfMoveClock = halfMoveNumber;
     int code = theMove & mask_3;
     theMove >>= 3;
     int colorcode = theMove & mask_3;

@@ -15,7 +15,7 @@ The unit tests use the Boost Unit testing library, install boost before compilin
 
 The unit tests are compiled with the command "make test"
 
-The unit tests can be run with the command ./unitTests
+The unit tests can be run with the command ./Saruman_unitTests
 
 ##Documentation
 The documentation can be generated using doxygen

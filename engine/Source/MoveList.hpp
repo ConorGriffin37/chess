@@ -20,13 +20,14 @@ class MoveList
     protected:
         std::vector<u64> moves; /**< A vector containing the moves in the MoveList */
         std::vector<int> scores; /**< A vector containing the scores of each move */
-        int timesCalled; /**< The amount of moves that have been retrieved with getNextMove */
         int position; /**< The current position in the moves vector */
+        bool done;
 
     public:
         bool kingTake; /**< Is the king taken by any of the generated moves (last move made was illegal) */
-        MoveList(Board &gameBoard, int colorcode, u64 bestMove);
+        MoveList(Board &gameBoard, int colorcode, u64 bestMove, u64 killerMove);
         MoveList(Board& gameBoard, int colorcode, bool dontScore);
+        MoveList(Board& gameBoard, int colorcode, std::vector<std::string> restrictedMoves);
         MoveList();
         /**
 		 * @fn scoreMoves
@@ -34,7 +35,7 @@ class MoveList
 		 * @param bestMove The hash move from the transposition table
 		 * @return void
 		 */
-        void scoreMoves(u64 bestMove);
+        void scoreMoves(u64 bestMove, u64 killerMove);
         /**
 		 * @fn addMove
 		 * @brief Adds a move to the moves vector based on the given parameters
