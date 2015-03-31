@@ -213,6 +213,11 @@ namespace GUI
                 MainClass.CancelEngineTask ();
                 MainClass.EngineOne.StopAndIgnoreMove ();
             }
+            if (MainClass.EngineTwo != null && MainClass.EngineOne.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
+            }
+
             MainClass.CurrentBoard = new Board ();
             MainClass.CurrentGameStatus = GameStatus.Inactive;
             MainClass.ResetClock ();
@@ -539,6 +544,10 @@ namespace GUI
                     MainClass.CancelEngineTask ();
                     MainClass.EngineOne.StopAndIgnoreMove ();
                 }
+                if (MainClass.EngineTwo != null && MainClass.EngineOne.IsThinking) {
+                    MainClass.CancelEngineTask ();
+                    MainClass.EngineTwo.StopAndIgnoreMove ();
+                }
 
                 if (MainClass.CurrentGameStatus != GameStatus.Active &&
                     MainClass.CurrentGameStatus != GameStatus.Inactive) {
@@ -702,6 +711,10 @@ namespace GUI
             if (MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.EngineOne.StopAndIgnoreMove ();
+            }
+            if (MainClass.EngineTwo != null && MainClass.EngineOne.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
             }
 
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
