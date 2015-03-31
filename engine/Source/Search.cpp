@@ -113,7 +113,7 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     if (allowNullMove) {
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
             gameBoard.setCastleOrEnpas(gameBoard.nextCastleOrEnpasent());
-            int eval = -AlphaBeta(gameBoard, -beta, -beta+1, remainingDepth-1-R, playerColor*-1, false);
+            int eval = -AlphaBeta(gameBoard, -beta, -beta+1, remainingDepth-1-NULL_MOVE_REDUCTION, playerColor*-1, false);
             gameBoard.setCastleOrEnpas(castle);
             if (eval >= beta) {
                 return eval;
@@ -177,13 +177,14 @@ int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int halfMoveNumber = gameBoard.halfMoveClock;
 
     while (true) {
         u64 nextCapture = possibleCaptures.getNextMove();
         if (nextCapture != 0) {
             gameBoard.makeMov(nextCapture);
             score = -qSearch(gameBoard, -beta, -alpha, playerColor*-1);
-            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash);
+            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash, halfMoveNumber);
             if (score != ILLEGAL_MOVE) {
                 if (score >= beta){
                     return beta;

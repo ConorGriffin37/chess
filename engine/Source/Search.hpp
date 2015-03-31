@@ -5,7 +5,7 @@ using namespace std;
 
 #include "Board.hpp"
 #include "Evaluation.hpp"
-#define R 2
+#define NULL_MOVE_REDUCTION 2
 
 #include <string>
 
