@@ -322,6 +322,7 @@ namespace GUI
             }
             Gtk.Application.Invoke (delegate {
                 MainClass.UpdateClock ();
+                UpdatePlayerToMove();
             });
         }
 
@@ -517,6 +518,7 @@ namespace GUI
                 }
                 Gtk.Application.Invoke (delegate {
                     MainClass.UpdateClock ();
+                    UpdatePlayerToMove();
                 });
 
                 currentSelectionState = PieceSelectionState.None;
@@ -615,6 +617,19 @@ namespace GUI
                                  );
 
             engineThinkCooldown = DateTime.Now;
+        }
+
+        public void UpdatePlayerToMove()
+        {
+            if (MainClass.CurrentGameStatus == GameStatus.Active) {
+                if (MainClass.CurrentBoard.PlayerToMove == PieceColour.White) {
+                    PlayerToMoveLabel.Text = "Player to move: White";
+                } else {
+                    PlayerToMoveLabel.Text = "Player to move: Black";
+                }
+            } else {
+                PlayerToMoveLabel.Text = "The game is not active.";
+            }
         }
     }
 }
