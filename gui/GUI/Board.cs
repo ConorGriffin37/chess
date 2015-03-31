@@ -153,6 +153,15 @@ namespace GUI
             }
             Piece movingPiece = Squares [source].Piece;
 
+            // Forbid castling if the king moves.
+            if (movingPiece.Type == PieceType.King) {
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteCastled = true;
+                } else {
+                    BlackCastled = true;
+                }
+            }
+
             // Special rules for castling
             if (movingPiece.Type == PieceType.King &&
                 (source == 4 || source == 60) &&
