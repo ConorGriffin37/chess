@@ -125,8 +125,9 @@ BOOST_AUTO_TEST_CASE(board_getPieceCode)
 int getLegalMoves(Board testBoard, int playerColor) {
 	MoveList possibleMoves = MoveList(testBoard, ((playerColor == 1) ? 6 : 7), u64(0));
 	u64 castle = testBoard.getCastleOrEnpasent();
-    u64 lastHash = testBoard.getZorHash();
-    int enpasCol = testBoard.getEnpasentCol();
+    	u64 lastHash = testBoard.getZorHash();
+    	int enpasCol = testBoard.getEnpasentCol();
+	int halfMoveNumber = testBoard.halfMoveClock;
 	int legalMoves = 0;
 
 	while (true) {
@@ -136,7 +137,7 @@ int getLegalMoves(Board testBoard, int playerColor) {
 			if (testBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
                 legalMoves++;
 			}
-			testBoard.unMakeMov(theMove, castle, enpasCol, lastHash);
+			testBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber);
 		} else {
 			break;
 		}
@@ -162,7 +163,8 @@ BOOST_AUTO_TEST_CASE(search_RootAlphaBeta)
     	testBoard.setEvaluation(Evaluation::evaluateBoard(testBoard));
     	testBoard.stageOfGame = Evaluation::stageOfGame(testBoard);
     	testBoard.setZorHash(TranspositionTables::getBoardHash(testBoard, 6));
-	BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4).first == "f1f8"); //it should find the checkmate for white
+	vector<string> searchMoves;
+	BOOST_CHECK(Search::RootAlphaBeta(testBoard, 1, 4, searchMoves).first == "f1f8"); //it should find the checkmate for white
 }
 
 //Perft is good for verifying the correctness of the move generation, generate all the leaf nodes at a given depth from a known position.
@@ -180,6 +182,7 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
+    int halfMoveNumber = gameBoard.halfMoveClock;
 
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? 6 : 7), true);
 
@@ -196,7 +199,7 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
         //if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
             nodes += Perft(depth - 1, gameBoard, playerColor*-1);
         //}
-        gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash);
+        gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber);
     }
 
     return nodes;
@@ -218,4 +221,3 @@ BOOST_AUTO_TEST_CASE(perft_Test)
     testBoard = Board("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
     BOOST_CHECK(Perft(4, testBoard, 1) == 3894594);
 }
-
