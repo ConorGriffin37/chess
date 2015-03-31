@@ -143,6 +143,12 @@ class TranspositionTables
 		 * @return bool Whether the position is open or not
 		 */
         static bool isOpen(u64 zorHash);
+        /**
+		 * @fn setOpen
+		 * @brief Unsets an open position for epetition checking
+		 * @param zorHash the Zorbrist hash of the board
+		 * @return void
+		 */
         static void unSetOpen(u64 zorHash);
 };
 
