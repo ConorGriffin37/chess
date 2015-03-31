@@ -29,3 +29,15 @@ Scrum Log - Sprint 3
   * Added killer move heuristic
 * Darragh:
   * Implemented 50 move rule
+
+**2015-03-31:**
+* Terry:
+  * Added ability to load 2 engines and play them against each other
+  * Fixed several bugs
+* Conor:
+  * Added null move heuristic
+  * Fixed bugs with threefold repetition
+* Darragh:
+  * Implemented threefold repetition
+  * Ran code profiling tools and generated visualistation for discussion
+  * Updated unit tests to work with changes made to the engine
