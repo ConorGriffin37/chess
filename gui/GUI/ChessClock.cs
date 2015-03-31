@@ -53,7 +53,7 @@ namespace GUI
                     });
                 } else {
                     Gtk.Application.Invoke(delegate {
-                        MainClass.win.ShowGameOverDialog (GameStatus.WhiteTime);
+                        MainClass.win.ShowGameOverDialog (GameStatus.BlackTime);
                     });
                 }
             }
