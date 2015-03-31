@@ -644,11 +644,11 @@ namespace GUI
 
         protected void OnOnePlayerSet (object sender, EventArgs e)
         {
-            if (MainClass.EngineOne.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.EngineOne.StopAndIgnoreMove ();
             }
-            if (MainClass.EngineTwo.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineTwo.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.EngineTwo.StopAndIgnoreMove ();
             }
@@ -657,11 +657,11 @@ namespace GUI
 
         protected void OnTwoPlayerSet (object sender, EventArgs e)
         {
-            if (MainClass.EngineOne.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.EngineOne.StopAndIgnoreMove ();
             }
-            if (MainClass.EngineTwo.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineTwo.IsThinking) {
                 MainClass.CancelEngineTask ();
                 MainClass.EngineTwo.StopAndIgnoreMove ();
             }
@@ -671,6 +671,8 @@ namespace GUI
         protected void OnEnginesSet (object sender, EventArgs e)
         {
             if (MainClass.EngineOne == null || MainClass.EngineTwo == null) {
+                OnePlayerAction.Activate ();
+
                 Console.Error.WriteLine ("(EE) Not enough engines loaded.");
                 MessageDialog errorDialog = new MessageDialog (
                                                 this,
@@ -680,8 +682,6 @@ namespace GUI
                                                 "Two engines need to be loaded!");
                 errorDialog.Run ();
                 errorDialog.Destroy ();
-
-                OnePlayerAction.Activate ();
 
                 return;
             }
