@@ -10,12 +10,20 @@
 void outbitboard(u64 n);
 u64 Search::nodes = 0;
 u64 Search::totalNodes = 0;
+u64 Search::KillerList[] = {};
+
+void Search::clearKiller()
+{
+    for (int i = 0; i < 1024; i++) {
+        KillerList[i] = 0;
+    }
+}
 
 pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int remainingDepth, std::vector<string> searchMoves)
 {
     MoveList possibleMoves;
     if (searchMoves.size() == 0) {
-        possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()).best);
+        possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), TranspositionTables::getBest(gameBoard.getZorHash()).best, KillerList[remainingDepth]);
     } else {
         possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), searchMoves);
     }
@@ -37,7 +45,7 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
             gameBoard.makeMov(nextMove);
             if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
                 UCI::sendInfo("currmove " + possibleMoves.getMoveCode(nextMove) + " currmovenumber " + to_string(++currMoveNumber));
-                score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1);
+                score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, -maxScore, remainingDepth - 1, playerColor*-1, true);
                 //score = -AlphaBeta(gameBoard, NEGATIVE_INFINITY, INFINITY, remainingDepth - 1, playerColor*-1);
                 //cout << "Move is " << possibleMoves.getMoveCode(nextMove.second) << " and score is " << score << std::endl;
                 if (score > maxScore){
@@ -62,14 +70,14 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     return make_pair(possibleMoves.getMoveCode(curBestMove), maxScore);
 }
 
-int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor)
+int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor, bool allowNullMove)
 {
     nodes++;
     if ((UCI::quit) or (UCI::killSearch)){
         return 0;
     }
 
-    if (remainingDepth == 0){
+    if (remainingDepth <= 0){
         if (gameBoard.inCheck(((playerColor*-1 == 1) ? WHITE_CODE : BLACK_CODE))) {
             return -ILLEGAL_MOVE;
         }
@@ -88,7 +96,8 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
             }
         }
     }
-    MoveList possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), best.best);
+
+    MoveList possibleMoves = MoveList(gameBoard, ((playerColor == 1) ? WHITE_CODE : BLACK_CODE), best.best, KillerList[remainingDepth]);
     if (possibleMoves.kingTake) {
         return -ILLEGAL_MOVE;
     }
@@ -98,20 +107,32 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
     int halfMoveNumber = gameBoard.halfMoveClock;
-
     bool canMove = false;
     u64 bestMove;
+
+    if (allowNullMove) {
+        if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
+            gameBoard.setCastleOrEnpas(gameBoard.nextCastleOrEnpasent());
+            int eval = -AlphaBeta(gameBoard, -beta, -beta+1, remainingDepth-1-R, playerColor*-1, false);
+            gameBoard.setCastleOrEnpas(castle);
+            if (eval >= beta) {
+                return eval;
+            }
+        }
+    }
 
     while (true) {
         u64 nextMove = possibleMoves.getNextMove();
         if (nextMove != 0) {
             gameBoard.makeMov(nextMove);
-            score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1);
+            score = -AlphaBeta(gameBoard, -beta, -alpha, remainingDepth - 1, playerColor*-1, true);
             gameBoard.unMakeMov(nextMove, castle, enpasCol, lastHash, halfMoveNumber);
             if (score != ILLEGAL_MOVE) {
                 canMove = true;
                 if (score >= beta){
                     TranspositionTables::setEntry(gameBoard.getZorHash(), nextMove, remainingDepth, beta, CUT_NODE);
+                    KillerList[remainingDepth] = nextMove;
+                    //addKiller(nextMove, remainingDepth);
                     return beta;
                 }
                 if (score > alpha){
@@ -127,10 +148,6 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE))) {
             return (-MATE_SCORE - remainingDepth);
         }
-        return 0;
-    }
-
-    if (gameBoard.halfMoveClock >= 100) {
         return 0;
     }
 
@@ -160,14 +177,13 @@ int Search::qSearch(Board& gameBoard, int alpha, int beta, int playerColor)
     u64 castle = gameBoard.getCastleOrEnpasent();
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
-    int halfMoveNumber = gameBoard.halfMoveClock;
 
     while (true) {
         u64 nextCapture = possibleCaptures.getNextMove();
         if (nextCapture != 0) {
             gameBoard.makeMov(nextCapture);
             score = -qSearch(gameBoard, -beta, -alpha, playerColor*-1);
-            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash, halfMoveNumber);
+            gameBoard.unMakeMov(nextCapture, castle, enpasCol, lastHash);
             if (score != ILLEGAL_MOVE) {
                 if (score >= beta){
                     return beta;

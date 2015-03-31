@@ -5,6 +5,7 @@ using namespace std;
 
 #include "Board.hpp"
 #include "Evaluation.hpp"
+#define R 2
 
 #include <string>
 
@@ -16,6 +17,8 @@ using namespace std;
 
 class Search
 {
+    private:
+        static u64 KillerList[1024]; /**< Last killer by depth */
     public:
         static u64 nodes; /**< The number of nodes that have been searched at a given depth*/
         static u64 totalNodes; /** < The total number of nodes searched */
@@ -37,7 +40,7 @@ class Search
 		 * @param remainingDepth The depth to search to
 		 * @return int The score of the position
 		 */
-        static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor);
+        static int AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth, int playerColor, bool allowNullMove);
         /**
          * @fn qSearch
          * @brief Performs a quiescence search on a given position
@@ -46,6 +49,7 @@ class Search
 		 * @return int The score of the position
          */
         static int qSearch(Board& gameBoard, int alpha, int beta, int playerColor);
+        static void clearKiller();
 };
 
 #endif // SEARCH_H

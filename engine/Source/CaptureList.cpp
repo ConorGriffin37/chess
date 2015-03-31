@@ -2,7 +2,7 @@
 
 CaptureList::CaptureList(Board& gameBoard, int colorcode)
 {
-    timesCalled = 0;
+    done = false;
     position = 0;
     kingTake = false;
     generateMoves(gameBoard, colorcode);

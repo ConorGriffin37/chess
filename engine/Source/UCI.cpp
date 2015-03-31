@@ -256,6 +256,7 @@ bool UCI::startCalculating(string input)
 
     if (quit == false) {
         TranspositionTables::setOld();
+        Search::clearKiller();
         outputBestMove(bestMove);
     }
     return true;
