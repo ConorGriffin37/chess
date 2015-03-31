@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 690">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 705">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -48,12 +48,12 @@
         <property name="ShortLabel" translatable="yes">Load _FEN</property>
         <signal name="Activated" handler="OnLoadFEN" />
       </action>
-      <action id="LoadEngineAction">
+      <action id="LoadEngineOneAction">
         <property name="Type">Action</property>
-        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;e</property>
-        <property name="Label" translatable="yes">_Load Engine</property>
-        <property name="ShortLabel" translatable="yes">_Load Engine</property>
-        <signal name="Activated" handler="OnLoadEngine" />
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;1</property>
+        <property name="Label" translatable="yes">Load Engine 1</property>
+        <property name="ShortLabel" translatable="yes">Load Engine</property>
+        <signal name="Activated" handler="OnLoadEngineOne" />
       </action>
       <action id="AboutAction">
         <property name="Type">Action</property>
@@ -146,6 +146,13 @@
         <property name="ShortLabel" translatable="yes">_Analyse Position</property>
         <signal name="Activated" handler="OnAnalyseMove" />
       </action>
+      <action id="LoadEngine2Action">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;2</property>
+        <property name="Label" translatable="yes">Load Engine 2</property>
+        <property name="ShortLabel" translatable="yes">Load Engine 2</property>
+        <signal name="Activated" handler="OnLoadEngineTwo" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -176,7 +183,8 @@
                 <node type="Menuitem" action="LoadFENAction" />
               </node>
               <node type="Menu" action="EngineAction">
-                <node type="Menuitem" action="LoadEngineAction" />
+                <node type="Menuitem" action="LoadEngineOneAction" />
+                <node type="Menuitem" action="LoadEngine2Action" />
                 <node type="Menuitem" action="MakeEngineMoveAction" />
                 <node type="Menuitem" action="SetEngineStrengthAction" />
                 <node type="Menuitem" action="AnalysePositionAction" />
@@ -361,7 +369,7 @@
             <property name="MemberName" />
             <property name="Spacing">5</property>
             <child>
-              <widget class="Gtk.Label" id="EngineNameLabel">
+              <widget class="Gtk.Label" id="EngineOneNameLabel">
                 <property name="MemberName" />
                 <property name="Xpad">10</property>
                 <property name="LabelProp" translatable="yes">engine_name</property>
@@ -374,7 +382,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="EngineAuthorLabel">
+              <widget class="Gtk.Label" id="EngineOneAuthorLabel">
                 <property name="MemberName" />
                 <property name="Xpad">10</property>
                 <property name="LabelProp" translatable="yes">engine_author</property>
@@ -385,7 +393,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="EngineDepthLabel">
+              <widget class="Gtk.Label" id="EngineOneDepthLabel">
                 <property name="MemberName" />
                 <property name="Xpad">10</property>
                 <property name="LabelProp" translatable="yes">engine_depth</property>
@@ -396,7 +404,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.Label" id="EngineNPSLabel">
+              <widget class="Gtk.Label" id="EngineOneNPSLabel">
                 <property name="MemberName" />
                 <property name="Xpad">10</property>
                 <property name="LabelProp" translatable="yes">engine_nps</property>
@@ -412,6 +420,65 @@
             <property name="AutoSize">True</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.HBox" id="hbox2">
+            <property name="MemberName" />
+            <property name="Spacing">5</property>
+            <child>
+              <widget class="Gtk.Label" id="EngineTwoNameLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+                <property name="LabelProp" translatable="yes">engine_name</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="EngineTwoAuthorLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+                <property name="LabelProp" translatable="yes">engine_author</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="EngineTwoDepthLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+                <property name="LabelProp" translatable="yes">engine_depth</property>
+              </widget>
+              <packing>
+                <property name="Position">2</property>
+                <property name="AutoSize">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="EngineTwoNPSLabel">
+                <property name="MemberName" />
+                <property name="Xpad">10</property>
+                <property name="LabelProp" translatable="yes">engine_nps</property>
+              </widget>
+              <packing>
+                <property name="Position">3</property>
+                <property name="AutoSize">False</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">3</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+            <property name="Padding">2</property>
           </packing>
         </child>
         <child>
@@ -433,7 +500,7 @@
             </child>
           </widget>
           <packing>
-            <property name="Position">3</property>
+            <property name="Position">4</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>

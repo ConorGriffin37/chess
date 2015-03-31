@@ -18,7 +18,7 @@ namespace GUI
 		
 		private global::Gtk.Action LoadFENAction;
 		
-		private global::Gtk.Action LoadEngineAction;
+		private global::Gtk.Action LoadEngineOneAction;
 		
 		private global::Gtk.Action AboutAction;
 		
@@ -45,6 +45,8 @@ namespace GUI
 		private global::Gtk.RadioAction EnginesAction;
 		
 		private global::Gtk.Action AnalysePositionAction;
+		
+		private global::Gtk.Action LoadEngine2Action;
 		
 		private global::Gtk.VBox vbox1;
 		
@@ -78,13 +80,23 @@ namespace GUI
 		
 		private global::Gtk.HBox hbox1;
 		
-		private global::Gtk.Label EngineNameLabel;
+		private global::Gtk.Label EngineOneNameLabel;
 		
-		private global::Gtk.Label EngineAuthorLabel;
+		private global::Gtk.Label EngineOneAuthorLabel;
 		
-		private global::Gtk.Label EngineDepthLabel;
+		private global::Gtk.Label EngineOneDepthLabel;
 		
-		private global::Gtk.Label EngineNPSLabel;
+		private global::Gtk.Label EngineOneNPSLabel;
+		
+		private global::Gtk.HBox hbox2;
+		
+		private global::Gtk.Label EngineTwoNameLabel;
+		
+		private global::Gtk.Label EngineTwoAuthorLabel;
+		
+		private global::Gtk.Label EngineTwoDepthLabel;
+		
+		private global::Gtk.Label EngineTwoNPSLabel;
 		
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		
@@ -114,9 +126,9 @@ namespace GUI
 			this.LoadFENAction = new global::Gtk.Action ("LoadFENAction", global::Mono.Unix.Catalog.GetString ("Load _FEN"), null, null);
 			this.LoadFENAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Load _FEN");
 			w1.Add (this.LoadFENAction, "<Primary><Mod2>f");
-			this.LoadEngineAction = new global::Gtk.Action ("LoadEngineAction", global::Mono.Unix.Catalog.GetString ("_Load Engine"), null, null);
-			this.LoadEngineAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Load Engine");
-			w1.Add (this.LoadEngineAction, "<Primary><Mod2>e");
+			this.LoadEngineOneAction = new global::Gtk.Action ("LoadEngineOneAction", global::Mono.Unix.Catalog.GetString ("Load Engine 1"), null, null);
+			this.LoadEngineOneAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Load Engine");
+			w1.Add (this.LoadEngineOneAction, "<Primary><Mod2>1");
 			this.AboutAction = new global::Gtk.Action ("AboutAction", global::Mono.Unix.Catalog.GetString ("_About"), null, null);
 			this.AboutAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_About");
 			w1.Add (this.AboutAction, null);
@@ -153,12 +165,15 @@ namespace GUI
 			this.TwoPlayerAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Player vs Player");
 			w1.Add (this.TwoPlayerAction, null);
 			this.EnginesAction = new global::Gtk.RadioAction ("EnginesAction", global::Mono.Unix.Catalog.GetString ("Engine vs Engine"), null, null, 0);
-			this.EnginesAction.Group = this.TwoPlayerAction.Group;
+			this.EnginesAction.Group = this.OnePlayerAction.Group;
 			this.EnginesAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Engine vs Engine");
 			w1.Add (this.EnginesAction, null);
 			this.AnalysePositionAction = new global::Gtk.Action ("AnalysePositionAction", global::Mono.Unix.Catalog.GetString ("_Analyse Position"), null, null);
 			this.AnalysePositionAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("_Analyse Position");
 			w1.Add (this.AnalysePositionAction, "<Primary>a");
+			this.LoadEngine2Action = new global::Gtk.Action ("LoadEngine2Action", global::Mono.Unix.Catalog.GetString ("Load Engine 2"), null, null);
+			this.LoadEngine2Action.ShortLabel = global::Mono.Unix.Catalog.GetString ("Load Engine 2");
+			w1.Add (this.LoadEngine2Action, "<Primary><Mod2>2");
 			this.UIManager.InsertActionGroup (w1, 0);
 			this.AddAccelGroup (this.UIManager.AccelGroup);
 			this.Name = "GUI.MainWindow";
@@ -169,7 +184,7 @@ namespace GUI
 			this.vbox1.Name = "vbox1";
 			this.vbox1.Spacing = 6;
 			// Container child vbox1.Gtk.Box+BoxChild
-			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='GameAction' action='GameAction'><menuitem name='SetClockAction' action='SetClockAction'/><menu name='GameModeAction' action='GameModeAction'><menuitem name='OnePlayerAction' action='OnePlayerAction'/><menuitem name='TwoPlayerAction' action='TwoPlayerAction'/><menuitem name='EnginesAction' action='EnginesAction'/></menu></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='FlipBoardAction' action='FlipBoardAction'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineAction' action='LoadEngineAction'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/><menuitem name='SetEngineStrengthAction' action='SetEngineStrengthAction'/><menuitem name='AnalysePositionAction' action='AnalysePositionAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
+			this.UIManager.AddUiFromString ("<ui><menubar name='MenuBar'><menu name='FileAction' action='FileAction'><menuitem name='QuitAction' action='QuitAction'/></menu><menu name='GameAction' action='GameAction'><menuitem name='SetClockAction' action='SetClockAction'/><menu name='GameModeAction' action='GameModeAction'><menuitem name='OnePlayerAction' action='OnePlayerAction'/><menuitem name='TwoPlayerAction' action='TwoPlayerAction'/><menuitem name='EnginesAction' action='EnginesAction'/></menu></menu><menu name='BoardAction' action='BoardAction'><menuitem name='ResetBoardAction1' action='ResetBoardAction1'/><menuitem name='FlipBoardAction' action='FlipBoardAction'/><menuitem name='LoadFENAction' action='LoadFENAction'/></menu><menu name='EngineAction' action='EngineAction'><menuitem name='LoadEngineOneAction' action='LoadEngineOneAction'/><menuitem name='LoadEngine2Action' action='LoadEngine2Action'/><menuitem name='MakeEngineMoveAction' action='MakeEngineMoveAction'/><menuitem name='SetEngineStrengthAction' action='SetEngineStrengthAction'/><menuitem name='AnalysePositionAction' action='AnalysePositionAction'/></menu><menu name='HelpAction' action='HelpAction'><menuitem name='AboutAction' action='AboutAction'/></menu></menubar></ui>");
 			this.MenuBar = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/MenuBar")));
 			this.MenuBar.Name = "MenuBar";
 			this.vbox1.Add (this.MenuBar);
@@ -301,44 +316,88 @@ namespace GUI
 			this.hbox1.Name = "hbox1";
 			this.hbox1.Spacing = 5;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.EngineNameLabel = new global::Gtk.Label ();
-			this.EngineNameLabel.Name = "EngineNameLabel";
-			this.EngineNameLabel.Xpad = 10;
-			this.EngineNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_name");
-			this.hbox1.Add (this.EngineNameLabel);
-			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNameLabel]));
+			this.EngineOneNameLabel = new global::Gtk.Label ();
+			this.EngineOneNameLabel.Name = "EngineOneNameLabel";
+			this.EngineOneNameLabel.Xpad = 10;
+			this.EngineOneNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_name");
+			this.hbox1.Add (this.EngineOneNameLabel);
+			global::Gtk.Box.BoxChild w16 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineOneNameLabel]));
 			w16.Position = 0;
 			w16.Expand = false;
 			w16.Fill = false;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.EngineAuthorLabel = new global::Gtk.Label ();
-			this.EngineAuthorLabel.Name = "EngineAuthorLabel";
-			this.EngineAuthorLabel.Xpad = 10;
-			this.EngineAuthorLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_author");
-			this.hbox1.Add (this.EngineAuthorLabel);
-			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineAuthorLabel]));
+			this.EngineOneAuthorLabel = new global::Gtk.Label ();
+			this.EngineOneAuthorLabel.Name = "EngineOneAuthorLabel";
+			this.EngineOneAuthorLabel.Xpad = 10;
+			this.EngineOneAuthorLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_author");
+			this.hbox1.Add (this.EngineOneAuthorLabel);
+			global::Gtk.Box.BoxChild w17 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineOneAuthorLabel]));
 			w17.Position = 1;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.EngineDepthLabel = new global::Gtk.Label ();
-			this.EngineDepthLabel.Name = "EngineDepthLabel";
-			this.EngineDepthLabel.Xpad = 10;
-			this.EngineDepthLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_depth");
-			this.hbox1.Add (this.EngineDepthLabel);
-			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineDepthLabel]));
+			this.EngineOneDepthLabel = new global::Gtk.Label ();
+			this.EngineOneDepthLabel.Name = "EngineOneDepthLabel";
+			this.EngineOneDepthLabel.Xpad = 10;
+			this.EngineOneDepthLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_depth");
+			this.hbox1.Add (this.EngineOneDepthLabel);
+			global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineOneDepthLabel]));
 			w18.Position = 2;
 			// Container child hbox1.Gtk.Box+BoxChild
-			this.EngineNPSLabel = new global::Gtk.Label ();
-			this.EngineNPSLabel.Name = "EngineNPSLabel";
-			this.EngineNPSLabel.Xpad = 10;
-			this.EngineNPSLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_nps");
-			this.hbox1.Add (this.EngineNPSLabel);
-			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineNPSLabel]));
+			this.EngineOneNPSLabel = new global::Gtk.Label ();
+			this.EngineOneNPSLabel.Name = "EngineOneNPSLabel";
+			this.EngineOneNPSLabel.Xpad = 10;
+			this.EngineOneNPSLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_nps");
+			this.hbox1.Add (this.EngineOneNPSLabel);
+			global::Gtk.Box.BoxChild w19 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.EngineOneNPSLabel]));
 			w19.Position = 3;
 			this.vbox1.Add (this.hbox1);
 			global::Gtk.Box.BoxChild w20 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox1]));
 			w20.Position = 2;
 			w20.Expand = false;
 			w20.Fill = false;
+			// Container child vbox1.Gtk.Box+BoxChild
+			this.hbox2 = new global::Gtk.HBox ();
+			this.hbox2.Name = "hbox2";
+			this.hbox2.Spacing = 5;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.EngineTwoNameLabel = new global::Gtk.Label ();
+			this.EngineTwoNameLabel.Name = "EngineTwoNameLabel";
+			this.EngineTwoNameLabel.Xpad = 10;
+			this.EngineTwoNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_name");
+			this.hbox2.Add (this.EngineTwoNameLabel);
+			global::Gtk.Box.BoxChild w21 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.EngineTwoNameLabel]));
+			w21.Position = 0;
+			w21.Expand = false;
+			w21.Fill = false;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.EngineTwoAuthorLabel = new global::Gtk.Label ();
+			this.EngineTwoAuthorLabel.Name = "EngineTwoAuthorLabel";
+			this.EngineTwoAuthorLabel.Xpad = 10;
+			this.EngineTwoAuthorLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_author");
+			this.hbox2.Add (this.EngineTwoAuthorLabel);
+			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.EngineTwoAuthorLabel]));
+			w22.Position = 1;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.EngineTwoDepthLabel = new global::Gtk.Label ();
+			this.EngineTwoDepthLabel.Name = "EngineTwoDepthLabel";
+			this.EngineTwoDepthLabel.Xpad = 10;
+			this.EngineTwoDepthLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_depth");
+			this.hbox2.Add (this.EngineTwoDepthLabel);
+			global::Gtk.Box.BoxChild w23 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.EngineTwoDepthLabel]));
+			w23.Position = 2;
+			// Container child hbox2.Gtk.Box+BoxChild
+			this.EngineTwoNPSLabel = new global::Gtk.Label ();
+			this.EngineTwoNPSLabel.Name = "EngineTwoNPSLabel";
+			this.EngineTwoNPSLabel.Xpad = 10;
+			this.EngineTwoNPSLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("engine_nps");
+			this.hbox2.Add (this.EngineTwoNPSLabel);
+			global::Gtk.Box.BoxChild w24 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.EngineTwoNPSLabel]));
+			w24.Position = 3;
+			this.vbox1.Add (this.hbox2);
+			global::Gtk.Box.BoxChild w25 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.hbox2]));
+			w25.Position = 3;
+			w25.Expand = false;
+			w25.Fill = false;
+			w25.Padding = ((uint)(2));
 			// Container child vbox1.Gtk.Box+BoxChild
 			this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow.Name = "GtkScrolledWindow";
@@ -354,19 +413,19 @@ namespace GUI
 			this.EngineOutput.LeftMargin = 5;
 			this.GtkScrolledWindow.Add (this.EngineOutput);
 			this.vbox1.Add (this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w22 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
-			w22.Position = 3;
+			global::Gtk.Box.BoxChild w27 = ((global::Gtk.Box.BoxChild)(this.vbox1 [this.GtkScrolledWindow]));
+			w27.Position = 4;
 			this.Add (this.vbox1);
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 690;
+			this.DefaultHeight = 705;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
 			this.LoadFENAction.Activated += new global::System.EventHandler (this.OnLoadFEN);
-			this.LoadEngineAction.Activated += new global::System.EventHandler (this.OnLoadEngine);
+			this.LoadEngineOneAction.Activated += new global::System.EventHandler (this.OnLoadEngineOne);
 			this.AboutAction.Activated += new global::System.EventHandler (this.OnAbout);
 			this.ResetBoardAction1.Activated += new global::System.EventHandler (this.OnResetBoard);
 			this.MakeEngineMoveAction.Activated += new global::System.EventHandler (this.OnMakeEngineMove);
@@ -377,6 +436,7 @@ namespace GUI
 			this.TwoPlayerAction.Activated += new global::System.EventHandler (this.OnTwoPlayerSet);
 			this.EnginesAction.Activated += new global::System.EventHandler (this.OnEnginesSet);
 			this.AnalysePositionAction.Activated += new global::System.EventHandler (this.OnAnalyseMove);
+			this.LoadEngine2Action.Activated += new global::System.EventHandler (this.OnLoadEngineTwo);
 			this.BoardArea.ExposeEvent += new global::Gtk.ExposeEventHandler (this.OnBoardExpose);
 			this.BoardArea.ButtonPressEvent += new global::Gtk.ButtonPressEventHandler (this.OnPieceClick);
 		}

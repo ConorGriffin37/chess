@@ -39,16 +39,20 @@ namespace GUI
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a)
         {
-            if (MainClass.CurrentEngine != null)
-                MainClass.CurrentEngine.Quit ();
+            if (MainClass.EngineOne != null)
+                MainClass.EngineOne.Quit ();
+            if (MainClass.EngineTwo != null)
+                MainClass.EngineTwo.Quit ();
             Application.Quit ();
             a.RetVal = true;
         }
 
         protected void OnQuit (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null)
-                MainClass.CurrentEngine.Quit ();
+            if (MainClass.EngineOne != null)
+                MainClass.EngineOne.Quit ();
+            if (MainClass.EngineTwo != null)
+                MainClass.EngineTwo.Quit ();
             Application.Quit ();
         }
 
@@ -65,9 +69,9 @@ namespace GUI
 
         protected void OnLoadFEN (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
             }
             LoadFENDialog fen = new LoadFENDialog();
             if (fen.Run () == (int)ResponseType.Ok) {
@@ -100,11 +104,11 @@ namespace GUI
             UpdateMaterialDifference (MainClass.CurrentBoard);
         }
 
-        protected void OnLoadEngine (object sender, EventArgs e)
+        protected void OnLoadEngineOne (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
             }
             FileChooserDialog chooser = new FileChooserDialog (
                                             "Please choose an engine executable.",
@@ -115,8 +119,8 @@ namespace GUI
 
             if (chooser.Run() == (int)ResponseType.Accept) {
                 try {
-                    MainClass.CurrentEngine = new UCITransceiver(chooser.Filename);
-                    MainClass.CurrentEngine.Init();
+                    MainClass.EngineOne = new UCITransceiver(chooser.Filename, 1);
+                    MainClass.EngineOne.Init();
                 } catch(Exception ex) {
                     Console.Error.WriteLine ("(EE) Error opening engine file: " + ex.Message);
                     MessageDialog errorDialog = new MessageDialog (
@@ -205,9 +209,9 @@ namespace GUI
 
         protected void OnResetBoard (object sender, EventArgs e)
         {
-            if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+            if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
             }
             MainClass.CurrentBoard = new Board ();
             MainClass.CurrentGameStatus = GameStatus.Inactive;
@@ -223,7 +227,7 @@ namespace GUI
                 // Force a cooldown of 0.5 seconds between requests for the engine to think.
                 return;
 
-            if (MainClass.CurrentEngine == null) {
+            if (MainClass.EngineOne == null) {
                 Console.Error.WriteLine ("(EE) Engine not loaded.");
                 Gtk.Application.Invoke (delegate {
                     MessageDialog errorDialog = new MessageDialog (
@@ -245,19 +249,19 @@ namespace GUI
 
         void EngineMove()
         {
-            if (MainClass.CurrentEngine.IsThinking) {
+            if (MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
             }
 
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
-            MainClass.CurrentEngine.SendPosition (currentFEN);
-            MainClass.CurrentEngine.WaitUntilReady ();
+            MainClass.EngineOne.SendPosition (currentFEN);
+            MainClass.EngineOne.WaitUntilReady ();
             string time = (MainClass.StrengthType == StrengthMeasure.Depth) ? "depth " : "movetime ";
             time += (MainClass.StrengthType == StrengthMeasure.Depth) ? MainClass.StrengthValue : MainClass.StrengthValue * 1000;
             try {
                 engineThinkTask = Task.Factory.StartNew<string> (
-                    () => MainClass.CurrentEngine.Go (time),
+                    () => MainClass.EngineOne.Go (time),
                     MainClass.EngineStopTokenSource.Token
                 )
                     .ContinueWith (task => ParseAndMakeMove (task.Result),
@@ -368,8 +372,8 @@ namespace GUI
         {
             Match match = engineOutputRegex.Match (output);
             if (match.Success) {
-                EngineDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
-                EngineNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
+                EngineOneDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
+                EngineOneNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
                 string score = match.Groups [3].Value.Substring (6);
                 if (score.StartsWith ("cp")) {
                     score = score.Substring (3);
@@ -408,20 +412,30 @@ namespace GUI
             }
         }
 
-        public void LogEngineNameAndAuthor(string name, string author)
+        public void LogEngineNameAndAuthor(int engine, string name, string author)
         {
-            EngineNameLabel.Text = name;
-            EngineAuthorLabel.Text = author;
+            if (engine == 1) {
+                EngineOneNameLabel.Text = name;
+                EngineOneAuthorLabel.Text = author;
+            } else {
+                EngineTwoNameLabel.Text = name;
+                EngineTwoAuthorLabel.Text = author;
+            }
             ClearEngineOutput ();
             EngineOutput.Buffer.Text = "Engine loaded: " + name;
         }
 
         public void ClearEngineInfo()
         {
-            EngineNameLabel.Text = "No engine loaded";
-            EngineAuthorLabel.Text = "";
-            EngineDepthLabel.Text = "";
-            EngineNPSLabel.Text = "";
+            EngineOneNameLabel.Text = "Engine 1 not loaded.";
+            EngineOneAuthorLabel.Text = "";
+            EngineOneDepthLabel.Text = "";
+            EngineOneNPSLabel.Text = "";
+            
+            EngineTwoNameLabel.Text = "Engine 2 not loaded.";
+            EngineTwoAuthorLabel.Text = "";
+            EngineTwoDepthLabel.Text = "";
+            EngineTwoNPSLabel.Text = "";
         }
 
         public void ClearEngineOutput()
@@ -470,9 +484,9 @@ namespace GUI
                 boardContext.Dispose ();
                 currentSelectionState = PieceSelectionState.Selected;
             } else {
-                if (MainClass.CurrentEngine != null && MainClass.CurrentEngine.IsThinking) {
+                if (MainClass.EngineOne != null && MainClass.EngineOne.IsThinking) {
                     MainClass.CancelEngineTask ();
-                    MainClass.CurrentEngine.StopAndIgnoreMove ();
+                    MainClass.EngineOne.StopAndIgnoreMove ();
                 }
 
                 if (MainClass.CurrentGameStatus != GameStatus.Active &&
@@ -523,7 +537,7 @@ namespace GUI
 
                 currentSelectionState = PieceSelectionState.None;
 
-                if (MainClass.CurrentEngine != null && MainClass.CurrentMode == GameMode.OnePlayer)
+                if (MainClass.EngineOne != null && MainClass.CurrentMode == GameMode.OnePlayer)
                     EngineMove ();
             }
         }
@@ -589,7 +603,7 @@ namespace GUI
                 // Force a cooldown of 0.5 seconds between requests for the engine to think.
                 return;
 
-            if (MainClass.CurrentEngine == null) {
+            if (MainClass.EngineOne == null) {
                 Console.Error.WriteLine ("(EE) Engine not loaded.");
                 Gtk.Application.Invoke (delegate {
                     MessageDialog errorDialog = new MessageDialog (
@@ -603,16 +617,16 @@ namespace GUI
                 });
                 return;
             }
-            if (MainClass.CurrentEngine.IsThinking) {
+            if (MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
-                MainClass.CurrentEngine.StopAndIgnoreMove ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
             }
 
             string currentFEN = MainClass.CurrentBoard.ToFEN ();
-            MainClass.CurrentEngine.SendPosition (currentFEN);
-            MainClass.CurrentEngine.WaitUntilReady ();
+            MainClass.EngineOne.SendPosition (currentFEN);
+            MainClass.EngineOne.WaitUntilReady ();
             engineThinkTask = Task.Factory.StartNew<string> (
-                                     () => MainClass.CurrentEngine.Go ("infinite"),
+                                     () => MainClass.EngineOne.Go ("infinite"),
                                      MainClass.EngineStopTokenSource.Token
                                  );
 
@@ -630,6 +644,38 @@ namespace GUI
             } else {
                 PlayerToMoveLabel.Text = "The game is not active.";
             }
+        }
+
+        protected void OnLoadEngineTwo (object sender, EventArgs e)
+        {
+            if (MainClass.EngineTwo != null && MainClass.EngineTwo.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
+            }
+            FileChooserDialog chooser = new FileChooserDialog (
+                                            "Please choose an engine executable.",
+                                            this,
+                                            FileChooserAction.Open,
+                                            "Cancel", ResponseType.Cancel,
+                                            "Open", ResponseType.Accept);
+
+            if (chooser.Run() == (int)ResponseType.Accept) {
+                try {
+                    MainClass.EngineTwo = new UCITransceiver(chooser.Filename, 2);
+                    MainClass.EngineTwo.Init();
+                } catch(Exception ex) {
+                    Console.Error.WriteLine ("(EE) Error opening engine file: " + ex.Message);
+                    MessageDialog errorDialog = new MessageDialog (
+                                                    chooser,
+                                                    DialogFlags.DestroyWithParent,
+                                                    MessageType.Error,
+                                                    ButtonsType.Ok,
+                                                    "Error loading engine file.");
+                    errorDialog.Run ();
+                    errorDialog.Destroy ();
+                }
+            }
+            chooser.Destroy ();
         }
     }
 }

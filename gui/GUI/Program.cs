@@ -9,7 +9,8 @@ namespace GUI
     class MainClass
     {
         public static Board CurrentBoard { get; set; }
-        public static UCITransceiver CurrentEngine { get; set; }
+        public static UCITransceiver EngineOne { get; set; }
+        public static UCITransceiver EngineTwo { get; set; }
         public static GameStatus CurrentGameStatus { get; set; }
         public static CancellationTokenSource EngineStopTokenSource { get; private set; }
         public static ChessClock WhiteClock { get; private set; }
