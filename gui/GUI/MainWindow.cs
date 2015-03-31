@@ -242,12 +242,12 @@ namespace GUI
                 return;
             }
 
-            EngineMove ();
+            EngineOneMove ();
 
             engineThinkCooldown = DateTime.Now;
         }
 
-        void EngineMove()
+        void EngineOneMove()
         {
             if (MainClass.EngineOne.IsThinking) {
                 MainClass.CancelEngineTask ();
@@ -264,7 +264,7 @@ namespace GUI
                     () => MainClass.EngineOne.Go (time),
                     MainClass.EngineStopTokenSource.Token
                 )
-                    .ContinueWith (task => ParseAndMakeMove (task.Result),
+                    .ContinueWith (task => ParseAndMakeMove (task.Result, 1),
                         MainClass.EngineStopTokenSource.Token);
             } catch(AggregateException ae) {
                 ae.Handle ((x) => {
@@ -281,7 +281,41 @@ namespace GUI
             }
         }
 
-        private void ParseAndMakeMove(string move)
+        void EngineTwoMove()
+        {
+            if (MainClass.EngineTwo.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
+            }
+
+            string currentFEN = MainClass.CurrentBoard.ToFEN ();
+            MainClass.EngineTwo.SendPosition (currentFEN);
+            MainClass.EngineTwo.WaitUntilReady ();
+            string time = (MainClass.StrengthType == StrengthMeasure.Depth) ? "depth " : "movetime ";
+            time += (MainClass.StrengthType == StrengthMeasure.Depth) ? MainClass.StrengthValue : MainClass.StrengthValue * 1000;
+            try {
+                engineThinkTask = Task.Factory.StartNew<string> (
+                    () => MainClass.EngineTwo.Go (time),
+                    MainClass.EngineStopTokenSource.Token
+                )
+                    .ContinueWith (task => ParseAndMakeMove (task.Result, 2),
+                        MainClass.EngineStopTokenSource.Token);
+            } catch(AggregateException ae) {
+                ae.Handle ((x) => {
+                    if (x is InvalidOperationException) {
+                        Console.Error.WriteLine ("(EE) Engine tried to make illegal move: " + x.Message);
+                        MainClass.CurrentGameStatus = GameStatus.WhiteAdjudicate;
+                        Gtk.Application.Invoke(delegate {
+                            ShowGameOverDialog(MainClass.CurrentGameStatus);
+                        });
+                        return true;
+                    }
+                    return false;
+                });
+            }
+        }
+
+        private void ParseAndMakeMove(string move, int engine)
         {
             string sourceStr = move.Substring (0, 2);
             string destinationStr = move.Substring (2, 2);
@@ -328,6 +362,18 @@ namespace GUI
                 MainClass.UpdateClock ();
                 UpdatePlayerToMove();
             });
+            if (MainClass.CurrentMode == GameMode.Engines) {
+                Thread.Sleep (1500);
+                if (engine == 1) {
+                    Gtk.Application.Invoke (delegate {
+                        EngineTwoMove ();
+                    });
+                } else {
+                    Gtk.Application.Invoke (delegate {
+                        EngineOneMove ();
+                    });
+                }
+            }
         }
 
         public void UpdateClock(ChessClock clock)
@@ -368,12 +414,17 @@ namespace GUI
             time.Destroy ();
         }
 
-        public void LogEngineOutput(string output)
+        public void LogEngineOutput(string output, int engine)
         {
             Match match = engineOutputRegex.Match (output);
             if (match.Success) {
-                EngineOneDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
-                EngineOneNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
+                if (engine == 1) {
+                    EngineOneDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
+                    EngineOneNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
+                } else {
+                    EngineTwoDepthLabel.Text = "Depth: " + match.Groups [1].Value.Substring (5);
+                    EngineTwoNPSLabel.Text = "NPS: " + match.Groups [2].Value.Substring (3);
+                }
                 string score = match.Groups [3].Value.Substring (6);
                 if (score.StartsWith ("cp")) {
                     score = score.Substring (3);
@@ -538,7 +589,7 @@ namespace GUI
                 currentSelectionState = PieceSelectionState.None;
 
                 if (MainClass.EngineOne != null && MainClass.CurrentMode == GameMode.OnePlayer)
-                    EngineMove ();
+                    EngineTwoMove ();
             }
         }
 
@@ -584,16 +635,47 @@ namespace GUI
 
         protected void OnOnePlayerSet (object sender, EventArgs e)
         {
+            if (MainClass.EngineOne.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
+            }
+            if (MainClass.EngineTwo.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
+            }
             MainClass.CurrentMode = GameMode.OnePlayer;
         }
 
         protected void OnTwoPlayerSet (object sender, EventArgs e)
         {
+            if (MainClass.EngineOne.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineOne.StopAndIgnoreMove ();
+            }
+            if (MainClass.EngineTwo.IsThinking) {
+                MainClass.CancelEngineTask ();
+                MainClass.EngineTwo.StopAndIgnoreMove ();
+            }
             MainClass.CurrentMode = GameMode.TwoPlayer;
         }
 
         protected void OnEnginesSet (object sender, EventArgs e)
         {
+            if (MainClass.EngineOne == null || MainClass.EngineTwo == null) {
+                Console.Error.WriteLine ("(EE) Not enough engines loaded.");
+                MessageDialog errorDialog = new MessageDialog (
+                                                this,
+                                                DialogFlags.DestroyWithParent,
+                                                MessageType.Error,
+                                                ButtonsType.Ok,
+                                                "Two engines need to be loaded!");
+                errorDialog.Run ();
+                errorDialog.Destroy ();
+
+                OnePlayerAction.Activate ();
+
+                return;
+            }
             MainClass.CurrentMode = GameMode.Engines;
         }
 

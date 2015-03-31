@@ -93,7 +93,7 @@ namespace GUI
                 if(response == null) continue;
                 Debug.Log(response);
                 Helper.SynchronousInvoke(delegate {
-                    MainClass.win.LogEngineOutput(response);
+                    MainClass.win.LogEngineOutput(response, number);
                 });
                 if (response.StartsWith ("bestmove")) {
                     IsThinking = false;

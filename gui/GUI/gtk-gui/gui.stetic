@@ -73,7 +73,7 @@
         <property name="ShortLabel" translatable="yes">_Reset Board</property>
         <signal name="Activated" handler="OnResetBoard" />
       </action>
-      <action id="MakeEngineMoveAction">
+      <action id="MakeEngineOneMoveAction">
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Primary&gt;m</property>
         <property name="Label" translatable="yes">Make Engine _Move</property>
@@ -185,7 +185,7 @@
               <node type="Menu" action="EngineAction">
                 <node type="Menuitem" action="LoadEngineOneAction" />
                 <node type="Menuitem" action="LoadEngine2Action" />
-                <node type="Menuitem" action="MakeEngineMoveAction" />
+                <node type="Menuitem" action="MakeEngineOneMoveAction" />
                 <node type="Menuitem" action="SetEngineStrengthAction" />
                 <node type="Menuitem" action="AnalysePositionAction" />
               </node>
