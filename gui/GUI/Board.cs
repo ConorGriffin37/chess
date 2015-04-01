@@ -174,13 +174,13 @@ namespace GUI
 
             if (movingPiece.Type == PieceType.Rook) {
                 if (source == 0) {
-                    BlackCastledL = false;
+                    BlackCastledL = true;
                 } else if (source == 7) {
-                    BlackCastledR = false;
+                    BlackCastledR = true;
                 } else if (source == 56) {
-                    WhiteCastledL = false;
+                    WhiteCastledL = true;
                 } else if (source == 63) {
-                    WhiteCastledR = false;
+                    WhiteCastledR = true;
                 }
             }
 
