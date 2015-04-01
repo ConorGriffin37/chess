@@ -117,8 +117,10 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     if (allowNullMove) {
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
             gameBoard.setCastleOrEnpas(gameBoard.nextCastleOrEnpasent());
+            gameBoard.setZorHash(gameBoard.getZorHash() ^ TranspositionTables::getBlackHash());
             int eval = -AlphaBeta(gameBoard, -beta, -beta + 1, remainingDepth - 1 - NULL_MOVE_REDUCTION, playerColor*-1, false);
             gameBoard.setCastleOrEnpas(castle);
+            gameBoard.setZorHash(lastHash);
             if (eval >= beta) {
                 return eval;
             }
