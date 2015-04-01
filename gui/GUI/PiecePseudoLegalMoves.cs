@@ -188,7 +188,7 @@ namespace GUI
 
             if (king.Colour == PieceColour.Black) {
                 Piece KingRook = board.Squares [7].Piece;
-                if (board.BlackCastledL == false) {
+                if (board.BlackCastledR == false) {
                     if (KingRook != null) {
                         // Check that KingRook is in fact a rook and of the correct colour
                         if (KingRook.Colour == PieceColour.Black && KingRook.Type == PieceType.Rook) {
@@ -205,7 +205,7 @@ namespace GUI
                 }
 
                 Piece QueenRook = board.Squares [0].Piece;
-                if (board.BlackCastledR == false) {
+                if (board.BlackCastledL == false) {
                     if (QueenRook != null) {
                         // Check that QueenRook is in fact a rook and of the correct colour
                         if (QueenRook.Colour == PieceColour.Black && QueenRook.Type == PieceType.Rook) {
