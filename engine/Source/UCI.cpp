@@ -2,6 +2,7 @@
 #include "Search.hpp"
 #include "Evaluation.hpp"
 #include "TranspositionTables.hpp"
+#include "MoveList.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -18,6 +19,8 @@ bool UCI::quit = false;
 Board UCI::currentBoard = Board();
 int UCI::currentColor = 1;
 bool UCI::killSearch = false;
+string UCI::ponderMove = "";
+bool UCI::ponderHit = false;
 
 
 bool UCI::waitForInput()
@@ -47,7 +50,7 @@ bool UCI::waitForInput()
     } else if (command == "stop"){
         killSearch = true;
     } else if (command == "ponderhit"){
-        //used for pondering, not being implemented this sprint
+        ponderHit = true;
     } else if (command == "debug"){
         //used for possible implementation of debug mode
     } else if (command == "setoption"){
@@ -63,6 +66,16 @@ bool UCI::waitForInput()
 
 void UCI::outputBestMove(string moveString)
 {
+    //Find the move the engine thinks opponent is most likely to play for pondering
+    ponderMove = "";
+    ponderHit = false;
+    UCI::currentBoard.makeMov(TranspositionTables::getBest(UCI::currentBoard.getZorHash()).best);
+    u64 nextMove = TranspositionTables::getBest(UCI::currentBoard.getZorHash()).best;
+    if (nextMove != 0) {
+        MoveList movList;
+        ponderMove = movList.getMoveCode(nextMove);
+        moveString = moveString + " ponder " + movList.getMoveCode(nextMove);
+    }
     cout << "bestmove " << moveString << endl;
 }
 
@@ -117,7 +130,6 @@ bool UCI::sentPosition(string input)
                 }
                 bool moveMade = currentBoard.simpleMakeMove(startPosition, endPosition, promote);
                 TranspositionTables::setOpen(currentBoard.getZorHash());
-                //outbitboard(currentBoard.getPieces());
                 if (moveMade == false){ //move not valid
                     return false;
                 }
@@ -139,7 +151,7 @@ bool UCI::startCalculating(string input)
     int winc = -1;              //whites increment per move in mseconds
     int binc = -1;              //blacks increment per move in mseconds
     int movestogo = -1;         //number of moves left until the next time control
-    int depth = 10;              //search only to a certain depth
+    int depth = 20;              //search only to a certain depth
     u64 nodes = -1;             //number of nodes to search
     int mate = -1;              //search for a mate in x moves
     int movetime = -1;          //time allowed for the move in mseconds
@@ -153,6 +165,18 @@ bool UCI::startCalculating(string input)
             }
         } else if (token == "ponder"){
             ponder = true;
+            if (ponderMove == "") {
+                return false;
+            }
+            pair<int, int> startPosition = make_pair(ponderMove[0] - 'a', ponderMove[1] - '1');
+            pair<int, int> endPosition = make_pair(ponderMove[2] - 'a', ponderMove[3] - '1');
+            char proChar = ' ';
+            if (ponderMove.length() == 5){
+                proChar = ponderMove[4];
+            }
+            cout << "Making ponderMove " << ponderMove << endl;
+            UCI::currentBoard.simpleMakeMove(startPosition, endPosition, proChar);
+            UCI::currentColor = UCI::currentColor*-1;
         } else if (token == "infinite"){
             infinite = true;
         } else if (token == "wtime"){
@@ -207,7 +231,7 @@ bool UCI::startCalculating(string input)
     timeBeforeSearch = chrono::system_clock::now();
     int lastSearched = 0;
 
-    while (((curDepth <= depth) or (infinite)) and (curDepth < MAX_DEPTH)) {
+    while (((curDepth <= depth) or (infinite or ponder)) and (curDepth < MAX_DEPTH)) {
         if (killSearch == true) {
             break;
         }
@@ -250,6 +274,12 @@ bool UCI::startCalculating(string input)
 
         if ((Search::totalNodes  > nodes) and (nodes > 0)) {
             break;
+        }
+
+        if (ponder and ponderHit) {
+            if (elapsed_seconds.count() > 10) {
+                break;
+            }
         }
 
         curDepth++;
