@@ -204,217 +204,6 @@ void Board::makeMove(int code, int colorcode, int from, int to)
     pieceBB[colorcode] = setbit(pieceBB[colorcode], to);
 }
 
-u64 Board::getAttacked(int colorcode)
-{
-    u64 colorboard = getPieceColor(colorcode);
-    u64 oppcolorboard;
-    if (colorcode == WHITE_CODE) {
-        oppcolorboard = getPieceColor(BLACK_CODE);
-    } else {
-        oppcolorboard = getPieceColor(WHITE_CODE);
-    }
-    u64 bitest = 1;
-    u64 attacked = 0;
-    for (int i = 0; i < 64; i++) {
-        int x = 7 - (i % 8);
-        int y = i/8;
-        if (colorboard & bitest) {
-            if (getPiece(PAWN_CODE) & bitest) { //pawn
-                if (colorcode == WHITE_CODE) { //white
-                    if (x < 7) {
-                        attacked = setbit(attacked, getpos(x + 1, y + 1));
-                    }
-                    if (x > 0) {
-                        attacked = setbit(attacked, getpos(x - 1, y + 1));
-                    }
-                } else if (colorcode == 7) { //black
-                    if (x < 7) {
-                        attacked = setbit(attacked, getpos(x + 1, y - 1));
-                    }
-                    if (x > 0) {
-                        attacked = setbit(attacked, getpos(x - 1, y - 1));
-                    }
-                }
-            } else if (getPiece(ROOK_CODE) & bitest or getPiece(QUEEN_CODE) & bitest) { //rook and queen (partialy)
-                for (int j = x + 1; j < 8; j++) {
-                    if (checkbit(colorboard, getpos(j, y))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(j, y))) {
-                        attacked = setbit(attacked, getpos(j, y));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(j, y));
-                }
-                for (int j = x - 1; j >= 0; j--) {
-                    if (checkbit(colorboard, getpos(j, y))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(j, y))) {
-                        attacked = setbit(attacked, getpos(j, y));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(j, y));
-                }
-                for (int j = y + 1; j < 8; j++) {
-                    if (checkbit(colorboard, getpos(x, j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x, j))) {
-                        attacked = setbit(attacked, getpos(x, j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x, j));
-                }
-                for (int j = y - 1; j >= 0; j--) {
-                    if (checkbit(colorboard, getpos(x, j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x, j))) {
-                        attacked = setbit(attacked, getpos(x, j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x, j));
-                }
-            } else if (getPiece(KNIGHT_CODE) & bitest) { //knight
-                if (x < 6) {
-                    if (y < 7) {
-                        if (checkbit(colorboard, getpos(x + 2, y + 1)) == false) {
-                            attacked = setbit(attacked, getpos(x + 2, y + 1));
-                        }
-                    }
-                    if (y > 0) {
-                        if (checkbit(colorboard, getpos(x + 2, y - 1)) == false) {
-                            attacked = setbit(attacked, getpos(x + 2, y - 1));
-                        }
-                    }
-                }
-                if (x > 1) {
-                    if (y < 7) {
-                        if (checkbit(colorboard, getpos(x - 2, y + 1)) == false) {
-                            attacked = setbit(attacked, getpos(x - 2, y + 1));
-                        }
-                    }
-                    if (y > 0) {
-                        if (checkbit(colorboard, getpos(x - 2, y - 1)) == false) {
-                            attacked = setbit(attacked, getpos(x - 2, y - 1));
-                        }
-                    }
-                }
-                if (y < 6) {
-                    if (x < 7) {
-                        if (checkbit(colorboard, getpos(x + 1, y + 2)) == false) {
-                            attacked = setbit(attacked, getpos(x + 1, y + 2));
-                        }
-                    }
-                    if (x > 0) {
-                        if (checkbit(colorboard, getpos(x - 1, y + 2)) == false) {
-                            attacked = setbit(attacked, getpos(x - 1, y + 2));
-                        }
-                    }
-                }
-                if (y > 1) {
-                    if (x < 7) {
-                        if (checkbit(colorboard, getpos(x + 1, y - 2)) == false) {
-                            attacked = setbit(attacked, getpos(x + 1, y - 2));
-                        }
-                    }
-                    if (x > 0) {
-                        if (checkbit(colorboard, getpos(x - 1, y - 2)) == false) {
-                            attacked = setbit(attacked, getpos(x - 1, y - 2));
-                        }
-                    }
-                }
-            } else if (getPiece(KING_CODE) & bitest) { //king
-                if (x < 7) {
-                    if (checkbit(colorboard, getpos(x + 1, y)) == false) {
-                        attacked = setbit(attacked, getpos(x + 1, y));
-                    }
-                    if (y < 7) {
-                        if (checkbit(colorboard, getpos(x + 1, y + 1)) == false) {
-                            attacked = setbit(attacked, getpos(x + 1, y + 1));
-                        }
-                    }
-                    if (y > 0) {
-                        if (checkbit(colorboard, getpos(x + 1, y - 1)) == false) {
-                            attacked = setbit(attacked, getpos(x + 1, y - 1));
-                        }
-                    }
-                }
-                if (y < 7) {
-                    if (checkbit(colorboard, getpos(x, y + 1)) == false) {
-                        attacked = setbit(attacked, getpos(x, y + 1));
-                    }
-                }
-                if (y > 0) {
-                    if (checkbit(colorboard, getpos(x, y - 1)) == false) {
-                        attacked = setbit(attacked, getpos(x, y - 1));
-                    }
-                }
-                if (x > 0) {
-                    if (checkbit(colorboard, getpos(x - 1, y)) == false) {
-                        attacked = setbit(attacked, getpos(x - 1, y));
-                    }
-                    if (y < 7) {
-                        if (checkbit(colorboard, getpos(x - 1, y + 1)) == false) {
-                            attacked = setbit(attacked, getpos(x - 1, y + 1));
-                        }
-                    }
-                    if (y > 0) {
-                        if (checkbit(colorboard, getpos(x - 1, y - 1)) == false) {
-                            attacked = setbit(attacked, getpos(x - 1, y - 1));
-                        }
-                    }
-                }
-            }
-            if (getPiece(BISHOP_CODE) & bitest or getPiece(QUEEN_CODE) & bitest) { //bishop and queen partially
-                for (int j = 1; j <= std::min(7 - x, 7 - y); j++) {
-                    if (checkbit(colorboard, getpos(x + j, y + j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x + j, y + j))) {
-                        attacked = setbit(attacked, getpos(x + j, y + j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x + j, y + j));
-                }
-                for (int j = 1; j <= std::min(7 - x, y); j++) {
-                    if (checkbit(colorboard, getpos(x + j, y - j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x + j, y - j))) {
-                        attacked = setbit(attacked, getpos(x + j, y - j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x + j, y - j));
-                }
-                for (int j = 1; j <= std::min(x, y); j++) {
-                    if (checkbit(colorboard, getpos(x - j, y - j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x - j, y - j))) {
-                        attacked = setbit(attacked, getpos(x - j, y - j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x - j, y - j));
-                }
-                for (int j = 1; j <= std::min(x, 7 - y); j++) {
-                    if (checkbit(colorboard, getpos(x - j, y + j))) {
-                        break;
-                    }
-                    if (checkbit(oppcolorboard, getpos(x - j, y + j))) {
-                        attacked = setbit(attacked, getpos(x - j, y + j));
-                        break;
-                    }
-                    attacked = setbit(attacked, getpos(x - j, y + j));
-                }
-            }
-        }
-        bitest <<= 1;
-    }
-    return attacked;
-}
-
 bool Board::getAttackedPawn(int colorcode, int pos, u64 oppcolorboard)
 {
     u64 opppawnboard = oppcolorboard & getPiece(PAWN_CODE);
@@ -623,6 +412,34 @@ bool Board::inCheck(int colorcode)
     u64 opprookqueen = (oppcolorboard & getPiece(QUEEN_CODE)) | (getPiece(ROOK_CODE) & oppcolorboard);
     u64 oppbisqueen = (oppcolorboard & getPiece(QUEEN_CODE)) | (getPiece(BISHOP_CODE) & oppcolorboard);
     int pos = bitScanForward(getPieceAndColor(KING_CODE, colorcode));
+    if (getAttackedPawn(colorcode, pos, oppcolorboard)) {
+        return true;
+    }
+    if (getAttackedKing(pos, oppcolorboard)) {
+        return true;
+    }
+    if (getAttackedKnight(pos, oppcolorboard)) {
+        return true;
+    }
+    if (getAttackedBishopQueen(pos, oppbisqueen)) {
+        return true;
+    }
+    if (getAttackedRookQueen(pos, opprookqueen)) {
+        return true;
+    }
+    return false;
+}
+
+bool Board::getAttacked(int colorcode, int pos)
+{
+    u64 oppcolorboard;
+    if (colorcode == WHITE_CODE) {
+        oppcolorboard = getPieceColor(BLACK_CODE);
+    } else {
+        oppcolorboard = getPieceColor(WHITE_CODE);
+    }
+    u64 opprookqueen = (oppcolorboard & getPiece(QUEEN_CODE)) | (getPiece(ROOK_CODE) & oppcolorboard);
+    u64 oppbisqueen = (oppcolorboard & getPiece(QUEEN_CODE)) | (getPiece(BISHOP_CODE) & oppcolorboard);
     if (getAttackedPawn(colorcode, pos, oppcolorboard)) {
         return true;
     }

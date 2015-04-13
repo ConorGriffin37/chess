@@ -579,11 +579,10 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         }
     }
     if (colorcode == WHITE_CODE) { //white
-        u64 attacked = gameBoard.getAttacked(BLACK_CODE);
         if (checkbit(gameBoard.getCastleOrEnpasent(), 0)) {
             if (checkbit(whiteocc, 0)) {
                 if (not checkbit(occupied, 2) and not checkbit(occupied, 1)) {
-                    if (not checkbit(attacked, 3) and not checkbit(attacked, 2) and not checkbit(attacked, 1)) {
+                    if (not gameBoard.getAttacked(colorcode, 3) and not gameBoard.getAttacked(colorcode, 2) and not gameBoard.getAttacked(colorcode, 1)) {
                         addMoveCastle(KING_CODE, colorcode, 3, 1, 0, 2);
                     }
                 }
@@ -592,18 +591,17 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         if (checkbit(gameBoard.getCastleOrEnpasent(), 7)) {
             if (checkbit(whiteocc, 7)) {
                 if (not checkbit(occupied, 4) and not checkbit(occupied, 5) and not checkbit(occupied, 6)) {
-                    if (not checkbit(attacked, 3) and not checkbit(attacked, 4) and not checkbit(attacked, 5)) {
+                    if (not gameBoard.getAttacked(colorcode, 3) and not gameBoard.getAttacked(colorcode, 4) and not gameBoard.getAttacked(colorcode, 5)) {
                         addMoveCastle(KING_CODE, colorcode, 3, 5, 7, 4);
                     }
                 }
             }
         }
     } else { //black
-        u64 attacked = gameBoard.getAttacked(WHITE_CODE);
         if (checkbit(gameBoard.getCastleOrEnpasent(), 56)) {
             if (checkbit(blackocc, 56)) {
                 if (not checkbit(occupied, 57) and not checkbit(occupied, 58)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 58) and not checkbit(attacked, 57)) {
+                    if (not gameBoard.getAttacked(colorcode, 59) and not gameBoard.getAttacked(colorcode, 58) and not gameBoard.getAttacked(colorcode, 57)) {
                         addMoveCastle(KING_CODE, colorcode, 59, 57, 56, 58);
                     }
                 }
@@ -612,7 +610,7 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         if (checkbit(gameBoard.getCastleOrEnpasent(), 63)) {
             if (checkbit(blackocc, 63)) {
                 if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
+                    if (not gameBoard.getAttacked(colorcode, 59) and not gameBoard.getAttacked(colorcode, 60) and not gameBoard.getAttacked(colorcode, 61)) {
                         addMoveCastle(KING_CODE, colorcode, 59, 61, 63, 60);
                     }
                 }

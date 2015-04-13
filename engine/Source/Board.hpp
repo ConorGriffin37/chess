@@ -186,11 +186,12 @@ class Board
         bool inCheck(int colorcode);
         /**
 		 * @fn getAttacked
-		 * @brief Returns all the squares attacked by a certain color
-		 * @param colorcode Attacking color
-		 * @return bitboard of attacked squares
+		 * @brief Returns if a certain square is attacked
+		 * @param colorcode Attacked color
+		 * @param pos Attacked square
+		 * @return bool if attacked or not
 		 */
-        u64 getAttacked(int colorcode);
+        bool getAttacked(int colorcode, int pos);
         /**
 		 * @fn getAttackedPawn
 		 * @brief If the given square is attacked by a pawn
