@@ -21,6 +21,7 @@ void initMasks();
 
 BOOST_AUTO_TEST_CASE(UCI_sentPosition)
 {
+    //Initialising things
     initMasks();
     Evaluation::initpopCountOfByte();
     TranspositionTables::initZobrist();
@@ -42,7 +43,6 @@ BOOST_AUTO_TEST_CASE(evaluation_evaluateBoard)
 
 BOOST_AUTO_TEST_CASE(evaluation_CheckForDoublePawns)
 {
-    Evaluation::initpopCountOfByte(); //initialising look-up table
     cout << "Testing CheckForDoublePawns function" << endl;
     Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     BOOST_CHECK(Evaluation::CheckForDoublePawns(6, testBoard) == 0); //No double pawns for white
@@ -205,19 +205,33 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
     return nodes;
 }
 
+void setUpForPerft(Board& testBoard)
+{
+    testBoard.setEvaluation(Evaluation::evaluateBoard(testBoard));
+    testBoard.stageOfGame = Evaluation::stageOfGame(testBoard);
+    testBoard.setZorHash(TranspositionTables::getBoardHash(testBoard, WHITE_CODE));
+}
+
 BOOST_AUTO_TEST_CASE(perft_Test)
 {
     cout << "Testing move generation (perft), this is slow" << endl;
     Board testBoard = Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); //initial position
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(4, testBoard, 1) == 197281); //Known value from the chess programming wiki http://chessprogramming.wikispaces.com/Perft+Results
+    setUpForPerft(testBoard);
     testBoard = Board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(4, testBoard, 1) == 4085603);
     testBoard = Board("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(5, testBoard, 1) == 674624);
     testBoard = Board("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1");
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(4, testBoard, -1) == 422333);
     testBoard = Board("rnbqkb1r/pp1p1ppp/2p5/4P3/2B5/8/PPP1NnPP/RNBQK2R w KQkq - 0 6");
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(3, testBoard, 1) == 53392);
     testBoard = Board("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10");
+    setUpForPerft(testBoard);
     BOOST_CHECK(Perft(4, testBoard, 1) == 3894594);
 }
