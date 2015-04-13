@@ -7,7 +7,8 @@ namespace GUI
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
     // The colour before the game result indicates which colour has lost.
     public enum GameStatus { Inactive, Active, Stalemate, WhiteCheckmate,
-        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime };
+        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime,
+        DrawRepetition, DrawFifty, DrawInsuffientMaterial };
 
     /**
      * @brief Representation of the board as a whole.

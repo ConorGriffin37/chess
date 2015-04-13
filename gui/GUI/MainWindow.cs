@@ -19,6 +19,8 @@ namespace GUI
         int materialDifference = 0;
         Cairo.Context boardContext;
         byte[] pieceValues = { 1, 3, 3, 5, 8 }; // Pawn, Knight, Bishop, Rook, Queen
+        byte[] whiteSquares = { 1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23, 24, 26, 28, 30, 33,
+                                35, 37, 39, 40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62 };
         DateTime engineThinkCooldown = DateTime.Now;
 
         Task engineThinkTask;
@@ -172,6 +174,18 @@ namespace GUI
                 case GameStatus.BlackTime:
                     message = "Time expired: Black. White wins.";
                     MainClass.CurrentGameStatus = GameStatus.BlackTime;
+                    break;
+                case GameStatus.DrawInsuffientMaterial:
+                    message = "Game is a draw due to insufficient material.";
+                    MainClass.CurrentGameStatus = GameStatus.DrawInsuffientMaterial;
+                    break;
+                case GameStatus.DrawFifty:
+                    message = "Game is a draw according to the 50-move rule.";
+                    MainClass.CurrentGameStatus = GameStatus.DrawFifty;
+                    break;
+                case GameStatus.DrawRepetition:
+                    message = "Game is a draw by threefold repetition.";
+                    MainClass.CurrentGameStatus = GameStatus.DrawRepetition;
                     break;
                 default:
                     break;
@@ -608,12 +622,17 @@ namespace GUI
          */
         public void UpdateMaterialDifference(Board board)
         {
+            int totalWhite = 0;
+            int totalBlack = 0;
+
             int materialDifference = 0;
             foreach (Square sq in board.Squares) {
                 if (sq.Piece != null) {
                     if (sq.Piece.Type != PieceType.King && sq.Piece.Colour == PieceColour.White) {
+                        totalWhite += pieceValues [(int)(sq.Piece.Type)];
                         materialDifference += pieceValues [(int)(sq.Piece.Type)];
                     } else if (sq.Piece.Type != PieceType.King && sq.Piece.Colour == PieceColour.Black) {
+                        totalBlack += pieceValues [(int)(sq.Piece.Type)];
                         materialDifference -= pieceValues [(int)(sq.Piece.Type)];
                     }
                 }
@@ -627,6 +646,40 @@ namespace GUI
                     Math.Abs (materialDifference), materialDifference > 1 ? "s" : "");
             } else {
                 MaterialDifferenceLabel.Text = "Material is equal.";
+            }
+
+            int maxMaterial = Math.Max (totalWhite, totalBlack);
+            if (maxMaterial <= 3) { // We compare to 3 because kings are not counted.
+                int minMaterial = Math.Min (totalWhite, totalBlack);
+                if (minMaterial == 0) {
+                    MainClass.CurrentGameStatus = GameStatus.DrawInsuffientMaterial;
+                } else if (maxMaterial == minMaterial && maxMaterial == 3) {   // Now we check for opposite-coloured bishops
+                    int whiteBishopSquare = -1;
+                    int blackBishopSquare = -1;
+                    for(int i = 0; i < board.Squares.Length; i++) {
+                        Square sq = board.Squares [i];
+                        if (sq.Piece != null && sq.Piece.Type == PieceType.Bishop) {
+                            if (sq.Piece.Colour == PieceColour.White)
+                                whiteBishopSquare = i;
+                            else
+                                blackBishopSquare = i;
+                        }
+                    }
+                    // Only continue if both pieces are actually bishops
+                    if (whiteBishopSquare != -1 && blackBishopSquare != -1) {
+                        // Now we check to see if they are on opposite colours, using XOR
+                        bool whiteBishopOnWhiteSquare = Array.IndexOf (whiteSquares, (byte)whiteBishopSquare) > -1;
+                        bool blackBishopOnWhiteSquare = Array.IndexOf (whiteSquares, (byte)blackBishopSquare) > -1;
+                        if (whiteBishopOnWhiteSquare ^ blackBishopOnWhiteSquare) {
+                            MainClass.CurrentGameStatus = GameStatus.DrawInsuffientMaterial;
+                        }
+                    }
+                }
+            }
+            if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
+                Gtk.Application.Invoke(delegate {
+                    ShowGameOverDialog(MainClass.CurrentGameStatus);
+                });
             }
         }
 

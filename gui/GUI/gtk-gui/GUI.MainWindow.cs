@@ -420,7 +420,7 @@ namespace GUI
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 773;
-			this.DefaultHeight = 705;
+			this.DefaultHeight = 715;
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 			this.QuitAction.Activated += new global::System.EventHandler (this.OnQuit);
