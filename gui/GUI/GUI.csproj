@@ -89,6 +89,7 @@
     <Compile Include="gtk-gui\GUI.PawnPromotionDialog.cs" />
     <Compile Include="EngineStrengthDialog.cs" />
     <Compile Include="gtk-gui\GUI.EngineStrengthDialog.cs" />
+    <Compile Include="GameHistory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
