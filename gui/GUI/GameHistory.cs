@@ -12,9 +12,10 @@ namespace GUI
         public Piece MovingPiece { get; set; }
         public bool SpecifierRequired { get; set; } // Whether or not to specify the source square in the short algebraic notation
         public PieceType? PromoteTo { get; set; }
+        public MoveResult Result { get; set; }
 
         public Move(byte source, byte destination, PieceColour colour, Piece movingPiece,
-                    bool specifierRequired = false, PieceType? promoteTo = null)
+                    MoveResult result, bool specifierRequired = false, PieceType? promoteTo = null)
         {
             Source = source;
             Destination = destination;
@@ -22,6 +23,7 @@ namespace GUI
             MovingPiece = movingPiece;
             SpecifierRequired = specifierRequired;
             PromoteTo = promoteTo;
+            Result = result;
         }
     }
 
@@ -38,7 +40,7 @@ namespace GUI
         public string Black { get; private set; }
         public string Result { get; private set; }
 
-        private string[] columns = { "a", "b", "c", "d", "e", "f", "g", "h" };
+        private static string[] columns = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
         public GameHistory ()
         {
@@ -53,14 +55,14 @@ namespace GUI
             Result = "*";
         }
 
-        private string SquareToNotation(byte square)
+        private static string SquareToNotation(byte square)
         {
             string column = columns [square % 8];
-            string row = Convert.ToString ((int)(square / 8));
+            string row = Convert.ToString (Math.Abs((int)(square / 8) - 7) + 1);
             return column + row;
         }
 
-        private string PieceToNotation(Piece piece)
+        private static string PieceToNotation(Piece piece)
         {
             string pieceNotation = "";
             switch (piece.Type) {
@@ -68,27 +70,48 @@ namespace GUI
                     pieceNotation = "";
                     break;
                 case PieceType.Knight:
-                    pieceNotation = "n";
+                    pieceNotation = "N";
                     break;
                 case PieceType.Bishop:
-                    pieceNotation = "b";
+                    pieceNotation = "B";
                     break;
                 case PieceType.Rook:
-                    pieceNotation = "r";
+                    pieceNotation = "R";
                     break;
                 case PieceType.King:
-                    pieceNotation = "k";
+                    pieceNotation = "K";
                     break;
                 case PieceType.Queen:
-                    pieceNotation = "q";
+                    pieceNotation = "Q";
                     break;
                 default:
                     break;
             }
-            if(piece.Colour == PieceColour.Black) {
-                pieceNotation = pieceNotation.ToUpper ();
-            }
+
             return pieceNotation;
+        }
+
+        private static string PromoteToNotation(PieceType? promoteTo)
+        {
+            switch (promoteTo) {
+                case null:
+                    return null;
+                case PieceType.Knight:
+                    return "N";
+                case PieceType.Bishop:
+                    return "B";
+                case PieceType.Rook:
+                    return "R";
+                case PieceType.Queen:
+                    return "Q";
+                default:
+                    return null;
+            }
+        }
+
+        private static string GetSpecifier(Move move)
+        {
+            return columns [move.Source % 8];
         }
 
         public void AddMove(Move move)
@@ -112,38 +135,59 @@ namespace GUI
             PGNFile.WriteLine ("[White \"" + White + "\"]");
             PGNFile.WriteLine ("[Black \"" + Black + "\"]");
             PGNFile.WriteLine ("[Result \"" + Result + "\"]");
+            PGNFile.WriteLine ();
 
             // Now we can print the moves
-            for (int i = 0; i < history.Count / 2; i++) {
-                string moveOutput = i + ". ";
+            for (int i = 0; i < history.Count; i += 2) {
+                string moveOutput = (i + 1) + ". ";
                 string whiteMove = "";
                 string blackMove = "";
-                if (history [i].Colour == PieceColour.Black) {
+
+                if (history[i].Result == MoveResult.KingsideCastle) {
+                    moveOutput += "O-O";
+                } else if (history[i].Result == MoveResult.QueensideCastle) {
+                    moveOutput += "O-O-O";
+                } else if (history [i].Colour == PieceColour.Black) {
                     whiteMove = "...";
 
                     string blackMovePiece = PieceToNotation (history [i].MovingPiece);
                     string blackMoveSpecifier = "";
                     if (history [i].SpecifierRequired) {
-                        blackMoveSpecifier = SquareToNotation (history [i].Source).Substring (0, 1);
+                        blackMoveSpecifier = GetSpecifier(history[i]);
+                    }
+                    string blackCaptureSpecifier = "";
+                    if (history[i].Result == MoveResult.Capture) {
+                        blackCaptureSpecifier = "x";
                     }
                     string blackMoveSquare = SquareToNotation (history [i].Destination);
-                    blackMove = blackMovePiece + blackMoveSpecifier + blackMoveSquare;
+                    string blackPromoteTo = PromoteToNotation(history[i].PromoteTo);
+                    blackMove = blackMovePiece + blackMoveSpecifier + blackCaptureSpecifier + blackMoveSquare + blackPromoteTo;
                 } else {
                     string whiteMovePiece = PieceToNotation (history [i].MovingPiece);
                     string whiteMoveSpecifier = "";
                     if (history [i].SpecifierRequired) {
-                        whiteMoveSpecifier = SquareToNotation (history [i].Source).Substring (0, 1);
+                        whiteMoveSpecifier = GetSpecifier(history[i]);
                     }
-                    string whiteMoveSquare = SquareToNotation (history [i + 1].Destination);
-                    whiteMove = whiteMovePiece + whiteMoveSpecifier + whiteMoveSquare;
+                    string whiteCaptureSpecifier = "";
+                    if (history[i].Result == MoveResult.Capture) {
+                        whiteCaptureSpecifier = "x";
+                    }
+                    string whiteMoveSquare = SquareToNotation (history [i].Destination);
+                    string whitePromoteTo = PromoteToNotation(history[i].PromoteTo);
+                    whiteMove = whiteMovePiece + whiteMoveSpecifier + whiteCaptureSpecifier + whiteMoveSquare + whitePromoteTo;
 
                     string blackMovePiece = PieceToNotation (history [i + 1].MovingPiece);
                     string blackMoveSpecifier = "";
-                    if (history [i].SpecifierRequired) {
-                        blackMoveSpecifier = SquareToNotation (history [i].Source).Substring (0, 1);
+                    if (history [i + 1].SpecifierRequired) {
+                        blackMoveSpecifier = GetSpecifier(history[i + 1]);
+                    }
+                    string blackCaptureSpecifier = "";
+                    if (history[i + 1].Result == MoveResult.Capture) {
+                        blackCaptureSpecifier = "x";
                     }
                     string blackMoveSquare = SquareToNotation (history [i + 1].Destination);
-                    blackMove = blackMovePiece + blackMoveSpecifier + blackMoveSquare;
+                    string blackPromoteTo = PromoteToNotation(history[i + 1].PromoteTo);
+                    blackMove = blackMovePiece + blackMoveSpecifier + blackCaptureSpecifier + blackMoveSquare + blackPromoteTo;
                 }
 
                 moveOutput = moveOutput + whiteMove + " " + blackMove + " ";
@@ -154,6 +198,7 @@ namespace GUI
                     return false;
                 }
             }
+            PGNFile.Close ();
             return true;
         }
     }

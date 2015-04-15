@@ -20,6 +20,7 @@ namespace GUI
         public static StrengthMeasure StrengthType { get; set; }
         public static int StrengthValue { get; set; }
         public static GameMode CurrentMode { get; set; }
+        public static GameHistory CurrentGameHistory { get; set; }
 
         public static void Main (string[] args)
         {
@@ -35,6 +36,7 @@ namespace GUI
             StrengthType = StrengthMeasure.Depth;
             StrengthValue = 7;
             CurrentMode = GameMode.OnePlayer;
+            CurrentGameHistory = new GameHistory ();
 
             Application.Init ();
             win = new MainWindow ();

@@ -9,6 +9,8 @@ namespace GUI
     public enum GameStatus { Inactive, Active, Stalemate, WhiteCheckmate,
         BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime,
         DrawRepetition, DrawFifty, DrawInsuffientMaterial };
+    // If a move was a castle, capture, etc.
+    public enum MoveResult { None, Capture, KingsideCastle, QueensideCastle }
 
     /**
      * @brief Representation of the board as a whole.
@@ -155,8 +157,10 @@ namespace GUI
          * Makes a move, switches the @c PlayerToMove variable,
          * and updates piece legal moves.
          */
-        public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        public MoveResult MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
+            MoveResult ret = MoveResult.None;
+
             if (!IsMoveValid (source, destination)) {
                 throw new InvalidOperationException ("Invalid move entered.");
             }
@@ -189,6 +193,7 @@ namespace GUI
             if (movingPiece.Type == PieceType.King &&
                 (source == 4 || source == 60) &&
                 Array.IndexOf (castleDestinations, destination) != -1) {
+                ret = destination - source > 0 ? MoveResult.KingsideCastle : MoveResult.QueensideCastle;
                 Square castleRookSquare = destination - source > 0 ?
                     Squares [destination + 1] : Squares [destination - 2];
                 Squares [destination].Piece = movingPiece;
@@ -198,6 +203,9 @@ namespace GUI
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
+                if (Squares [destination].Piece != null) {
+                    ret = MoveResult.Capture;
+                }
                 switch (promoteTo) {
                     case PieceType.Bishop:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
@@ -233,6 +241,7 @@ namespace GUI
             }
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
             PieceLegalMoves.GenerateLegalMoves (this);
+            return ret;
         }
 
         /**

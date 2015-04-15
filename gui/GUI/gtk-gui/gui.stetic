@@ -153,6 +153,17 @@
         <property name="ShortLabel" translatable="yes">Load Engine 2</property>
         <signal name="Activated" handler="OnLoadEngineTwo" />
       </action>
+      <action id="PGNAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">PGN</property>
+        <property name="ShortLabel" translatable="yes">PGN</property>
+      </action>
+      <action id="ExportAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Export...</property>
+        <property name="ShortLabel" translatable="yes">Export...</property>
+        <signal name="Activated" handler="OnExportPGN" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -175,6 +186,9 @@
                   <node type="Menuitem" action="OnePlayerAction" />
                   <node type="Menuitem" action="TwoPlayerAction" />
                   <node type="Menuitem" action="EnginesAction" />
+                </node>
+                <node type="Menu" action="PGNAction">
+                  <node type="Menuitem" action="ExportAction" />
                 </node>
               </node>
               <node type="Menu" action="BoardAction">

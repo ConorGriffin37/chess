@@ -364,7 +364,20 @@ namespace GUI
             }
 
             try {
-                MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
+                MoveResult result = MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
+
+                bool specifierRequired = false;
+                if(result == MoveResult.Capture && MainClass.CurrentBoard.Squares[destinationByte].Piece.Type == PieceType.Pawn) {
+                    specifierRequired = true;
+                }
+
+                MainClass.CurrentGameHistory.AddMove(new Move(sourceByte, destinationByte,
+                    MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour,
+                    MainClass.CurrentBoard.Squares [destinationByte].Piece,
+                    result,
+                    specifierRequired,
+                    promoteTo));
+
                 Gtk.Application.Invoke(delegate {
                     RedrawBoard();
                 });
@@ -593,7 +606,19 @@ namespace GUI
                 }
 
                 try {
-                    MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
+                    MoveResult result = MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
+
+                    bool specifierRequired = false;
+                    if(result == MoveResult.Capture && MainClass.CurrentBoard.Squares[(byte)pieceIndex].Piece.Type == PieceType.Pawn) {
+                        specifierRequired = true;
+                    }
+
+                    MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
+                                                            MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
+                                                            MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece,
+                                                            result,
+                                                            specifierRequired,
+                                                            promoteTo));
                 } catch(InvalidOperationException) {
                     Debug.Log ("Invalid move entered.");
                 }
@@ -824,6 +849,20 @@ namespace GUI
                 }
             }
             chooser.Destroy ();
+        }
+
+        protected void OnExportPGN (object sender, EventArgs e)
+        {
+            var fc = new FileChooserDialog ("Choose where to save the PGN",
+                         this,
+                         FileChooserAction.Save,
+                         "Cancel", ResponseType.Cancel,
+                         "Save", ResponseType.Accept);
+
+            if (fc.Run () == (int)ResponseType.Accept) {
+                MainClass.CurrentGameHistory.SavePGN (fc.Filename);
+            }
+            fc.Destroy ();
         }
     }
 }
