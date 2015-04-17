@@ -25,6 +25,17 @@ namespace GUI
             PromoteTo = promoteTo;
             Result = result;
         }
+
+        public Move(Move other)
+        {
+            Source = other.Source;
+            Destination = other.Destination;
+            Colour = other.Colour;
+            MovingPiece = other.MovingPiece;
+            SpecifierRequired = other.SpecifierRequired;
+            PromoteTo = other.PromoteTo;
+            Result = other.Result;
+        }
     }
 
     public class GameHistory
@@ -41,6 +52,7 @@ namespace GUI
         public string Result { get; private set; }
 
         public int FiftyMoveRuleCount { get; private set; }
+        public int MoveCount { get; private set; }
 
         private static string[] columns = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
@@ -57,6 +69,25 @@ namespace GUI
             Result = "*";
 
             FiftyMoveRuleCount = 0;
+            MoveCount = 1;
+        }
+
+        public static string MoveToNotation(Move move)
+        {
+            string movePiece = PieceToNotation (move.MovingPiece);
+            string moveSpecifier = "";
+            if (move.SpecifierRequired) {
+                moveSpecifier = GetSpecifier(move);
+            }
+            string captureSpecifier = "";
+            if (move.Result == MoveResult.Capture) {
+                captureSpecifier = "x";
+            }
+            string moveSquare = SquareToNotation (move.Destination);
+            string promoteTo = PromoteToNotation(move.PromoteTo);
+            string moveString = movePiece + moveSpecifier + captureSpecifier + moveSquare + promoteTo;
+
+            return moveString;
         }
 
         private static string SquareToNotation(byte square)
@@ -121,11 +152,19 @@ namespace GUI
         public void AddMove(Move move)
         {
             history.Add (move);
+            if (move.Colour == PieceColour.Black) {
+                MoveCount++;
+            }
         }
 
         public void UndoLastMove()
         {
             history.RemoveAt (history.Count - 1);
+        }
+
+        public Move GetLastMove()
+        {
+            return new Move (history [history.Count - 1]);
         }
 
         public GameStatus? UpdateFiftyMoveCount(MoveResult result)
@@ -141,18 +180,18 @@ namespace GUI
             return null;
         }
 
-        public bool SavePGN(string filename)
+        public string ToPGNString()
         {
-            StreamWriter PGNFile = new StreamWriter (filename);
+            string output = "";
+
             // First, create the PGN headers
-            PGNFile.WriteLine ("[Event \"" + Event + "\"]");
-            PGNFile.WriteLine ("[Site \"" + Site + "\"]");
-            PGNFile.WriteLine ("[Date \"" + Date + "\"]");
-            PGNFile.WriteLine ("[Round \"" + Round + "\"]");
-            PGNFile.WriteLine ("[White \"" + White + "\"]");
-            PGNFile.WriteLine ("[Black \"" + Black + "\"]");
-            PGNFile.WriteLine ("[Result \"" + Result + "\"]");
-            PGNFile.WriteLine ();
+            output += ("[Event \"" + Event + "\"]\n");
+            output += ("[Site \"" + Site + "\"]\n");
+            output += ("[Date \"" + Date + "\"]\n");
+            output += ("[Round \"" + Round + "\"]\n");
+            output += ("[White \"" + White + "\"]\n");
+            output += ("[Black \"" + Black + "\"]\n");
+            output += ("[Result \"" + Result + "\"]\n");
 
             // Now we can print the moves
             for (int i = 0; i < history.Count; i += 2) {
@@ -166,55 +205,30 @@ namespace GUI
                     moveOutput += "O-O-O";
                 } else if (history [i].Colour == PieceColour.Black) {
                     whiteMove = "...";
-
-                    string blackMovePiece = PieceToNotation (history [i].MovingPiece);
-                    string blackMoveSpecifier = "";
-                    if (history [i].SpecifierRequired) {
-                        blackMoveSpecifier = GetSpecifier(history[i]);
-                    }
-                    string blackCaptureSpecifier = "";
-                    if (history[i].Result == MoveResult.Capture) {
-                        blackCaptureSpecifier = "x";
-                    }
-                    string blackMoveSquare = SquareToNotation (history [i].Destination);
-                    string blackPromoteTo = PromoteToNotation(history[i].PromoteTo);
-                    blackMove = blackMovePiece + blackMoveSpecifier + blackCaptureSpecifier + blackMoveSquare + blackPromoteTo;
+                    blackMove = MoveToNotation (history [i]);
                 } else {
-                    string whiteMovePiece = PieceToNotation (history [i].MovingPiece);
-                    string whiteMoveSpecifier = "";
-                    if (history [i].SpecifierRequired) {
-                        whiteMoveSpecifier = GetSpecifier(history[i]);
-                    }
-                    string whiteCaptureSpecifier = "";
-                    if (history[i].Result == MoveResult.Capture) {
-                        whiteCaptureSpecifier = "x";
-                    }
-                    string whiteMoveSquare = SquareToNotation (history [i].Destination);
-                    string whitePromoteTo = PromoteToNotation(history[i].PromoteTo);
-                    whiteMove = whiteMovePiece + whiteMoveSpecifier + whiteCaptureSpecifier + whiteMoveSquare + whitePromoteTo;
-
-                    string blackMovePiece = PieceToNotation (history [i + 1].MovingPiece);
-                    string blackMoveSpecifier = "";
-                    if (history [i + 1].SpecifierRequired) {
-                        blackMoveSpecifier = GetSpecifier(history[i + 1]);
-                    }
-                    string blackCaptureSpecifier = "";
-                    if (history[i + 1].Result == MoveResult.Capture) {
-                        blackCaptureSpecifier = "x";
-                    }
-                    string blackMoveSquare = SquareToNotation (history [i + 1].Destination);
-                    string blackPromoteTo = PromoteToNotation(history[i + 1].PromoteTo);
-                    blackMove = blackMovePiece + blackMoveSpecifier + blackCaptureSpecifier + blackMoveSquare + blackPromoteTo;
+                    whiteMove = MoveToNotation (history [i]);
+                    blackMove = MoveToNotation (history [i + 1]);
                 }
 
                 moveOutput = moveOutput + whiteMove + " " + blackMove + " ";
-                try {
-                    PGNFile.Write (moveOutput);
-                } catch(Exception ex) {
-                    Console.Error.WriteLine ("(EE) Error writing to file " + filename + ": " + ex.Message);
-                    return false;
-                }
+                output += moveOutput;
             }
+
+            return output;
+        }
+
+        public bool SavePGN(string filename)
+        {
+            StreamWriter PGNFile = new StreamWriter (filename);
+
+            try {
+                PGNFile.WriteLine(ToPGNString());
+            } catch(Exception ex) {
+                Console.Error.WriteLine ("(EE) Error writing to PGN file: " + ex.Message);
+                return false;
+            }
+
             PGNFile.Close ();
             return true;
         }

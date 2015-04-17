@@ -104,6 +104,11 @@ namespace GUI
             }
             MainClass.ResetClock ();
             UpdateMaterialDifference (MainClass.CurrentBoard);
+            MainClass.CurrentGameHistory = new GameHistory ();
+            ClearGameHistoryView ();
+            if (MainClass.CurrentBoard.PlayerToMove == PieceColour.Black) {
+                GameHistoryView.Buffer.Text = "1. ... ";
+            }
         }
 
         protected void OnLoadEngineOne (object sender, EventArgs e)
@@ -237,6 +242,8 @@ namespace GUI
             MainClass.ResetClock ();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (MainClass.CurrentBoard);
             PieceLegalMoves.GenerateLegalMoves (MainClass.CurrentBoard);
+            MainClass.CurrentGameHistory = new GameHistory ();
+            ClearGameHistoryView ();
             RedrawBoard ();
         }
 
@@ -377,6 +384,7 @@ namespace GUI
                     result,
                     specifierRequired,
                     promoteTo));
+                UpdateGameHistoryView();
 
                 if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                     MainClass.CurrentGameStatus = GameStatus.DrawFifty;
@@ -627,6 +635,7 @@ namespace GUI
                                                             result,
                                                             specifierRequired,
                                                             promoteTo));
+                    UpdateGameHistoryView();
 
                     if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                         MainClass.CurrentGameStatus = GameStatus.DrawFifty;
@@ -878,6 +887,22 @@ namespace GUI
                 MainClass.CurrentGameHistory.SavePGN (fc.Filename);
             }
             fc.Destroy ();
+        }
+
+        private void UpdateGameHistoryView()
+        {
+            Move move = MainClass.CurrentGameHistory.GetLastMove ();
+            string moveOutput = "";
+            if (move.Colour == PieceColour.White) {
+                moveOutput += " " + MainClass.CurrentGameHistory.MoveCount + ". ";
+            }
+            moveOutput += GameHistory.MoveToNotation (move) + " ";
+            GameHistoryView.Buffer.Text += moveOutput;
+        }
+
+        private void ClearGameHistoryView()
+        {
+            GameHistoryView.Buffer.Text = "";
         }
     }
 }

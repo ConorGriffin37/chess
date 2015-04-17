@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 715">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="973 715">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -245,11 +245,12 @@
             <child>
               <widget class="Gtk.VBox" id="vbox3">
                 <property name="MemberName" />
-                <property name="WidthRequest">200</property>
+                <property name="WidthRequest">400</property>
                 <property name="Spacing">6</property>
                 <child>
                   <widget class="Gtk.HBox" id="hbox4">
                     <property name="MemberName" />
+                    <property name="Homogeneous">True</property>
                     <property name="Spacing">6</property>
                     <child>
                       <widget class="Gtk.VBox" id="vbox4">
@@ -331,7 +332,7 @@
                   </widget>
                   <packing>
                     <property name="Position">0</property>
-                    <property name="AutoSize">True</property>
+                    <property name="AutoSize">False</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
                   </packing>
@@ -364,7 +365,19 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder />
+                  <widget class="Gtk.TextView" id="GameHistoryView">
+                    <property name="MemberName" />
+                    <property name="WidthRequest">400</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Editable">False</property>
+                    <property name="CursorVisible">False</property>
+                    <property name="Text" translatable="yes" />
+                    <property name="WrapMode">Word</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
+                    <property name="AutoSize">True</property>
+                  </packing>
                 </child>
               </widget>
               <packing>
