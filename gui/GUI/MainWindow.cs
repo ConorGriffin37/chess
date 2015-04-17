@@ -378,6 +378,13 @@ namespace GUI
                     specifierRequired,
                     promoteTo));
 
+                if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
+                    MainClass.CurrentGameStatus = GameStatus.DrawFifty;
+                    Gtk.Application.Invoke(delegate {
+                        ShowGameOverDialog(MainClass.CurrentGameStatus);
+                    });
+                }
+
                 Gtk.Application.Invoke(delegate {
                     RedrawBoard();
                 });
@@ -394,6 +401,7 @@ namespace GUI
                 MainClass.UpdateClock ();
                 UpdatePlayerToMove();
             });
+
             if (MainClass.CurrentMode == GameMode.Engines) {
                 Thread.Sleep (1500);
                 if (engine == 1) {
@@ -619,6 +627,13 @@ namespace GUI
                                                             result,
                                                             specifierRequired,
                                                             promoteTo));
+
+                    if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
+                        MainClass.CurrentGameStatus = GameStatus.DrawFifty;
+                        Gtk.Application.Invoke(delegate {
+                            ShowGameOverDialog(MainClass.CurrentGameStatus);
+                        });
+                    }
                 } catch(InvalidOperationException) {
                     Debug.Log ("Invalid move entered.");
                 }
@@ -637,7 +652,7 @@ namespace GUI
                 currentSelectionState = PieceSelectionState.None;
 
                 if (MainClass.EngineOne != null && MainClass.CurrentMode == GameMode.OnePlayer)
-                    EngineTwoMove ();
+                    EngineOneMove ();
             }
         }
 

@@ -10,7 +10,7 @@ namespace GUI
         BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime,
         DrawRepetition, DrawFifty, DrawInsuffientMaterial };
     // If a move was a castle, capture, etc.
-    public enum MoveResult { None, Capture, KingsideCastle, QueensideCastle }
+    public enum MoveResult { None, PawnMove, Capture, KingsideCastle, QueensideCastle }
 
     /**
      * @brief Representation of the board as a whole.
@@ -203,6 +203,9 @@ namespace GUI
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
+                if (Squares [source].Piece.Type == PieceType.Pawn) {
+                    ret = MoveResult.PawnMove;
+                }
                 if (Squares [destination].Piece != null) {
                     ret = MoveResult.Capture;
                 }

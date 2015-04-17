@@ -40,6 +40,8 @@ namespace GUI
         public string Black { get; private set; }
         public string Result { get; private set; }
 
+        public int FiftyMoveRuleCount { get; private set; }
+
         private static string[] columns = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
         public GameHistory ()
@@ -53,6 +55,8 @@ namespace GUI
             White = "Unknown";
             Black = "Unknown";
             Result = "*";
+
+            FiftyMoveRuleCount = 0;
         }
 
         private static string SquareToNotation(byte square)
@@ -122,6 +126,19 @@ namespace GUI
         public void UndoLastMove()
         {
             history.RemoveAt (history.Count - 1);
+        }
+
+        public GameStatus? UpdateFiftyMoveCount(MoveResult result)
+        {
+            if (result == MoveResult.PawnMove || result == MoveResult.Capture) {
+                FiftyMoveRuleCount = 0;
+            } else {
+                FiftyMoveRuleCount++;
+            }
+            if (FiftyMoveRuleCount >= 100) {
+                return GameStatus.DrawFifty;
+            }
+            return null;
         }
 
         public bool SavePGN(string filename)
