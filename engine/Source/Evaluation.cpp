@@ -283,21 +283,21 @@ int Evaluation::stageOfGame(Board& evalBoard)
     int numWhiteQueens = popCount(evalBoard.getPieceAndColor(QUEEN_CODE, WHITE_CODE));
     int numBlackQueens = popCount(evalBoard.getPieceAndColor(QUEEN_CODE, BLACK_CODE));
     if ((!numWhiteQueens) and (!numBlackQueens)){
-        return 1;
+        return END_GAME;
     } else if ((numWhiteQueens) and (!numBlackQueens)){
         if (numMinorPieces(WHITE_CODE, evalBoard) <= 1){
-            return 1;
+            return END_GAME;
         }
     } else if ((!numWhiteQueens) and (numBlackQueens)){
         if (numMinorPieces(BLACK_CODE, evalBoard) <= 1){
-            return 1;
+            return END_GAME;
         }
     } else {
         if ((numMinorPieces(WHITE_CODE, evalBoard) <= 1) and (numMinorPieces(BLACK_CODE, evalBoard) <= 1)){
-            return 1;
+            return END_GAME;
         }
     }
-    return 0;
+    return MID_GAME;
 }
 
 int Evaluation::getPosScore(int code, int colorCode, int position, int gameStage)

@@ -151,7 +151,7 @@ bool UCI::startCalculating(string input)
     int winc = -1;              //whites increment per move in mseconds
     int binc = -1;              //blacks increment per move in mseconds
     int movestogo = -1;         //number of moves left until the next time control
-    int depth = 20;              //search only to a certain depth
+    int depth = MAX_DEPTH;      //search only to a certain depth
     u64 nodes = -1;             //number of nodes to search
     int mate = -1;              //search for a mate in x moves
     int movetime = -1;          //time allowed for the move in mseconds
@@ -174,7 +174,6 @@ bool UCI::startCalculating(string input)
             if (ponderMove.length() == 5){
                 proChar = ponderMove[4];
             }
-            cout << "Making ponderMove " << ponderMove << endl;
             UCI::currentBoard.simpleMakeMove(startPosition, endPosition, proChar);
             UCI::currentColor = UCI::currentColor*-1;
         } else if (token == "infinite"){
@@ -230,6 +229,16 @@ bool UCI::startCalculating(string input)
     chrono::time_point<chrono::system_clock> timeBeforeSearch, timeAfterSearch;
     timeBeforeSearch = chrono::system_clock::now();
     int lastSearched = 0;
+
+    if ((wtime != -1) or (btime != -1)) {
+        if ((depth == MAX_DEPTH) and (movetime == -1)) {
+            if (currentBoard.stageOfGame == MID_GAME) {
+                depth = 7;
+            } else { //End game
+                depth = 9;
+            }
+        }
+    }
 
     while (((curDepth <= depth) or (infinite or ponder)) and (curDepth < MAX_DEPTH)) {
         if (killSearch == true) {

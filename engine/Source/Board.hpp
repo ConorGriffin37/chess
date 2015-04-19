@@ -28,6 +28,9 @@
 
 #define MAX_DEPTH 20
 
+#define MID_GAME 0
+#define END_GAME 1
+
 
 typedef unsigned long long u64;
 
