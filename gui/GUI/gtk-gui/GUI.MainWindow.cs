@@ -171,7 +171,7 @@ namespace GUI
 			this.TwoPlayerAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Player vs Player");
 			w1.Add (this.TwoPlayerAction, null);
 			this.EnginesAction = new global::Gtk.RadioAction ("EnginesAction", global::Mono.Unix.Catalog.GetString ("Engine vs Engine"), null, null, 0);
-			this.EnginesAction.Group = this.OnePlayerAction.Group;
+			this.EnginesAction.Group = this.TwoPlayerAction.Group;
 			this.EnginesAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Engine vs Engine");
 			w1.Add (this.EnginesAction, null);
 			this.AnalysePositionAction = new global::Gtk.Action ("AnalysePositionAction", global::Mono.Unix.Catalog.GetString ("_Analyse Position"), null, null);

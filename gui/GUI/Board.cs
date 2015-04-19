@@ -25,10 +25,16 @@ namespace GUI
         public virtual bool BlackCastledL { get; set; }
         public virtual bool WhiteCastledL { get; set; }
         public virtual PieceColour PlayerToMove { get; set; }
+        public virtual byte EnPassantSquare { get; protected set; }
+        public virtual PieceColour EnPassantColour { get; protected set; }
 
         public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
         public readonly byte[] pawnPromotionDestinations = { 0, 1, 2, 3, 4, 5, 6, 7,
                                                              56, 57, 58, 59, 60, 61, 62, 63 };
+        public readonly byte[] enPassantStartSquares = { 8, 9, 10, 11, 12, 13, 14, 15,
+                                                         48, 49, 50, 51, 52, 53, 54, 55 };
+        public readonly byte[] enPassantEndSquares = { 24, 25, 26, 27, 28, 29, 30, 31,
+                                                       32, 33, 34, 35, 36, 37, 38, 39 };
 
         /**
          * @brief Default constructor.
@@ -45,6 +51,8 @@ namespace GUI
             BlackCastledL = true;
             WhiteCastledL = true;
             PlayerToMove = PieceColour.White;
+            EnPassantSquare = 0;
+            EnPassantColour = PieceColour.White;
 
             if (empty) {
                 Squares = new Square[64];
@@ -113,6 +121,8 @@ namespace GUI
             BlackCastledR = other.BlackCastledR;
             WhiteCastledR = other.WhiteCastledR;
             PlayerToMove = other.PlayerToMove;
+            EnPassantSquare = other.EnPassantSquare;
+            EnPassantColour = other.EnPassantColour;
         }
 
         public void AddPiece(PieceColour colour, PieceType type, int position)
@@ -203,8 +213,14 @@ namespace GUI
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
+                // Handle pawn moves
                 if (Squares [source].Piece.Type == PieceType.Pawn) {
                     ret = MoveResult.PawnMove;
+                    // Handle en passant creation
+                    if (Array.IndexOf (enPassantStartSquares, source) > -1 && Array.IndexOf (enPassantEndSquares, destination) > -1) {
+                        EnPassantColour = Squares [source].Piece.Colour;
+                        EnPassantSquare = EnPassantColour == PieceColour.White ? (byte)(destination + 8) : (byte)(destination - 8);
+                    }
                 }
                 if (Squares [destination].Piece != null) {
                     ret = MoveResult.Capture;
@@ -227,8 +243,21 @@ namespace GUI
                         Squares [source].Piece = null;
                         break;
                     default:
-                        Squares [destination].Piece = movingPiece;
-                        Squares [source].Piece = null;
+                        // Handle en passant capture
+                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare) {
+                            byte captureSquare = EnPassantColour == PieceColour.White ? (byte)(destination - 8) : (byte)(destination + 8);
+                            Squares [destination].Piece = movingPiece;
+                            Squares [captureSquare].Piece = null;
+                            Squares [source].Piece = null;
+                            ret = MoveResult.Capture;
+                            EnPassantSquare = 0;
+                        } else {
+                            Squares [destination].Piece = movingPiece;
+                            Squares [source].Piece = null;
+                            if (movingPiece.Type != PieceType.Pawn) {
+                                EnPassantSquare = 0;
+                            }
+                        }
                         break;
                 }
                         

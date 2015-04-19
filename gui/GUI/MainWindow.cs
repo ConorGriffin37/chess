@@ -373,14 +373,21 @@ namespace GUI
             try {
                 MoveResult result = MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
 
+                Piece movingPiece = null;
+                if(promoteTo == null) {
+                    movingPiece = MainClass.CurrentBoard.Squares[destinationByte].Piece;
+                } else {
+                    movingPiece = new Piece(MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour, PieceType.Pawn);
+                }
+
                 bool specifierRequired = false;
-                if(result == MoveResult.Capture && MainClass.CurrentBoard.Squares[destinationByte].Piece.Type == PieceType.Pawn) {
+                if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                     specifierRequired = true;
                 }
 
                 MainClass.CurrentGameHistory.AddMove(new Move(sourceByte, destinationByte,
                     MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour,
-                    MainClass.CurrentBoard.Squares [destinationByte].Piece,
+                    movingPiece,
                     result,
                     specifierRequired,
                     promoteTo));
@@ -624,14 +631,21 @@ namespace GUI
                 try {
                     MoveResult result = MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
 
+                    Piece movingPiece = null;
+                    if(promoteTo == null) {
+                        movingPiece = MainClass.CurrentBoard.Squares[(byte)pieceIndex].Piece;
+                    } else {
+                        movingPiece = new Piece(MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour, PieceType.Pawn);
+                    }
+
                     bool specifierRequired = false;
-                    if(result == MoveResult.Capture && MainClass.CurrentBoard.Squares[(byte)pieceIndex].Piece.Type == PieceType.Pawn) {
+                    if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                         specifierRequired = true;
                     }
 
                     MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
                                                             MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
-                                                            MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece,
+                                                            movingPiece,
                                                             result,
                                                             specifierRequired,
                                                             promoteTo));
