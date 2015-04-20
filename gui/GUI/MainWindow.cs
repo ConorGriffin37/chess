@@ -385,19 +385,19 @@ namespace GUI
                     specifierRequired = true;
                 }
 
+                string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
                 MainClass.CurrentGameHistory.AddMove(new Move(sourceByte, destinationByte,
                     MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour,
                     movingPiece,
                     result,
                     specifierRequired,
-                    promoteTo));
+                    promoteTo), fenPosition);
                 UpdateGameHistoryView();
 
                 if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                     MainClass.CurrentGameStatus = GameStatus.DrawFifty;
-                    Gtk.Application.Invoke(delegate {
-                        ShowGameOverDialog(MainClass.CurrentGameStatus);
-                    });
+                } else if (MainClass.CurrentGameHistory.CheckThreefoldRepetition() == GameStatus.DrawRepetition) {
+                    MainClass.CurrentGameStatus = GameStatus.DrawRepetition;
                 }
 
                 Gtk.Application.Invoke(delegate {
@@ -406,7 +406,10 @@ namespace GUI
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
-            MainClass.CurrentGameStatus = MainClass.CurrentBoard.CheckForMate ();
+            GameStatus isMate = MainClass.CurrentBoard.CheckForMate ();
+            if (isMate != GameStatus.Active) {
+                MainClass.CurrentGameStatus = isMate;
+            }
             if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
                 Gtk.Application.Invoke(delegate {
                     ShowGameOverDialog(MainClass.CurrentGameStatus);
@@ -643,19 +646,19 @@ namespace GUI
                         specifierRequired = true;
                     }
 
+                    string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
                     MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
                                                             MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
                                                             movingPiece,
                                                             result,
                                                             specifierRequired,
-                                                            promoteTo));
+                                                            promoteTo), fenPosition);
                     UpdateGameHistoryView();
 
                     if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                         MainClass.CurrentGameStatus = GameStatus.DrawFifty;
-                        Gtk.Application.Invoke(delegate {
-                            ShowGameOverDialog(MainClass.CurrentGameStatus);
-                        });
+                    } else if (MainClass.CurrentGameHistory.CheckThreefoldRepetition() == GameStatus.DrawRepetition) {
+                        MainClass.CurrentGameStatus = GameStatus.DrawRepetition;
                     }
                 } catch(InvalidOperationException) {
                     Debug.Log ("Invalid move entered.");
@@ -663,7 +666,10 @@ namespace GUI
                 Gtk.Application.Invoke(delegate {
                     RedrawBoard();
                 });
-                MainClass.CurrentGameStatus = MainClass.CurrentBoard.CheckForMate ();
+                GameStatus isMate = MainClass.CurrentBoard.CheckForMate ();
+                if (isMate != GameStatus.Active) {
+                    MainClass.CurrentGameStatus = isMate;
+                }
                 if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
                     ShowGameOverDialog (MainClass.CurrentGameStatus);
                 }

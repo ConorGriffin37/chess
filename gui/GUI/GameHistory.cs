@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace GUI
 {
@@ -41,6 +42,7 @@ namespace GUI
     public class GameHistory
     {
         private List<Move> history;
+        private List<string> positions;
 
         // PGN Metadata
         public string Event { get; private set; }
@@ -59,6 +61,7 @@ namespace GUI
         public GameHistory ()
         {
             history = new List<Move> ();
+            positions = new List<string> ();
 
             Event = "Casual game.";
             Site = System.Environment.MachineName;
@@ -149,9 +152,10 @@ namespace GUI
             return columns [move.Source % 8];
         }
 
-        public void AddMove(Move move)
+        public void AddMove(Move move, string fen)
         {
             history.Add (move);
+            positions.Add (fen);
             if (move.Colour == PieceColour.Black) {
                 MoveCount++;
             }
@@ -176,6 +180,17 @@ namespace GUI
             }
             if (FiftyMoveRuleCount >= 100) {
                 return GameStatus.DrawFifty;
+            }
+            return null;
+        }
+
+        public GameStatus? CheckThreefoldRepetition()
+        {
+            Dictionary<string, int> counts = positions.GroupBy (x => x)
+                                                      .ToDictionary (g => g.Key,
+                                                                     g => g.Count ());
+            if (counts.ContainsValue (3)) {
+                return GameStatus.DrawRepetition;
             }
             return null;
         }
