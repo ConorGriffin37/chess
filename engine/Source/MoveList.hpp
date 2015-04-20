@@ -21,6 +21,9 @@ class MoveList
         std::vector<u64> moves; /**< A vector containing the moves in the MoveList */
         std::vector<int> scores; /**< A vector containing the scores of each move */
         int position; /**< The current position in the moves vector */
+        int lastTo; /**< The last position the oponent moved to */
+        int bestAttacker; /**< The best attacker of the last moved piece */
+        int bestAttScore; /**< The lowest attacker score */
         bool done;
 
     public:

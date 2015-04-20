@@ -70,6 +70,7 @@ Board::Board(std::string fen)
         return;
     }
 
+    lastMoveTo = -1;
     castleorenpasent = 0;
     enpasentCol = -1;
     for (int i = 0; i < 8; i++) {
@@ -591,6 +592,7 @@ void Board::makeMov(u64 theMove)
     int from = theMove & mask_6;
     theMove >>= 6;
     int to = theMove & mask_6;
+    lastMoveTo = to;
     theMove >>= 6;
     setCastleOrEnpas(nextCastleOrEnpasent());
     zorHash ^= TranspositionTables::getBlackHash();
@@ -684,12 +686,13 @@ void Board::makeMov(u64 theMove)
     }
 }
 
-void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber)
+void Board::unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber, int lastTo)
 {
     zorHash = oldHash;
     setCastleOrEnpas(oldCastleOrEnpas);
     enpasentCol = lastEnpasent;
     halfMoveClock = halfMoveNumber;
+    lastMoveTo = lastTo;
     int code = theMove & mask_3;
     theMove >>= 3;
     int colorcode = theMove & mask_3;
@@ -762,4 +765,14 @@ void Board::setZorHash(u64 x)
 u64 Board::getZorHash()
 {
     return zorHash;
+}
+
+void Board::setLastMove(int x)
+{
+    lastMoveTo = x;
+}
+
+int Board::getLastMove()
+{
+    return lastMoveTo;
 }

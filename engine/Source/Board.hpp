@@ -65,6 +65,7 @@ class Board
         int materialEval; /**< The current materialEvaluation for the board */
         u64 zorHash; /**< The current zobrist hash of the board */
         int enpasentCol; /**< The column where enpasant is available */
+        int lastMoveTo; /**< The last position that a piece was moved to*/
 
     public:
         int halfMoveClock; /**< A counter used to indicate the number of halfmoves since the last irreversible move for 50 move rule*/
@@ -264,7 +265,7 @@ class Board
 		 * @param oldHash The zobrist hash before the move was made
 		 * @return void
 		 */
-        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber);
+        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber, int lastTo);
         /**
 		 * @fn setEvaluation
 		 * @brief Sets the materialEval of the board to a given number
@@ -304,6 +305,8 @@ class Board
 		 * @return u64 The Zobrist hash of the board
 		 */
         u64 getZorHash();
+        void setLastMove(int x);
+        int getLastMove();
 };
 
 #endif // BOARD_HPP_INCLUDED
