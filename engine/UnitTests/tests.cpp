@@ -128,6 +128,7 @@ int getLegalMoves(Board testBoard, int playerColor) {
     	u64 lastHash = testBoard.getZorHash();
     	int enpasCol = testBoard.getEnpasentCol();
 	int halfMoveNumber = testBoard.halfMoveClock;
+	int lastTo = testBoard.getLastMove();
 	int legalMoves = 0;
 
 	while (true) {
@@ -135,9 +136,9 @@ int getLegalMoves(Board testBoard, int playerColor) {
 		if (theMove) {
 			testBoard.makeMov(theMove);
 			if (testBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
-                legalMoves++;
+                		legalMoves++;
 			}
-			testBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber);
+			testBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber, lastTo);
 		} else {
 			break;
 		}
@@ -183,6 +184,7 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
     u64 lastHash = gameBoard.getZorHash();
     int enpasCol = gameBoard.getEnpasentCol();
     int halfMoveNumber = gameBoard.halfMoveClock;
+    int lastTo = gameBoard.getLastMove();
 
     MoveList possibleMoves(gameBoard, ((playerColor == 1) ? 6 : 7), true);
 
@@ -199,7 +201,7 @@ u64 Perft(int depth, Board& gameBoard, int playerColor)
         //if (gameBoard.inCheck(((playerColor == 1) ? 6 : 7)) == false) {
             nodes += Perft(depth - 1, gameBoard, playerColor*-1);
         //}
-        gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber);
+        gameBoard.unMakeMov(theMove, castle, enpasCol, lastHash, halfMoveNumber, lastTo);
     }
 
     return nodes;
