@@ -270,6 +270,7 @@ class Board
 		 * @fn setEvaluation
 		 * @brief Sets the materialEval of the board to a given number
 		 * @param eval The value to set materialEval to
+		 * @param lastTo The last square the oponenet moved to.
 		 * @return void
 		 */
         void setEvaluation(int eval);
