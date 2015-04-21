@@ -679,30 +679,19 @@ void MoveList::generateMoves(Board &gameBoard, int colorcode)
 
 u64 MoveList::getNextMove()
 {
-    if (done == false) {
-        int bestscore = -1;
-        int best = 0;
-        for (unsigned int i = 0; i < moves.size(); i++) {
-            if (scores[i] > bestscore) {
-                bestscore = scores[i];
-                best = i;
-            }
-        }
-        if (bestscore == -1) {
-            return 0;
-        } else {
-            if (bestscore == 10) {
-                done = true;
-            }
-            scores[best] = -1;
-            return moves[best];
+    int bestscore = -1;
+    int best = 0;
+    for (unsigned int i = 0; i < moves.size(); i++) {
+        if (scores[i] > bestscore) {
+            bestscore = scores[i];
+            best = i;
         }
     }
-    for (unsigned int i = position; i < moves.size(); i++) {
-        position++;
-        if (scores[i] > -1) {
-            return moves[i];
-        }
+    if (bestscore == -1) {
+        return 0;
+    } else {
+        scores[best] = -1;
+        return moves[best];
     }
     return 0;
 }
