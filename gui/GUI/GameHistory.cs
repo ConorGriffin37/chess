@@ -264,11 +264,11 @@ namespace GUI
                             if (theBoard.Squares[i].Piece.LegalMoves[j] == destination)
                             {
                                 string otherPieceSquare = SquareToNotation((byte)i);
-                                if (otherPieceSquare[0] == pieceOnSquare[0]) 
+                                if (otherPieceSquare[0] != pieceOnSquare[0]) 
                                 {
                                     needsFileSpecifier = true;
                                 }
-                                else if (otherPieceSquare[1] == pieceOnSquare[1])
+                                else
                                 {
                                     needsRankSpecifier = true;
                                 }
