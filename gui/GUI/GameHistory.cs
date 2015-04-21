@@ -218,6 +218,145 @@ namespace GUI
             return output;
         }
 
+        public static bool checkDisabiguationNeeded(Board theBoard, int pieceIndex, byte destination)
+        {
+            for (int i = 0; i < theBoard.Squares.Length; i++)
+            {
+                if (theBoard.Squares[i].Piece == null)
+                {
+                    if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[pieceIndex].Piece.Type) && (i != pieceIndex))
+                    {
+                        for (int j = 0; j < theBoard.Squares[i].Piece.LegalMoves.Count; j++)
+                        {
+                            if (theBoard.Squares[i].Piece.LegalMoves[j] == destination)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static List<Tuple<Move, string>> getPossibleMoveNotations(Board gameBoard)
+        {
+            List<Tuple<Move, string>> possibleMoveNotations = new List<Tuple<Move, string>>();
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves(gameBoard);
+            PieceLegalMoves.GenerateLegalMoves(gameBoard);
+            for (int i = 0; i < gameBoard.Squares.Length; i++)
+            {
+                if (gameBoard.Squares[i].Piece != null)
+                {
+                    for (int j = 0; j < gameBoard.Squares[i].Piece.LegalMoves.Count; j++)
+                    {
+                        bool disambiguationNeeded = checkDisabiguationNeeded(gameBoard, i, gameBoard.Squares[i].Piece.LegalMoves[j]);
+
+                        Board copiedBoard = new Board(gameBoard);
+                        MoveResult result = MoveResult.None;
+                        if ((gameBoard.Squares[i].Piece.Type == PieceType.Pawn) && (Array.IndexOf(copiedBoard.pawnPromotionDestinations, gameBoard.Squares[i].Piece.LegalMoves[j]) != -1)) {
+                            //Promotion
+                            result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], PieceType.Queen);
+                            Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
+                                                    result, disambiguationNeeded, PieceType.Queen);
+                            Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
+                            possibleMoveNotations.Add(newTuple);
+                            newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
+                                                    result, disambiguationNeeded, PieceType.Rook);
+                            newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
+                            possibleMoveNotations.Add(newTuple);
+                            newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
+                                                    result, disambiguationNeeded, PieceType.Bishop);
+                            newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
+                            possibleMoveNotations.Add(newTuple);
+                            newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
+                                                    result, disambiguationNeeded, PieceType.Knight);
+                            newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
+                            possibleMoveNotations.Add(newTuple);
+                        } else {
+                            result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
+                            Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
+                                                    result, disambiguationNeeded, null);
+                            Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
+                            possibleMoveNotations.Add(newTuple);
+                        }
+                    }
+                }
+            }
+            return possibleMoveNotations;
+        }
+
+        public static GameHistory importPGN(string PGN)
+        {
+            GameHistory newGameHistory = new GameHistory();
+            //Parse tag pairs first
+            string startingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            while (PGN.Contains("["))
+            {
+                string tagPair = PGN.Substring(PGN.IndexOf('[') + 1, PGN.IndexOf(']') - PGN.IndexOf('[') - 1);
+                PGN = PGN.Substring(PGN.IndexOf(']') + 1);
+
+                switch (tagPair.Substring(0, tagPair.IndexOf(' ')))
+                {
+                    case "Event":
+                        newGameHistory.Event = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "Site":
+                        newGameHistory.Site = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "Date":
+                        newGameHistory.Date = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "Round":
+                        newGameHistory.Round = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "White":
+                        newGameHistory.White = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "Black":
+                        newGameHistory.Black = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "Result":
+                        newGameHistory.Result = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    case "FEN":
+                        startingFEN = tagPair.Substring(tagPair.IndexOf('"') + 1).TrimEnd('"');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            //Remove comments from PGN
+            while (PGN.Contains("{"))
+            {
+                PGN.Remove(PGN.IndexOf('{'), PGN.IndexOf('}') - PGN.IndexOf('}'));
+            }
+
+            //Take in moves one by one
+            FENParser importFEN = new FENParser(startingFEN);
+            Board gameBoard = importFEN.GetBoard();
+
+            List<Tuple<Move, string>> possibleMoveNotations = getPossibleMoveNotations(gameBoard);
+            string[] tokens = PGN.Split(' ');
+
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                char[] trimChars = { '!', '?' };
+                string moveNotation = tokens[i].Trim(trimChars);
+                for (int j = 0; j < possibleMoveNotations.Count; j++)
+                {
+                    if (moveNotation.Equals(possibleMoveNotations[j].Item2))
+                    {
+                        newGameHistory.AddMove(possibleMoveNotations[j].Item1);
+                        gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
+                        possibleMoveNotations = getPossibleMoveNotations(gameBoard);
+                        break;
+                    }
+                }
+            }
+            return newGameHistory;
+        }
+
         public bool SavePGN(string filename)
         {
             StreamWriter PGNFile = new StreamWriter (filename);
