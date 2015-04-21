@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.IO;
 using Gtk;
 using Cairo;
 
@@ -917,6 +918,19 @@ namespace GUI
         private void ClearGameHistoryView()
         {
             GameHistoryView.Buffer.Text = "";
+        }
+
+        protected void OnImportPGN (object sender, EventArgs e)
+        {
+            var fc = new FileChooserDialog ("Choose a PGN file to open.",
+                                            this,
+                                            FileChooserAction.Open,
+                                            "Cancel", ResponseType.Cancel,
+                                            "Open", ResponseType.Accept);
+            if (fc.Run () == (int)ResponseType.Accept) {
+                MainClass.CurrentGameHistory = GameHistory.importPGN (File.ReadAllText (fc.Filename));
+            }
+            fc.Destroy ();
         }
     }
 }

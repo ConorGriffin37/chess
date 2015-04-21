@@ -164,6 +164,12 @@
         <property name="ShortLabel" translatable="yes">Export...</property>
         <signal name="Activated" handler="OnExportPGN" />
       </action>
+      <action id="ImportAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Import...</property>
+        <property name="ShortLabel" translatable="yes">Import...</property>
+        <signal name="Activated" handler="OnImportPGN" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -189,6 +195,7 @@
                 </node>
                 <node type="Menu" action="PGNAction">
                   <node type="Menuitem" action="ExportAction" />
+                  <node type="Menuitem" action="ImportAction" />
                 </node>
               </node>
               <node type="Menu" action="BoardAction">
