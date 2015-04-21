@@ -29,6 +29,7 @@ Scrum Log - Sprint 4
 **2015-04-15:**
 * Terry:
   * Expanded PGN exporting functionality. 
+  * Worked on saruman server. 
 * Conor:
   * Tested placing non captures on front of losing captures. 
 * Darragh:
@@ -38,6 +39,7 @@ Scrum Log - Sprint 4
 **2015-04-16:**
 * Terry:
   * Worked on game history.
+  * Worked on saruman server. 
 * Conor:
   * Researched methods for making the engine undeterministic. 
 * Darragh:
@@ -58,6 +60,7 @@ Scrum Log - Sprint 4
 * Terry:
   * Added enpasent support.
   * Fixed error in PGN export.
+  * Got saruman server up and running. 
 * Conor:
   * Attempted implemenation of ways to make the engine undeterministic. 
 * Darragh:
