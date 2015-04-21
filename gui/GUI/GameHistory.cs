@@ -218,11 +218,11 @@ namespace GUI
             output += ("[Round \"" + Round + "\"]\n");
             output += ("[White \"" + White + "\"]\n");
             output += ("[Black \"" + Black + "\"]\n");
-            output += ("[Result \"" + Result + "\"]\n");
+            output += ("[Result \"" + Result + "\"]\n\n");
 
             // Now we can print the moves
             for (int i = 0; i < history.Count; i += 2) {
-                string moveOutput = (i + 1) + ". ";
+                string moveOutput = ((i / 2) + 1) + ". ";
                 string whiteMove = "";
                 string blackMove = "";
 
