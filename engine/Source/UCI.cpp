@@ -17,6 +17,7 @@ void outbitboard(u64 n);
 
 bool UCI::quit = false;
 Board UCI::currentBoard = Board();
+Board UCI::ponderBoard = Board();
 int UCI::currentColor = 1;
 bool UCI::killSearch = false;
 string UCI::ponderMove = "";
@@ -69,13 +70,16 @@ void UCI::outputBestMove(string moveString)
     //Find the move the engine thinks opponent is most likely to play for pondering
     ponderMove = "";
     ponderHit = false;
+    Board lastBoard = currentBoard;
     UCI::currentBoard.makeMov(TranspositionTables::getBest(UCI::currentBoard.getZorHash()).best);
+    UCI::ponderBoard = UCI::currentBoard;
     u64 nextMove = TranspositionTables::getBest(UCI::currentBoard.getZorHash()).best;
     if (nextMove != 0) {
         MoveList movList;
         ponderMove = movList.getMoveCode(nextMove);
         moveString = moveString + " ponder " + movList.getMoveCode(nextMove);
     }
+    UCI::currentBoard = lastBoard;
     cout << "bestmove " << moveString << endl;
 }
 
@@ -158,6 +162,7 @@ bool UCI::startCalculating(string input)
     bool infinite = false;      //search untill given the stop command
     string token;
     stringstream ss(input);
+    Board lastBoard = UCI::currentBoard;
     while (getline(ss, token, ' ')){
         if (token == "searchmoves"){
             while (getline(ss, token, ' ')){
@@ -174,8 +179,9 @@ bool UCI::startCalculating(string input)
             if (ponderMove.length() == 5){
                 proChar = ponderMove[4];
             }
+            UCI::currentBoard = UCI::ponderBoard;
             UCI::currentBoard.simpleMakeMove(startPosition, endPosition, proChar);
-            UCI::currentColor = UCI::currentColor*-1;
+            UCI::currentColor = UCI::currentColor;
         } else if (token == "infinite"){
             infinite = true;
         } else if (token == "wtime"){
@@ -299,6 +305,7 @@ bool UCI::startCalculating(string input)
         Search::clearKiller();
         outputBestMove(bestMove);
     }
+    UCI::currentBoard = lastBoard;
     return true;
 }
 
