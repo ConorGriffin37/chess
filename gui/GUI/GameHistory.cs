@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace GUI
 {
+    public enum SpecifierType { None, File, Rank, Both }
+
     public class Move
     {
         public byte Source { get; set; }
@@ -218,25 +220,49 @@ namespace GUI
             return output;
         }
 
-        public static bool checkDisabiguationNeeded(Board theBoard, int pieceIndex, byte destination)
+        public static SpecifierType checkDisabiguationNeeded(Board theBoard, byte source, byte destination)
         {
+            string pieceOnSquare = SquareToNotation(source);
+            bool needsFileSpecifier = false;
+            bool needsRankSpecifier = false;
             for (int i = 0; i < theBoard.Squares.Length; i++)
             {
                 if (theBoard.Squares[i].Piece != null)
                 {
-                    if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[pieceIndex].Piece.Type) && (i != pieceIndex))
+                    if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[source].Piece.Type) && (i != source))
                     {
                         for (int j = 0; j < theBoard.Squares[i].Piece.LegalMoves.Count; j++)
                         {
                             if (theBoard.Squares[i].Piece.LegalMoves[j] == destination)
                             {
-                                return true;
+                                string otherPieceSquare = SquareToNotation((byte)i);
+                                if (otherPieceSquare[0] == pieceOnSquare[0]) 
+                                {
+                                    needsFileSpecifier = true;
+                                }
+                                else if (otherPieceSquare[1] == pieceOnSquare[1])
+                                {
+                                    needsRankSpecifier = true;
+                                }
+
                             }
                         }
                     }
                 }
             }
-            return false;
+            if (needsFileSpecifier && needsRankSpecifier)
+            {
+                return SpecifierType.Both;
+            }
+            else if (needsFileSpecifier)
+            {
+                return SpecifierType.File;
+            }
+            else if (needsRankSpecifier)
+            {
+                return SpecifierType.Rank;
+            }
+            return SpecifierType.None;
         }
 
         public static List<Tuple<Move, string>> getPossibleMoveNotations(Board gameBoard)
@@ -250,7 +276,7 @@ namespace GUI
                 {
                     for (int j = 0; j < gameBoard.Squares[i].Piece.LegalMoves.Count; j++)
                     {
-                        bool disambiguationNeeded = checkDisabiguationNeeded(gameBoard, i, gameBoard.Squares[i].Piece.LegalMoves[j]);
+                        SpecifierType disambiguationNeeded = checkDisabiguationNeeded(gameBoard, (byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
 
                         Board copiedBoard = new Board(gameBoard);
                         MoveResult result = MoveResult.None;
