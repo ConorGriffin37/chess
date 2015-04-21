@@ -396,6 +396,12 @@ namespace GUI
             {
                 char[] trimChars = { '!', '?' };
                 string moveNotation = tokens[i].Trim(trimChars);
+
+                if (moveNotation.Contains('.'))
+                {
+                    moveNotation = moveNotation.Substring(moveNotation.IndexOf('.') + 1);
+                }
+
                 for (int j = 0; j < possibleMoveNotations.Count; j++)
                 {
                     if (moveNotation.Equals(possibleMoveNotations[j].Item2))
