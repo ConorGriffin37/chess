@@ -222,7 +222,7 @@ namespace GUI
         {
             for (int i = 0; i < theBoard.Squares.Length; i++)
             {
-                if (theBoard.Squares[i].Piece == null)
+                if (theBoard.Squares[i].Piece != null)
                 {
                     if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[pieceIndex].Piece.Type) && (i != pieceIndex))
                     {
