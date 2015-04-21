@@ -304,6 +304,8 @@ namespace GUI
                         SpecifierType disambiguationNeeded = checkDisabiguationNeeded(gameBoard, (byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
 
                         Board copiedBoard = new Board(gameBoard);
+                        PiecePseudoLegalMoves.GeneratePseudoLegalMoves(copiedBoard);
+                        PieceLegalMoves.GenerateLegalMoves(copiedBoard);
                         MoveResult result = MoveResult.None;
                         if ((gameBoard.Squares[i].Piece.Type == PieceType.Pawn) && (Array.IndexOf(copiedBoard.pawnPromotionDestinations, gameBoard.Squares[i].Piece.LegalMoves[j]) != -1)) {
                             //Promotion
@@ -398,8 +400,8 @@ namespace GUI
                 {
                     if (moveNotation.Equals(possibleMoveNotations[j].Item2))
                     {
-                        newGameHistory.AddMove(possibleMoveNotations[j].Item1);
                         gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
+                        newGameHistory.AddMove(possibleMoveNotations[j].Item1, gameBoard.ToFEN().Split(' ')[0]);
                         possibleMoveNotations = getPossibleMoveNotations(gameBoard);
                         break;
                     }

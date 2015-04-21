@@ -935,6 +935,11 @@ namespace GUI
                                             "Open", ResponseType.Accept);
             if (fc.Run () == (int)ResponseType.Accept) {
                 MainClass.CurrentGameHistory = GameHistory.importPGN (File.ReadAllText (fc.Filename));
+                string pgn = MainClass.CurrentGameHistory.ToPGNString ();
+                int indexOfMovesStart = pgn.IndexOf ("1.");
+                if (indexOfMovesStart > 0) {
+                    GameHistoryView.Buffer.Text = pgn.Substring (indexOfMovesStart);
+                }
             }
             fc.Destroy ();
         }
