@@ -403,7 +403,9 @@ namespace GUI
                     checkOrCheckmate,
                     specifierRequired,
                     promoteTo), fenPosition);
-                UpdateGameHistoryView();
+                Gtk.Application.Invoke(delegate {
+                    UpdateGameHistoryView();
+                });
 
                 if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                     MainClass.CurrentGameStatus = GameStatus.DrawFifty;

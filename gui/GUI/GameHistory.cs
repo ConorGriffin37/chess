@@ -244,7 +244,7 @@ namespace GUI
                 } else if (history [i].Colour == PieceColour.Black) {
                     whiteMove = "...";
                     blackMove = MoveToNotation (history [i]);
-                } else if ((history.Count - i) % 2 != 0) {  // When the final move is a white move
+                } else if (history.Count % 2 != 0 && i == history.Count - 1) {  // When the final move is a white move
                     whiteMove = MoveToNotation (history [i]);
                     blackMove = "";
                 } else {
