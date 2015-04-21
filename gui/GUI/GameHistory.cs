@@ -307,8 +307,7 @@ namespace GUI
         public static List<Tuple<Move, string>> getPossibleMoveNotations(Board gameBoard)
         {
             List<Tuple<Move, string>> possibleMoveNotations = new List<Tuple<Move, string>>();
-            PiecePseudoLegalMoves.GeneratePseudoLegalMoves(gameBoard);
-            PieceLegalMoves.GenerateLegalMoves(gameBoard);
+
             for (int i = 0; i < gameBoard.Squares.Length; i++)
             {
                 if (gameBoard.Squares[i].Piece != null)
@@ -318,8 +317,6 @@ namespace GUI
                         SpecifierType disambiguationNeeded = checkDisabiguationNeeded(gameBoard, (byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
 
                         Board copiedBoard = new Board(gameBoard);
-                        PiecePseudoLegalMoves.GeneratePseudoLegalMoves(copiedBoard);
-                        PieceLegalMoves.GenerateLegalMoves(copiedBoard);
                         MoveResult result = MoveResult.None;
                         if ((gameBoard.Squares[i].Piece.Type == PieceType.Pawn) && (Array.IndexOf(copiedBoard.pawnPromotionDestinations, gameBoard.Squares[i].Piece.LegalMoves[j]) != -1)) {
                             //Promotion
@@ -424,6 +421,9 @@ namespace GUI
             //Take in moves one by one
             FENParser importFEN = new FENParser(startingFEN);
             Board gameBoard = importFEN.GetBoard();
+
+            PiecePseudoLegalMoves.GeneratePseudoLegalMoves(gameBoard);
+            PieceLegalMoves.GenerateLegalMoves(gameBoard);
 
             List<Tuple<Move, string>> possibleMoveNotations = getPossibleMoveNotations(gameBoard);
             string[] tokens = PGN.Split(' ');

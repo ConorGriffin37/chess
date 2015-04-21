@@ -530,6 +530,13 @@ namespace GUI
         {
             Colour = other.Colour;
             Type = other.Type;
+            if (other.PseudoLegalMoves != null)
+                PseudoLegalMoves = new List<byte> (other.PseudoLegalMoves);
+            if (other.LegalMoves != null)
+                LegalMoves = new List<byte> (other.LegalMoves);
+            TimesAttacked = other.TimesAttacked;
+            TimesDefended = other.TimesDefended;
+            HasMoved = other.HasMoved;
         }
 
         /**
