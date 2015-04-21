@@ -15,6 +15,9 @@ MoveList::MoveList(Board& gameBoard, int colorcode, u64 bestMove, u64 killerMove
     done = false;
     position = 0;
     kingTake = false;
+    lastTo = gameBoard.getLastMove();
+    bestAttacker = -1;
+    bestAttScore = 100;
     generateMoves(gameBoard, colorcode);
     scoreMoves(bestMove, killerMove);
 }
@@ -24,6 +27,9 @@ MoveList::MoveList(Board& gameBoard, int colorcode, bool dontScore)
     done = false;
     position = 0;
     kingTake = false;
+    lastTo = gameBoard.getLastMove();
+    bestAttacker = -1;
+    bestAttScore = 100;
     generateMoves(gameBoard, colorcode);
 }
 
@@ -32,6 +38,9 @@ MoveList::MoveList(Board& gameBoard, int colorcode, std::vector<std::string> res
     done = false;
     position = 0;
     kingTake = false;
+    lastTo = gameBoard.getLastMove();
+    bestAttacker = -1;
+    bestAttScore = 100;
     generateMoves(gameBoard, colorcode);
     std::sort(restrictedMoves.begin(), restrictedMoves.begin() + restrictedMoves.size());
     std::vector<u64> newMoves(moves);
@@ -60,8 +69,15 @@ void MoveList::scoreMoves(u64 bestMove, u64 killerMove)
             scores[i] = scores[i] + 5000;
         }
         if (moves[i] == killerMove) {
-            scores[i] = scores[i] + 20;
+            if (rand() & 1) {
+                scores[i] = scores[i] + 20;
+            } else {
+                scores[i] = scores[i] + 2000;
+            }
         }
+    }
+    if (bestAttacker != -1) {
+        scores[bestAttacker] = scores[bestAttacker] + 200;
     }
 }
 
@@ -89,7 +105,7 @@ void MoveList::addMove(int code, int colorcode, int from, int to)
     newMove <<= 3;
     newMove |= code;
     moves.push_back(newMove);
-    scores.push_back(10);
+    scores.push_back(0);
 }
 
 void MoveList::addMoveTake(int code, int colorcode, int from, int to, int takecode)
@@ -110,7 +126,15 @@ void MoveList::addMoveTake(int code, int colorcode, int from, int to, int takeco
     if (takecode == KING_CODE) {
         kingTake = true;
     }
-    scores.push_back(pieceScore[takecode]*20 - pieceScore[code]);
+    if (to == lastTo) {
+        if (pieceScore[code] < bestAttScore) {
+            bestAttacker = scores.size();
+            bestAttScore = pieceScore[code];
+        }
+        scores.push_back(pieceScore[takecode]*20 + 10 - pieceScore[code]);
+    } else {
+        scores.push_back(pieceScore[takecode]*20 - pieceScore[code]);
+    }
     moves.push_back(newMove);
 }
 
@@ -191,7 +215,7 @@ void MoveList::addMoveCastle(int code, int colorcode, int from, int to, int rook
     newMove |= colorcode;
     newMove <<= 3;
     newMove |= code;
-    scores.push_back(10);
+    scores.push_back(0);
     moves.push_back(newMove);
 }
 
@@ -579,11 +603,10 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         }
     }
     if (colorcode == WHITE_CODE) { //white
-        u64 attacked = gameBoard.getAttacked(BLACK_CODE);
         if (checkbit(gameBoard.getCastleOrEnpasent(), 0)) {
             if (checkbit(whiteocc, 0)) {
                 if (not checkbit(occupied, 2) and not checkbit(occupied, 1)) {
-                    if (not checkbit(attacked, 3) and not checkbit(attacked, 2) and not checkbit(attacked, 1)) {
+                    if (not gameBoard.getAttacked(colorcode, 3) and not gameBoard.getAttacked(colorcode, 2) and not gameBoard.getAttacked(colorcode, 1)) {
                         addMoveCastle(KING_CODE, colorcode, 3, 1, 0, 2);
                     }
                 }
@@ -592,18 +615,17 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         if (checkbit(gameBoard.getCastleOrEnpasent(), 7)) {
             if (checkbit(whiteocc, 7)) {
                 if (not checkbit(occupied, 4) and not checkbit(occupied, 5) and not checkbit(occupied, 6)) {
-                    if (not checkbit(attacked, 3) and not checkbit(attacked, 4) and not checkbit(attacked, 5)) {
+                    if (not gameBoard.getAttacked(colorcode, 3) and not gameBoard.getAttacked(colorcode, 4) and not gameBoard.getAttacked(colorcode, 5)) {
                         addMoveCastle(KING_CODE, colorcode, 3, 5, 7, 4);
                     }
                 }
             }
         }
     } else { //black
-        u64 attacked = gameBoard.getAttacked(WHITE_CODE);
         if (checkbit(gameBoard.getCastleOrEnpasent(), 56)) {
             if (checkbit(blackocc, 56)) {
                 if (not checkbit(occupied, 57) and not checkbit(occupied, 58)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 58) and not checkbit(attacked, 57)) {
+                    if (not gameBoard.getAttacked(colorcode, 59) and not gameBoard.getAttacked(colorcode, 58) and not gameBoard.getAttacked(colorcode, 57)) {
                         addMoveCastle(KING_CODE, colorcode, 59, 57, 56, 58);
                     }
                 }
@@ -612,7 +634,7 @@ void MoveList::getKingMoves(Board &gameBoard, int pos, int colorcode)
         if (checkbit(gameBoard.getCastleOrEnpasent(), 63)) {
             if (checkbit(blackocc, 63)) {
                 if (not checkbit(occupied, 60) and not checkbit(occupied, 61) and not checkbit(occupied, 62)) {
-                    if (not checkbit(attacked, 59) and not checkbit(attacked, 60) and not checkbit(attacked, 61)) {
+                    if (not gameBoard.getAttacked(colorcode, 59) and not gameBoard.getAttacked(colorcode, 60) and not gameBoard.getAttacked(colorcode, 61)) {
                         addMoveCastle(KING_CODE, colorcode, 59, 61, 63, 60);
                     }
                 }
@@ -657,30 +679,19 @@ void MoveList::generateMoves(Board &gameBoard, int colorcode)
 
 u64 MoveList::getNextMove()
 {
-    if (done == false) {
-        int bestscore = -1;
-        int best = 0;
-        for (unsigned int i = 0; i < moves.size(); i++) {
-            if (scores[i] > bestscore) {
-                bestscore = scores[i];
-                best = i;
-            }
-        }
-        if (bestscore == -1) {
-            return 0;
-        } else {
-            if (bestscore == 10) {
-                done = true;
-            }
-            scores[best] = -1;
-            return moves[best];
+    int bestscore = -1;
+    int best = 0;
+    for (unsigned int i = 0; i < moves.size(); i++) {
+        if (scores[i] > bestscore) {
+            bestscore = scores[i];
+            best = i;
         }
     }
-    for (unsigned int i = position; i < moves.size(); i++) {
-        position++;
-        if (scores[i] > -1) {
-            return moves[i];
-        }
+    if (bestscore == -1) {
+        return 0;
+    } else {
+        scores[best] = -1;
+        return moves[best];
     }
     return 0;
 }

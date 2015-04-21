@@ -17,9 +17,12 @@ class UCI
 {
     public:
         static Board currentBoard; /**< The board set-up with the position command */
+        static Board ponderBoard; /**< The board available to ponder on */
         static int currentColor; /**< The player who is next to move. 1 for white, -1 for black */
         static bool quit; /**< A flag to be set to true when the quit command is received */
         static bool killSearch; /**< A flag to be set to kill the current search */
+        static string ponderMove; /**< The last move sent to the engine as the move the engine wants to ponder on */
+        static bool ponderHit; /**< A flag to be set to true if the move currently being pondered on is the move made by the opponent */
         /**
 		 * @fn WaitForInput
 		 * @brief Waits to receive input via stdin

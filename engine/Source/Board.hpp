@@ -28,6 +28,9 @@
 
 #define MAX_DEPTH 20
 
+#define MID_GAME 0
+#define END_GAME 1
+
 
 typedef unsigned long long u64;
 
@@ -62,6 +65,7 @@ class Board
         int materialEval; /**< The current materialEvaluation for the board */
         u64 zorHash; /**< The current zobrist hash of the board */
         int enpasentCol; /**< The column where enpasant is available */
+        int lastMoveTo; /**< The last position that a piece was moved to*/
 
     public:
         int halfMoveClock; /**< A counter used to indicate the number of halfmoves since the last irreversible move for 50 move rule*/
@@ -186,11 +190,12 @@ class Board
         bool inCheck(int colorcode);
         /**
 		 * @fn getAttacked
-		 * @brief Returns all the squares attacked by a certain color
-		 * @param colorcode Attacking color
-		 * @return bitboard of attacked squares
+		 * @brief Returns if a certain square is attacked
+		 * @param colorcode Attacked color
+		 * @param pos Attacked square
+		 * @return bool if attacked or not
 		 */
-        u64 getAttacked(int colorcode);
+        bool getAttacked(int colorcode, int pos);
         /**
 		 * @fn getAttackedPawn
 		 * @brief If the given square is attacked by a pawn
@@ -260,11 +265,12 @@ class Board
 		 * @param oldHash The zobrist hash before the move was made
 		 * @return void
 		 */
-        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber);
+        void unMakeMov(u64 theMove, u64 oldCastleOrEnpas, int lastEnpasent, u64 oldHash, int halfMoveNumber, int lastTo);
         /**
 		 * @fn setEvaluation
 		 * @brief Sets the materialEval of the board to a given number
 		 * @param eval The value to set materialEval to
+		 * @param lastTo The last square the oponenet moved to.
 		 * @return void
 		 */
         void setEvaluation(int eval);
@@ -300,6 +306,8 @@ class Board
 		 * @return u64 The Zobrist hash of the board
 		 */
         u64 getZorHash();
+        void setLastMove(int x);
+        int getLastMove();
 };
 
 #endif // BOARD_HPP_INCLUDED
