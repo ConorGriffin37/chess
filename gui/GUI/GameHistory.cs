@@ -16,9 +16,10 @@ namespace GUI
         public SpecifierType SpecifierRequired { get; set; } // Whether or not to specify the source square in the short algebraic notation
         public PieceType? PromoteTo { get; set; }
         public MoveResult Result { get; set; }
+        public string FEN { get; set; }
 
         public Move(byte source, byte destination, PieceColour colour, Piece movingPiece,
-                    MoveResult result, SpecifierType specifierRequired = SpecifierType.None, PieceType? promoteTo = null)
+            MoveResult result, string fen, SpecifierType specifierRequired = SpecifierType.None, PieceType? promoteTo = null)
         {
             Source = source;
             Destination = destination;
@@ -27,6 +28,7 @@ namespace GUI
             SpecifierRequired = specifierRequired;
             PromoteTo = promoteTo;
             Result = result;
+            FEN = fen;
         }
 
         public Move(Move other)
@@ -38,6 +40,7 @@ namespace GUI
             SpecifierRequired = other.SpecifierRequired;
             PromoteTo = other.PromoteTo;
             Result = other.Result;
+            FEN = other.FEN;
         }
     }
 
@@ -295,6 +298,7 @@ namespace GUI
             List<Tuple<Move, string>> possibleMoveNotations = new List<Tuple<Move, string>>();
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves(gameBoard);
             PieceLegalMoves.GenerateLegalMoves(gameBoard);
+            string gameBoardFEN = gameBoard.ToFEN ();
             for (int i = 0; i < gameBoard.Squares.Length; i++)
             {
                 if (gameBoard.Squares[i].Piece != null)
@@ -311,25 +315,25 @@ namespace GUI
                             //Promotion
                             result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], PieceType.Queen);
                             Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, disambiguationNeeded, PieceType.Queen);
+                                                    result, gameBoardFEN, disambiguationNeeded, PieceType.Queen);
                             Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, disambiguationNeeded, PieceType.Rook);
+                                result, gameBoardFEN, disambiguationNeeded, PieceType.Rook);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, disambiguationNeeded, PieceType.Bishop);
+                                result, gameBoardFEN, disambiguationNeeded, PieceType.Bishop);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, disambiguationNeeded, PieceType.Knight);
+                                result, gameBoardFEN, disambiguationNeeded, PieceType.Knight);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                         } else {
                             result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
                             Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, disambiguationNeeded, null);
+                                result, gameBoardFEN, disambiguationNeeded, null);
                             Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                         }

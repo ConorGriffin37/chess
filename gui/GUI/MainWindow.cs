@@ -372,6 +372,7 @@ namespace GUI
             }
 
             try {
+                SpecifierType specifierRequired = GameHistory.checkDisabiguationNeeded(MainClass.CurrentBoard, sourceByte, destinationByte);
                 MoveResult result = MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
 
                 Piece movingPiece = null;
@@ -381,7 +382,6 @@ namespace GUI
                     movingPiece = new Piece(MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour, PieceType.Pawn);
                 }
 
-                SpecifierType specifierRequired = SpecifierType.None;
                 if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                     specifierRequired = SpecifierType.File;
                 }
@@ -391,6 +391,7 @@ namespace GUI
                     MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour,
                     movingPiece,
                     result,
+                    MainClass.CurrentBoard.ToFEN(),
                     specifierRequired,
                     promoteTo), fenPosition);
                 UpdateGameHistoryView();
@@ -633,6 +634,7 @@ namespace GUI
                 }
 
                 try {
+                    SpecifierType specifierRequired = GameHistory.checkDisabiguationNeeded(MainClass.CurrentBoard, selectedPiece, (byte)pieceIndex);
                     MoveResult result = MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
 
                     Piece movingPiece = null;
@@ -642,18 +644,18 @@ namespace GUI
                         movingPiece = new Piece(MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour, PieceType.Pawn);
                     }
 
-                    SpecifierType specifierRequired = SpecifierType.None;
                     if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                         specifierRequired = SpecifierType.File;
                     }
 
                     string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
                     MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
-                                                            MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
-                                                            movingPiece,
-                                                            result,
-                                                            specifierRequired,
-                                                            promoteTo), fenPosition);
+                        MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
+                        movingPiece,
+                        result,
+                        MainClass.CurrentBoard.ToFEN(),
+                        specifierRequired,
+                        promoteTo), fenPosition);
                     UpdateGameHistoryView();
 
                     if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
@@ -940,6 +942,22 @@ namespace GUI
                 if (indexOfMovesStart > 0) {
                     GameHistoryView.Buffer.Text = pgn.Substring (indexOfMovesStart);
                 }
+
+                // Load the FEN from the last move
+                FENParser parser = new FENParser(MainClass.CurrentGameHistory.GetLastMove().FEN);
+                MainClass.CurrentBoard = parser.GetBoard();
+                MainClass.CurrentGameStatus = GameStatus.Inactive;
+                PiecePseudoLegalMoves.GeneratePseudoLegalMoves(MainClass.CurrentBoard);
+                PieceLegalMoves.GenerateLegalMoves(MainClass.CurrentBoard);
+                RedrawBoard();
+
+                MainClass.CurrentGameStatus = GameStatus.Inactive;
+                GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
+                if (currentStatus != GameStatus.Inactive && currentStatus != GameStatus.Active) {
+                    ShowGameOverDialog (currentStatus);
+                }
+                MainClass.ResetClock ();
+                UpdateMaterialDifference (MainClass.CurrentBoard);
             }
             fc.Destroy ();
         }
