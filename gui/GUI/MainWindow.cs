@@ -428,6 +428,11 @@ namespace GUI
                     ShowGameOverDialog(MainClass.CurrentGameStatus);
                 });
             }
+
+            if (MainClass.CurrentGameStatus == GameStatus.Inactive) {
+                MainClass.CurrentGameStatus = GameStatus.Active;
+            }
+
             Gtk.Application.Invoke (delegate {
                 MainClass.UpdateClock ();
                 UpdatePlayerToMove();
@@ -696,6 +701,11 @@ namespace GUI
                 if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
                     ShowGameOverDialog (MainClass.CurrentGameStatus);
                 }
+
+                if (MainClass.CurrentGameStatus == GameStatus.Inactive) {
+                    MainClass.CurrentGameStatus = GameStatus.Active;
+                }
+
                 Gtk.Application.Invoke (delegate {
                     MainClass.UpdateClock ();
                     UpdatePlayerToMove();
