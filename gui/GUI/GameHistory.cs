@@ -415,7 +415,7 @@ namespace GUI
             //Remove comments from PGN
             while (PGN.Contains("{"))
             {
-                PGN.Remove(PGN.IndexOf('{'), PGN.IndexOf('}') - PGN.IndexOf('}'));
+                PGN = PGN.Remove(PGN.IndexOf('{'), PGN.IndexOf('}') - PGN.IndexOf('{') + 1);
             }
 
             //Take in moves one by one
