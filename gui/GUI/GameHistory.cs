@@ -17,9 +17,10 @@ namespace GUI
         public PieceType? PromoteTo { get; set; }
         public MoveResult Result { get; set; }
         public string FEN { get; set; }
+        public int CheckOrCheckmate { get; set; } // 0 for none, 1 for check, 2 for checkmate
 
         public Move(byte source, byte destination, PieceColour colour, Piece movingPiece,
-            MoveResult result, string fen, SpecifierType specifierRequired = SpecifierType.None, PieceType? promoteTo = null)
+            MoveResult result, string fen, int checkOrCheckmate, SpecifierType specifierRequired = SpecifierType.None, PieceType? promoteTo = null)
         {
             Source = source;
             Destination = destination;
@@ -29,6 +30,7 @@ namespace GUI
             PromoteTo = promoteTo;
             Result = result;
             FEN = fen;
+            CheckOrCheckmate = checkOrCheckmate;
         }
 
         public Move(Move other)
@@ -41,6 +43,7 @@ namespace GUI
             PromoteTo = other.PromoteTo;
             Result = other.Result;
             FEN = other.FEN;
+            CheckOrCheckmate = other.CheckOrCheckmate;
         }
     }
 
@@ -95,6 +98,11 @@ namespace GUI
             string promoteTo = PromoteToNotation(move.PromoteTo);
             string moveString = movePiece + moveSpecifier + captureSpecifier + moveSquare + promoteTo;
 
+            if (move.CheckOrCheckmate == 1) {
+                moveString += "+";
+            } else if (move.CheckOrCheckmate == 2) {
+                moveString += "#";
+            }
             return moveString;
         }
 
@@ -314,26 +322,44 @@ namespace GUI
                         if ((gameBoard.Squares[i].Piece.Type == PieceType.Pawn) && (Array.IndexOf(copiedBoard.pawnPromotionDestinations, gameBoard.Squares[i].Piece.LegalMoves[j]) != -1)) {
                             //Promotion
                             result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], PieceType.Queen);
+
+                            int checkOrCheckmate = 0;
+                            GameStatus mateState = copiedBoard.CheckForMate ();
+                            if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                                checkOrCheckmate = 2;
+                            } else if (copiedBoard.WhiteCheck || copiedBoard.BlackCheck) {
+                                checkOrCheckmate = 1;
+                            }
+
                             Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                                    result, gameBoardFEN, disambiguationNeeded, PieceType.Queen);
+                                                    result, gameBoardFEN, checkOrCheckmate, disambiguationNeeded, PieceType.Queen);
                             Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                result, gameBoardFEN, disambiguationNeeded, PieceType.Rook);
+                                result, gameBoardFEN, checkOrCheckmate, disambiguationNeeded, PieceType.Rook);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                result, gameBoardFEN, disambiguationNeeded, PieceType.Bishop);
+                                result, gameBoardFEN, checkOrCheckmate, disambiguationNeeded, PieceType.Bishop);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                             newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                result, gameBoardFEN, disambiguationNeeded, PieceType.Knight);
+                                result, gameBoardFEN, checkOrCheckmate, disambiguationNeeded, PieceType.Knight);
                             newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                         } else {
                             result = copiedBoard.MakeMove((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
+
+                            int checkOrCheckmate = 0;
+                            GameStatus mateState = copiedBoard.CheckForMate ();
+                            if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                                checkOrCheckmate = 2;
+                            } else if (copiedBoard.WhiteCheck || copiedBoard.BlackCheck) {
+                                checkOrCheckmate = 1;
+                            }
+
                             Move newMove = new Move((byte)i, gameBoard.Squares[i].Piece.LegalMoves[j], gameBoard.Squares[i].Piece.Colour, gameBoard.Squares[i].Piece,
-                                result, gameBoardFEN, disambiguationNeeded, null);
+                                result, gameBoardFEN, checkOrCheckmate, disambiguationNeeded, null);
                             Tuple<Move, string> newTuple = new Tuple<Move, string>(newMove, MoveToNotation(newMove));
                             possibleMoveNotations.Add(newTuple);
                         }

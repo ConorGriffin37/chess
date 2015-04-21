@@ -382,6 +382,14 @@ namespace GUI
                     movingPiece = new Piece(MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour, PieceType.Pawn);
                 }
 
+                int checkOrCheckmate = 0;
+                GameStatus mateState = MainClass.CurrentBoard.CheckForMate ();
+                if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                    checkOrCheckmate = 2;
+                } else if (MainClass.CurrentBoard.WhiteCheck || MainClass.CurrentBoard.BlackCheck) {
+                    checkOrCheckmate = 1;
+                }
+
                 if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                     specifierRequired = SpecifierType.File;
                 }
@@ -392,6 +400,7 @@ namespace GUI
                     movingPiece,
                     result,
                     MainClass.CurrentBoard.ToFEN(),
+                    checkOrCheckmate,
                     specifierRequired,
                     promoteTo), fenPosition);
                 UpdateGameHistoryView();
@@ -648,12 +657,21 @@ namespace GUI
                         specifierRequired = SpecifierType.File;
                     }
 
+                    int checkOrCheckmate = 0;
+                    GameStatus mateState = MainClass.CurrentBoard.CheckForMate ();
+                    if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                        checkOrCheckmate = 2;
+                    } else if (MainClass.CurrentBoard.WhiteCheck || MainClass.CurrentBoard.BlackCheck) {
+                        checkOrCheckmate = 1;
+                    }
+
                     string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
                     MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
                         MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
                         movingPiece,
                         result,
                         MainClass.CurrentBoard.ToFEN(),
+                        checkOrCheckmate,
                         specifierRequired,
                         promoteTo), fenPosition);
                     UpdateGameHistoryView();
