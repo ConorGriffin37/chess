@@ -24,6 +24,7 @@ Scrum Log - Sprint 4
   * Reached conculusion on extended transposition tables, does not speed up the engine currently. 
 * Darragh:
   * Fixed perft unit test
+  * Researched endgame tablebases. 
   
 **2015-04-15:**
 * Terry:
@@ -32,6 +33,7 @@ Scrum Log - Sprint 4
   * Tested placing non captures on front of losing captures. 
 * Darragh:
   * Worked on engine evaluation. 
+  * Researched endgame tablebases. 
   
 **2015-04-16:**
 * Terry:
