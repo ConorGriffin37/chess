@@ -5,18 +5,20 @@ using System.Linq;
 
 namespace GUI
 {
+    public enum SpecifierType { None, File, Rank, Both }
+
     public class Move
     {
         public byte Source { get; set; }
         public byte Destination { get; set; }
         public PieceColour Colour { get; set; }
         public Piece MovingPiece { get; set; }
-        public bool SpecifierRequired { get; set; } // Whether or not to specify the source square in the short algebraic notation
+        public SpecifierType SpecifierRequired { get; set; } // Whether or not to specify the source square in the short algebraic notation
         public PieceType? PromoteTo { get; set; }
         public MoveResult Result { get; set; }
 
         public Move(byte source, byte destination, PieceColour colour, Piece movingPiece,
-                    MoveResult result, bool specifierRequired = false, PieceType? promoteTo = null)
+                    MoveResult result, SpecifierType specifierRequired = SpecifierType.None, PieceType? promoteTo = null)
         {
             Source = source;
             Destination = destination;
@@ -79,7 +81,7 @@ namespace GUI
         {
             string movePiece = PieceToNotation (move.MovingPiece);
             string moveSpecifier = "";
-            if (move.SpecifierRequired) {
+            if (move.SpecifierRequired != SpecifierType.None) {
                 moveSpecifier = GetSpecifier(move);
             }
             string captureSpecifier = "";
@@ -149,7 +151,17 @@ namespace GUI
 
         private static string GetSpecifier(Move move)
         {
-            return columns [move.Source % 8];
+            switch (move.SpecifierRequired) {
+                case SpecifierType.File:
+                    return columns [move.Source % 8];
+                case SpecifierType.Rank:
+                    return Convert.ToString (Math.Abs((int)(move.Source / 8) - 7) + 1);
+                case SpecifierType.Both:
+                    return SquareToNotation (move.Source);
+                default:
+                    break;
+            }
+            return "";
         }
 
         public void AddMove(Move move, string fen)

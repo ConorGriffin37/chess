@@ -380,9 +380,9 @@ namespace GUI
                     movingPiece = new Piece(MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour, PieceType.Pawn);
                 }
 
-                bool specifierRequired = false;
+                SpecifierType specifierRequired = SpecifierType.None;
                 if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
-                    specifierRequired = true;
+                    specifierRequired = SpecifierType.File;
                 }
 
                 string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
@@ -641,9 +641,9 @@ namespace GUI
                         movingPiece = new Piece(MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour, PieceType.Pawn);
                     }
 
-                    bool specifierRequired = false;
+                    SpecifierType specifierRequired = SpecifierType.None;
                     if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
-                        specifierRequired = true;
+                        specifierRequired = SpecifierType.File;
                     }
 
                     string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
