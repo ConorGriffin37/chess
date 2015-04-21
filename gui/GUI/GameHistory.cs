@@ -426,11 +426,11 @@ namespace GUI
             PieceLegalMoves.GenerateLegalMoves(gameBoard);
 
             List<Tuple<Move, string>> possibleMoveNotations = getPossibleMoveNotations(gameBoard);
-            string[] tokens = PGN.Split(' ');
+            string[] tokens = PGN.Split(null);
 
             for (int i = 0; i < tokens.Length; i++)
             {
-                char[] trimChars = { '!', '?' };
+                char[] trimChars = { '!', '?', '\n'};
                 string moveNotation = tokens[i].Trim(trimChars);
 
                 if (moveNotation.Contains('.'))
@@ -438,15 +438,21 @@ namespace GUI
                     moveNotation = moveNotation.Substring(moveNotation.IndexOf('.') + 1);
                 }
 
-                for (int j = 0; j < possibleMoveNotations.Count; j++)
+                if (moveNotation.Length != 0)
                 {
-                    if (moveNotation.Equals(possibleMoveNotations[j].Item2))
+                    //Console.WriteLine("***" + moveNotation + "***"); //debugging output
+                    for (int j = 0; j < possibleMoveNotations.Count; j++)
                     {
-                        gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
-                        newGameHistory.AddMove(possibleMoveNotations[j].Item1, gameBoard.ToFEN().Split(' ')[0]);
-                        possibleMoveNotations = getPossibleMoveNotations(gameBoard);
-                        break;
+                        Console.Write(possibleMoveNotations[j].Item2 + " ");
+                        if (moveNotation.Equals(possibleMoveNotations[j].Item2))
+                        {
+                            gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
+                            newGameHistory.AddMove(possibleMoveNotations[j].Item1, gameBoard.ToFEN().Split(' ')[0]);
+                            possibleMoveNotations = getPossibleMoveNotations(gameBoard);
+                            break;
+                        }
                     }
+                    //Console.WriteLine(""); //debugging output
                 }
             }
             return newGameHistory;
