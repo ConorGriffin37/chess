@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.IO;
 using Gtk;
 using Cairo;
 
@@ -343,6 +344,10 @@ namespace GUI
 
         private void ParseAndMakeMove(string move, int engine)
         {
+            if (move.Length < 4)
+            {
+                return;
+            }
             string sourceStr = move.Substring (0, 2);
             string destinationStr = move.Substring (2, 2);
             string promoteToStr = "";
@@ -371,6 +376,7 @@ namespace GUI
             }
 
             try {
+                SpecifierType specifierRequired = GameHistory.checkDisabiguationNeeded(MainClass.CurrentBoard, sourceByte, destinationByte);
                 MoveResult result = MainClass.CurrentBoard.MakeMove (sourceByte, destinationByte, promoteTo);
 
                 Piece movingPiece = null;
@@ -380,7 +386,14 @@ namespace GUI
                     movingPiece = new Piece(MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour, PieceType.Pawn);
                 }
 
-                SpecifierType specifierRequired = SpecifierType.None;
+                int checkOrCheckmate = 0;
+                GameStatus mateState = MainClass.CurrentBoard.CheckForMate ();
+                if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                    checkOrCheckmate = 2;
+                } else if (MainClass.CurrentBoard.WhiteCheck || MainClass.CurrentBoard.BlackCheck) {
+                    checkOrCheckmate = 1;
+                }
+
                 if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                     specifierRequired = SpecifierType.File;
                 }
@@ -390,9 +403,13 @@ namespace GUI
                     MainClass.CurrentBoard.Squares [destinationByte].Piece.Colour,
                     movingPiece,
                     result,
+                    MainClass.CurrentBoard.ToFEN(),
+                    checkOrCheckmate,
                     specifierRequired,
                     promoteTo), fenPosition);
-                UpdateGameHistoryView();
+                Gtk.Application.Invoke(delegate {
+                    UpdateGameHistoryView();
+                });
 
                 if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
                     MainClass.CurrentGameStatus = GameStatus.DrawFifty;
@@ -406,6 +423,7 @@ namespace GUI
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
+
             GameStatus isMate = MainClass.CurrentBoard.CheckForMate ();
             if (isMate != GameStatus.Active) {
                 MainClass.CurrentGameStatus = isMate;
@@ -415,12 +433,17 @@ namespace GUI
                     ShowGameOverDialog(MainClass.CurrentGameStatus);
                 });
             }
+
+            if (MainClass.CurrentGameStatus == GameStatus.Inactive) {
+                MainClass.CurrentGameStatus = GameStatus.Active;
+            }
+
             Gtk.Application.Invoke (delegate {
                 MainClass.UpdateClock ();
                 UpdatePlayerToMove();
             });
 
-            if (MainClass.CurrentMode == GameMode.Engines) {
+            if (MainClass.CurrentMode == GameMode.Engines && MainClass.CurrentGameStatus == GameStatus.Active) {
                 Thread.Sleep (1500);
                 if (engine == 1) {
                     Gtk.Application.Invoke (delegate {
@@ -602,6 +625,14 @@ namespace GUI
                     MainClass.EngineTwo.StopAndIgnoreMove ();
                 }
 
+                if (!MainClass.CurrentBoard.IsMoveValid (selectedPiece, (byte)pieceIndex)) {
+                    currentSelectionState = PieceSelectionState.None;
+                    Gtk.Application.Invoke (delegate {
+                        RedrawBoard ();
+                    });
+                    return;
+                }
+
                 if (MainClass.CurrentGameStatus != GameStatus.Active &&
                     MainClass.CurrentGameStatus != GameStatus.Inactive) {
                     Console.Error.WriteLine ("(EE) Attempted move during finished game.");
@@ -632,6 +663,7 @@ namespace GUI
                 }
 
                 try {
+                    SpecifierType specifierRequired = GameHistory.checkDisabiguationNeeded(MainClass.CurrentBoard, selectedPiece, (byte)pieceIndex);
                     MoveResult result = MainClass.CurrentBoard.MakeMove (selectedPiece, (byte)pieceIndex, promoteTo);
 
                     Piece movingPiece = null;
@@ -641,18 +673,27 @@ namespace GUI
                         movingPiece = new Piece(MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour, PieceType.Pawn);
                     }
 
-                    SpecifierType specifierRequired = SpecifierType.None;
                     if(result == MoveResult.Capture && movingPiece.Type == PieceType.Pawn) {
                         specifierRequired = SpecifierType.File;
                     }
 
+                    int checkOrCheckmate = 0;
+                    GameStatus mateState = MainClass.CurrentBoard.CheckForMate ();
+                    if (mateState == GameStatus.WhiteCheckmate || mateState == GameStatus.BlackCheckmate) {
+                        checkOrCheckmate = 2;
+                    } else if (MainClass.CurrentBoard.WhiteCheck || MainClass.CurrentBoard.BlackCheck) {
+                        checkOrCheckmate = 1;
+                    }
+
                     string fenPosition = MainClass.CurrentBoard.ToFEN().Split(' ')[0];
                     MainClass.CurrentGameHistory.AddMove(new Move(selectedPiece, (byte)pieceIndex,
-                                                            MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
-                                                            movingPiece,
-                                                            result,
-                                                            specifierRequired,
-                                                            promoteTo), fenPosition);
+                        MainClass.CurrentBoard.Squares [(byte)pieceIndex].Piece.Colour,
+                        movingPiece,
+                        result,
+                        MainClass.CurrentBoard.ToFEN(),
+                        checkOrCheckmate,
+                        specifierRequired,
+                        promoteTo), fenPosition);
                     UpdateGameHistoryView();
 
                     if (MainClass.CurrentGameHistory.UpdateFiftyMoveCount (result) == GameStatus.DrawFifty) {
@@ -673,6 +714,11 @@ namespace GUI
                 if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
                     ShowGameOverDialog (MainClass.CurrentGameStatus);
                 }
+
+                if (MainClass.CurrentGameStatus == GameStatus.Inactive) {
+                    MainClass.CurrentGameStatus = GameStatus.Active;
+                }
+
                 Gtk.Application.Invoke (delegate {
                     MainClass.UpdateClock ();
                     UpdatePlayerToMove();
@@ -744,11 +790,6 @@ namespace GUI
                         }
                     }
                 }
-            }
-            if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
-                Gtk.Application.Invoke(delegate {
-                    ShowGameOverDialog(MainClass.CurrentGameStatus);
-                });
             }
         }
 
@@ -923,6 +964,44 @@ namespace GUI
         private void ClearGameHistoryView()
         {
             GameHistoryView.Buffer.Text = "";
+        }
+
+        protected void OnImportPGN (object sender, EventArgs e)
+        {
+            var fc = new FileChooserDialog ("Choose a PGN file to open.",
+                                            this,
+                                            FileChooserAction.Open,
+                                            "Cancel", ResponseType.Cancel,
+                                            "Open", ResponseType.Accept);
+            if (fc.Run () == (int)ResponseType.Accept) {
+                MainClass.CurrentGameHistory = GameHistory.importPGN (File.ReadAllText (fc.Filename));
+                string pgn = MainClass.CurrentGameHistory.ToPGNString ();
+                int indexOfMovesStart = pgn.IndexOf ("1.");
+                if (indexOfMovesStart > 0) {
+                    GameHistoryView.Buffer.Text = pgn.Substring (indexOfMovesStart);
+                }
+
+                // Load the FEN from the last move
+                FENParser parser = new FENParser(MainClass.CurrentGameHistory.GetLastMove().FEN);
+                MainClass.CurrentBoard = parser.GetBoard();
+                MainClass.CurrentGameStatus = GameStatus.Inactive;
+                PiecePseudoLegalMoves.GeneratePseudoLegalMoves(MainClass.CurrentBoard);
+                PieceLegalMoves.GenerateLegalMoves(MainClass.CurrentBoard);
+                Gtk.Application.Invoke (delegate {
+                    RedrawBoard ();
+                });
+
+                MainClass.CurrentGameStatus = GameStatus.Inactive;
+                GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
+                if (currentStatus != GameStatus.Inactive && currentStatus != GameStatus.Active) {
+                    Gtk.Application.Invoke (delegate {
+                        ShowGameOverDialog (currentStatus);
+                    });
+                }
+                MainClass.ResetClock ();
+                UpdateMaterialDifference (MainClass.CurrentBoard);
+            }
+            fc.Destroy ();
         }
     }
 }

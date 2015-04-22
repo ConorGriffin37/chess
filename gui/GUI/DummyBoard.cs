@@ -97,7 +97,7 @@ namespace GUI
                         break;
                     default:
                         // Handle en passant capture
-                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare) {
+                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare && EnPassantSquare != 0) {
                             byte captureSquare = EnPassantColour == PieceColour.White ? (byte)(destination - 8) : (byte)(destination + 8);
                             Squares [destination].Piece = movingPiece;
                             capturedPiece = Squares [captureSquare].Piece;

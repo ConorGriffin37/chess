@@ -97,10 +97,11 @@ namespace GUI
                 });
                 if (response.StartsWith ("bestmove")) {
                     IsThinking = false;
-                    if(response.Substring(9).Length > 4) {
-                        return response.Substring (9, 5);
+                    string[] responseTokens = response.Split(' ');
+                    if (responseTokens.Length > 1) {
+                        return responseTokens[1];
                     } else {
-                        return response.Substring (9, 4);
+                        return "";
                     }
                 }
             } while(true);
@@ -117,7 +118,15 @@ namespace GUI
                 if (response.StartsWith ("bestmove")) {
                     WaitUntilReady();
                     Debug.Log ("Engine stopped and ready for new input.");
-                    return response.Substring (9, 5);
+                    string[] responseTokens = response.Split(' ');
+                    if (responseTokens.Length > 1)
+                    {
+                        return responseTokens[1];
+                    }
+                    else
+                    {
+                        return "";
+                    }
                 }
             } while(response != null);
             throw new TimeoutException ("Engine has stopped responding.");

@@ -105,13 +105,13 @@ namespace GUI
          * 
          * Copies the list of pieces from one board to another.
          */
-        public Board(Board other)
+        public Board(Board other, bool copyLists = false)
         {
             Squares = new Square[64];
             for (int i = 0; i < 64; i++) {
                 Squares [i] = new Square ();
                 if (other.Squares [i].Piece != null) {
-                    Squares [i].Piece = new Piece (other.Squares [i].Piece);
+                    Squares [i].Piece = new Piece (other.Squares [i].Piece, copyLists);
                 }
             }
             BlackCheck = other.BlackCheck;
@@ -244,7 +244,7 @@ namespace GUI
                         break;
                     default:
                         // Handle en passant capture
-                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare) {
+                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare && EnPassantSquare != 0) {
                             byte captureSquare = EnPassantColour == PieceColour.White ? (byte)(destination - 8) : (byte)(destination + 8);
                             Squares [destination].Piece = movingPiece;
                             Squares [captureSquare].Piece = null;
@@ -526,10 +526,24 @@ namespace GUI
          * 
          * @param other     the piece from which to copy.
          */
-        public Piece(Piece other)
+        public Piece(Piece other, bool copyLists = false)
         {
             Colour = other.Colour;
             Type = other.Type;
+            if (copyLists == true)
+            {
+                if (other.PseudoLegalMoves != null)
+                {
+                    PseudoLegalMoves = new List<byte>(other.PseudoLegalMoves);
+                }
+                if (other.LegalMoves != null)
+                {
+                    LegalMoves = new List<byte>(other.LegalMoves);
+                }
+            }
+            TimesAttacked = other.TimesAttacked;
+            TimesDefended = other.TimesDefended;
+            HasMoved = other.HasMoved;
         }
 
         /**
