@@ -85,6 +85,14 @@ namespace GUI
 
         public static string MoveToNotation(Move move)
         {
+            if (move.Result == MoveResult.KingsideCastle)
+            {
+                return "O-O";
+            }
+            else if (move.Result == MoveResult.QueensideCastle)
+            {
+                return "O-O-O";
+            }
             string movePiece = PieceToNotation (move.MovingPiece);
             string moveSpecifier = "";
             if (move.SpecifierRequired != SpecifierType.None) {
@@ -148,13 +156,13 @@ namespace GUI
                 case null:
                     return null;
                 case PieceType.Knight:
-                    return "N";
+                    return "=N";
                 case PieceType.Bishop:
-                    return "B";
+                    return "=B";
                 case PieceType.Rook:
-                    return "R";
+                    return "=R";
                 case PieceType.Queen:
-                    return "Q";
+                    return "=Q";
                 default:
                     return null;
             }
@@ -262,13 +270,17 @@ namespace GUI
         public static SpecifierType checkDisabiguationNeeded(Board theBoard, byte source, byte destination)
         {
             string pieceOnSquare = SquareToNotation(source);
+            if ((theBoard.Squares[source].Piece.Type == PieceType.Pawn) && (pieceOnSquare[0] != SquareToNotation(destination)[0]))
+            {
+                return SpecifierType.File;
+            }
             bool needsFileSpecifier = false;
             bool needsRankSpecifier = false;
             for (int i = 0; i < theBoard.Squares.Length; i++)
             {
                 if (theBoard.Squares[i].Piece != null)
                 {
-                    if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[source].Piece.Type) && (i != source))
+                    if ((theBoard.Squares[i].Piece.Type == theBoard.Squares[source].Piece.Type) && ((byte)i != source))
                     {
                         for (int j = 0; j < theBoard.Squares[i].Piece.LegalMoves.Count; j++)
                         {
@@ -283,7 +295,6 @@ namespace GUI
                                 {
                                     needsRankSpecifier = true;
                                 }
-
                             }
                         }
                     }
@@ -430,7 +441,8 @@ namespace GUI
 
             for (int i = 0; i < tokens.Length; i++)
             {
-                char[] trimChars = { '!', '?', '\n'};
+                char[] trimChars = { '!', '?' };
+                char[] checkChars = { '+', '#' };
                 string moveNotation = tokens[i].Trim(trimChars);
 
                 if (moveNotation.Contains('.'))
@@ -444,7 +456,7 @@ namespace GUI
                     for (int j = 0; j < possibleMoveNotations.Count; j++)
                     {
                         Console.Write(possibleMoveNotations[j].Item2 + " ");
-                        if (moveNotation.Equals(possibleMoveNotations[j].Item2))
+                        if (moveNotation.Equals(possibleMoveNotations[j].Item2) || moveNotation.Equals(possibleMoveNotations[j].Item2.Trim(checkChars))) 
                         {
                             gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
                             newGameHistory.AddMove(possibleMoveNotations[j].Item1, gameBoard.ToFEN().Split(' ')[0]);
