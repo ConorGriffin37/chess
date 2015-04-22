@@ -327,7 +327,7 @@ namespace GUI
                     {
                         SpecifierType disambiguationNeeded = checkDisabiguationNeeded(gameBoard, (byte)i, gameBoard.Squares[i].Piece.LegalMoves[j]);
 
-                        Board copiedBoard = new Board(gameBoard);
+                        Board copiedBoard = new Board(gameBoard, true);
                         MoveResult result = MoveResult.None;
                         if ((gameBoard.Squares[i].Piece.Type == PieceType.Pawn) && (Array.IndexOf(copiedBoard.pawnPromotionDestinations, gameBoard.Squares[i].Piece.LegalMoves[j]) != -1)) {
                             //Promotion
