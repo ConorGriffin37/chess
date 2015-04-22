@@ -455,7 +455,7 @@ namespace GUI
                     //Console.WriteLine("***" + moveNotation + "***"); //debugging output
                     for (int j = 0; j < possibleMoveNotations.Count; j++)
                     {
-                        Console.Write(possibleMoveNotations[j].Item2 + " ");
+                        //Console.Write(possibleMoveNotations[j].Item2 + " ");
                         if (moveNotation.Equals(possibleMoveNotations[j].Item2) || moveNotation.Equals(possibleMoveNotations[j].Item2.Trim(checkChars))) 
                         {
                             gameBoard.MakeMove(possibleMoveNotations[j].Item1.Source, possibleMoveNotations[j].Item1.Destination, possibleMoveNotations[j].Item1.PromoteTo);
