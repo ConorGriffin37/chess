@@ -791,11 +791,6 @@ namespace GUI
                     }
                 }
             }
-            if (MainClass.CurrentGameStatus != GameStatus.Active && MainClass.CurrentGameStatus != GameStatus.Inactive) {
-                Gtk.Application.Invoke(delegate {
-                    ShowGameOverDialog(MainClass.CurrentGameStatus);
-                });
-            }
         }
 
         protected void OnSetEngineStrength (object sender, EventArgs e)
