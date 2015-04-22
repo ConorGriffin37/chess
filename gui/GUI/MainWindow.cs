@@ -984,12 +984,16 @@ namespace GUI
                 MainClass.CurrentGameStatus = GameStatus.Inactive;
                 PiecePseudoLegalMoves.GeneratePseudoLegalMoves(MainClass.CurrentBoard);
                 PieceLegalMoves.GenerateLegalMoves(MainClass.CurrentBoard);
-                RedrawBoard();
+                Gtk.Application.Invoke (delegate {
+                    RedrawBoard ();
+                });
 
                 MainClass.CurrentGameStatus = GameStatus.Inactive;
                 GameStatus currentStatus = MainClass.CurrentBoard.CheckForMate ();
                 if (currentStatus != GameStatus.Inactive && currentStatus != GameStatus.Active) {
-                    ShowGameOverDialog (currentStatus);
+                    Gtk.Application.Invoke (delegate {
+                        ShowGameOverDialog (currentStatus);
+                    });
                 }
                 MainClass.ResetClock ();
                 UpdateMaterialDifference (MainClass.CurrentBoard);
