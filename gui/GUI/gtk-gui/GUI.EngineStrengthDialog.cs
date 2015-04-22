@@ -43,6 +43,7 @@ namespace GUI
 			this.DepthButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Depth"));
 			this.DepthButton.CanFocus = true;
 			this.DepthButton.Name = "DepthButton";
+			this.DepthButton.Active = true;
 			this.DepthButton.DrawIndicator = true;
 			this.DepthButton.UseUnderline = true;
 			this.DepthButton.Group = new global::GLib.SList (global::System.IntPtr.Zero);

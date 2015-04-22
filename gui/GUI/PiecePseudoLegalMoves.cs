@@ -101,7 +101,17 @@ namespace GUI
 
         private static void CheckValidAttackPawn(Board board, byte destination, Piece movingPiece)
         {
-            // TODO: Add support for en passant.
+            // Handle en passant
+            if (board.EnPassantSquare > -1 && movingPiece.Colour != board.EnPassantColour && destination == board.EnPassantSquare) {
+                // We have a valid en passant possible
+                movingPiece.PseudoLegalMoves.Add (destination);
+
+                if (movingPiece.Colour == PieceColour.White) {
+                    WhiteAttackBoard [destination] = true;
+                } else {
+                    BlackAttackBoard [destination] = true;
+                }
+            }
 
             Piece attackedPiece = board.Squares [destination].Piece;
 

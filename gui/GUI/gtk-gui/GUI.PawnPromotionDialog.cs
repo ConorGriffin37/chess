@@ -29,7 +29,6 @@ namespace GUI
 			this.WidthRequest = 350;
 			this.HeightRequest = 125;
 			this.Name = "GUI.PawnPromotionDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString ("dialog1");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			this.Resizable = false;
 			this.AllowGrow = false;

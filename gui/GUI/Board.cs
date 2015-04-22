@@ -7,7 +7,10 @@ namespace GUI
     public enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King };
     // The colour before the game result indicates which colour has lost.
     public enum GameStatus { Inactive, Active, Stalemate, WhiteCheckmate,
-        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime };
+        BlackCheckmate, WhiteAdjudicate, BlackAdjudicate, WhiteTime, BlackTime,
+        DrawRepetition, DrawFifty, DrawInsuffientMaterial };
+    // If a move was a castle, capture, etc.
+    public enum MoveResult { None, PawnMove, Capture, KingsideCastle, QueensideCastle }
 
     /**
      * @brief Representation of the board as a whole.
@@ -22,10 +25,16 @@ namespace GUI
         public virtual bool BlackCastledL { get; set; }
         public virtual bool WhiteCastledL { get; set; }
         public virtual PieceColour PlayerToMove { get; set; }
+        public virtual byte EnPassantSquare { get; protected set; }
+        public virtual PieceColour EnPassantColour { get; protected set; }
 
         public readonly byte[] castleDestinations = { 2, 6, 56, 62 };
         public readonly byte[] pawnPromotionDestinations = { 0, 1, 2, 3, 4, 5, 6, 7,
                                                              56, 57, 58, 59, 60, 61, 62, 63 };
+        public readonly byte[] enPassantStartSquares = { 8, 9, 10, 11, 12, 13, 14, 15,
+                                                         48, 49, 50, 51, 52, 53, 54, 55 };
+        public readonly byte[] enPassantEndSquares = { 24, 25, 26, 27, 28, 29, 30, 31,
+                                                       32, 33, 34, 35, 36, 37, 38, 39 };
 
         /**
          * @brief Default constructor.
@@ -42,6 +51,8 @@ namespace GUI
             BlackCastledL = true;
             WhiteCastledL = true;
             PlayerToMove = PieceColour.White;
+            EnPassantSquare = 0;
+            EnPassantColour = PieceColour.White;
 
             if (empty) {
                 Squares = new Square[64];
@@ -94,13 +105,13 @@ namespace GUI
          * 
          * Copies the list of pieces from one board to another.
          */
-        public Board(Board other)
+        public Board(Board other, bool copyLists = false)
         {
             Squares = new Square[64];
             for (int i = 0; i < 64; i++) {
                 Squares [i] = new Square ();
                 if (other.Squares [i].Piece != null) {
-                    Squares [i].Piece = new Piece (other.Squares [i].Piece);
+                    Squares [i].Piece = new Piece (other.Squares [i].Piece, copyLists);
                 }
             }
             BlackCheck = other.BlackCheck;
@@ -110,6 +121,8 @@ namespace GUI
             BlackCastledR = other.BlackCastledR;
             WhiteCastledR = other.WhiteCastledR;
             PlayerToMove = other.PlayerToMove;
+            EnPassantSquare = other.EnPassantSquare;
+            EnPassantColour = other.EnPassantColour;
         }
 
         public void AddPiece(PieceColour colour, PieceType type, int position)
@@ -154,8 +167,10 @@ namespace GUI
          * Makes a move, switches the @c PlayerToMove variable,
          * and updates piece legal moves.
          */
-        public void MakeMove(byte source, byte destination, PieceType? promoteTo = null)
+        public MoveResult MakeMove(byte source, byte destination, PieceType? promoteTo = null)
         {
+            MoveResult ret = MoveResult.None;
+
             if (!IsMoveValid (source, destination)) {
                 throw new InvalidOperationException ("Invalid move entered.");
             }
@@ -188,6 +203,7 @@ namespace GUI
             if (movingPiece.Type == PieceType.King &&
                 (source == 4 || source == 60) &&
                 Array.IndexOf (castleDestinations, destination) != -1) {
+                ret = destination - source > 0 ? MoveResult.KingsideCastle : MoveResult.QueensideCastle;
                 Square castleRookSquare = destination - source > 0 ?
                     Squares [destination + 1] : Squares [destination - 2];
                 Squares [destination].Piece = movingPiece;
@@ -197,6 +213,18 @@ namespace GUI
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
+                // Handle pawn moves
+                if (Squares [source].Piece.Type == PieceType.Pawn) {
+                    ret = MoveResult.PawnMove;
+                    // Handle en passant creation
+                    if (Array.IndexOf (enPassantStartSquares, source) > -1 && Array.IndexOf (enPassantEndSquares, destination) > -1) {
+                        EnPassantColour = Squares [source].Piece.Colour;
+                        EnPassantSquare = EnPassantColour == PieceColour.White ? (byte)(destination + 8) : (byte)(destination - 8);
+                    }
+                }
+                if (Squares [destination].Piece != null) {
+                    ret = MoveResult.Capture;
+                }
                 switch (promoteTo) {
                     case PieceType.Bishop:
                         Squares [destination].Piece = new Piece (movingPiece.Colour, PieceType.Bishop);
@@ -215,8 +243,21 @@ namespace GUI
                         Squares [source].Piece = null;
                         break;
                     default:
-                        Squares [destination].Piece = movingPiece;
-                        Squares [source].Piece = null;
+                        // Handle en passant capture
+                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare && EnPassantSquare != 0) {
+                            byte captureSquare = EnPassantColour == PieceColour.White ? (byte)(destination - 8) : (byte)(destination + 8);
+                            Squares [destination].Piece = movingPiece;
+                            Squares [captureSquare].Piece = null;
+                            Squares [source].Piece = null;
+                            ret = MoveResult.Capture;
+                            EnPassantSquare = 0;
+                        } else {
+                            Squares [destination].Piece = movingPiece;
+                            Squares [source].Piece = null;
+                            if (movingPiece.Type != PieceType.Pawn) {
+                                EnPassantSquare = 0;
+                            }
+                        }
                         break;
                 }
                         
@@ -232,6 +273,7 @@ namespace GUI
             }
             PiecePseudoLegalMoves.GeneratePseudoLegalMoves (this);
             PieceLegalMoves.GenerateLegalMoves (this);
+            return ret;
         }
 
         /**
@@ -484,10 +526,24 @@ namespace GUI
          * 
          * @param other     the piece from which to copy.
          */
-        public Piece(Piece other)
+        public Piece(Piece other, bool copyLists = false)
         {
             Colour = other.Colour;
             Type = other.Type;
+            if (copyLists == true)
+            {
+                if (other.PseudoLegalMoves != null)
+                {
+                    PseudoLegalMoves = new List<byte>(other.PseudoLegalMoves);
+                }
+                if (other.LegalMoves != null)
+                {
+                    LegalMoves = new List<byte>(other.LegalMoves);
+                }
+            }
+            TimesAttacked = other.TimesAttacked;
+            TimesDefended = other.TimesDefended;
+            HasMoved = other.HasMoved;
         }
 
         /**

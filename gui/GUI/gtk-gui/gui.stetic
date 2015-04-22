@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../bin/Debug/GUI.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="773 715">
+  <widget class="Gtk.Window" id="GUI.MainWindow" design-size="973 715">
     <action-group name="Default">
       <action id="FileAction">
         <property name="Type">Action</property>
@@ -153,6 +153,23 @@
         <property name="ShortLabel" translatable="yes">Load Engine 2</property>
         <signal name="Activated" handler="OnLoadEngineTwo" />
       </action>
+      <action id="PGNAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">PGN</property>
+        <property name="ShortLabel" translatable="yes">PGN</property>
+      </action>
+      <action id="ExportAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Export...</property>
+        <property name="ShortLabel" translatable="yes">Export...</property>
+        <signal name="Activated" handler="OnExportPGN" />
+      </action>
+      <action id="ImportAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Import...</property>
+        <property name="ShortLabel" translatable="yes">Import...</property>
+        <signal name="Activated" handler="OnImportPGN" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Gandalf Chess GUI</property>
@@ -175,6 +192,10 @@
                   <node type="Menuitem" action="OnePlayerAction" />
                   <node type="Menuitem" action="TwoPlayerAction" />
                   <node type="Menuitem" action="EnginesAction" />
+                </node>
+                <node type="Menu" action="PGNAction">
+                  <node type="Menuitem" action="ExportAction" />
+                  <node type="Menuitem" action="ImportAction" />
                 </node>
               </node>
               <node type="Menu" action="BoardAction">
@@ -231,11 +252,12 @@
             <child>
               <widget class="Gtk.VBox" id="vbox3">
                 <property name="MemberName" />
-                <property name="WidthRequest">200</property>
+                <property name="WidthRequest">400</property>
                 <property name="Spacing">6</property>
                 <child>
                   <widget class="Gtk.HBox" id="hbox4">
                     <property name="MemberName" />
+                    <property name="Homogeneous">True</property>
                     <property name="Spacing">6</property>
                     <child>
                       <widget class="Gtk.VBox" id="vbox4">
@@ -317,7 +339,7 @@
                   </widget>
                   <packing>
                     <property name="Position">0</property>
-                    <property name="AutoSize">True</property>
+                    <property name="AutoSize">False</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
                   </packing>
@@ -350,7 +372,19 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder />
+                  <widget class="Gtk.TextView" id="GameHistoryView">
+                    <property name="MemberName" />
+                    <property name="WidthRequest">400</property>
+                    <property name="CanFocus">True</property>
+                    <property name="Editable">False</property>
+                    <property name="CursorVisible">False</property>
+                    <property name="Text" translatable="yes" />
+                    <property name="WrapMode">Word</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
+                    <property name="AutoSize">True</property>
+                  </packing>
                 </child>
               </widget>
               <packing>

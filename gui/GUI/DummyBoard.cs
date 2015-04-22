@@ -24,6 +24,8 @@ namespace GUI
         public override bool BlackCastledL { get; set; }
         public override bool WhiteCastledL { get; set; }
         public override PieceColour PlayerToMove { get; set; }
+        public override byte EnPassantSquare { get; protected set; }
+        public override PieceColour EnPassantColour { get; protected set; }
 
         public DummyBoard (Board other)
         {
@@ -41,6 +43,8 @@ namespace GUI
             BlackCastledL = other.BlackCastledR;
             WhiteCastledL = other.WhiteCastledR;
             PlayerToMove = other.PlayerToMove;
+            EnPassantSquare = other.EnPassantSquare;
+            EnPassantColour = other.EnPassantColour;
         }
 
         // Returns value of captured piece, for use in DummyBoard.UndoMove
@@ -63,6 +67,16 @@ namespace GUI
                     destination + 1].Piece = castleRookSquare.Piece;
                 castleRookSquare.Piece = null;
             } else {
+                // Handle en passant.
+                if (Squares [source].Piece.Type == PieceType.Pawn) {
+                    if (Array.IndexOf (enPassantStartSquares, source) > -1 && Array.IndexOf (enPassantEndSquares, destination) > -1) {
+                        EnPassantColour = Squares [source].Piece.Colour;
+                        EnPassantSquare = EnPassantColour == PieceColour.White ? (byte)(destination + 8) : (byte)(destination - 8);
+                    } else {
+                        EnPassantSquare = 0;
+                    }
+                }
+
                 capturedPiece = Squares [destination].Piece;
                 switch (promoteTo) {
                     case PieceType.Bishop:
@@ -82,8 +96,17 @@ namespace GUI
                         Squares [source].Piece = null;
                         break;
                     default:
-                        Squares [destination].Piece = movingPiece;
-                        Squares [source].Piece = null;
+                        // Handle en passant capture
+                        if (movingPiece.Type == PieceType.Pawn && destination == EnPassantSquare && EnPassantSquare != 0) {
+                            byte captureSquare = EnPassantColour == PieceColour.White ? (byte)(destination - 8) : (byte)(destination + 8);
+                            Squares [destination].Piece = movingPiece;
+                            capturedPiece = Squares [captureSquare].Piece;
+                            Squares [captureSquare].Piece = null;
+                            Squares [source].Piece = null;
+                        } else {
+                            Squares [destination].Piece = movingPiece;
+                            Squares [source].Piece = null;
+                        }
                         break;
                 }
             }
