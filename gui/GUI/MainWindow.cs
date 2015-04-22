@@ -344,6 +344,10 @@ namespace GUI
 
         private void ParseAndMakeMove(string move, int engine)
         {
+            if (move.Length < 4)
+            {
+                return;
+            }
             string sourceStr = move.Substring (0, 2);
             string destinationStr = move.Substring (2, 2);
             string promoteToStr = "";
@@ -419,6 +423,7 @@ namespace GUI
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
+            MainClass.CurrentGameStatus = GameStatus.Inactive;
             GameStatus isMate = MainClass.CurrentBoard.CheckForMate ();
             if (isMate != GameStatus.Active) {
                 MainClass.CurrentGameStatus = isMate;
@@ -438,7 +443,7 @@ namespace GUI
                 UpdatePlayerToMove();
             });
 
-            if (MainClass.CurrentMode == GameMode.Engines) {
+            if (MainClass.CurrentMode == GameMode.Engines && MainClass.CurrentGameStatus == GameStatus.Active) {
                 Thread.Sleep (1500);
                 if (engine == 1) {
                     Gtk.Application.Invoke (delegate {
