@@ -625,6 +625,14 @@ namespace GUI
                     MainClass.EngineTwo.StopAndIgnoreMove ();
                 }
 
+                if (!MainClass.CurrentBoard.IsMoveValid (selectedPiece, (byte)pieceIndex)) {
+                    currentSelectionState = PieceSelectionState.None;
+                    Gtk.Application.Invoke (delegate {
+                        RedrawBoard ();
+                    });
+                    return;
+                }
+
                 if (MainClass.CurrentGameStatus != GameStatus.Active &&
                     MainClass.CurrentGameStatus != GameStatus.Inactive) {
                     Console.Error.WriteLine ("(EE) Attempted move during finished game.");
