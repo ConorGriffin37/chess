@@ -423,7 +423,7 @@ namespace GUI
             } catch(InvalidOperationException) {
                 throw new InvalidOperationException (move);
             }
-            MainClass.CurrentGameStatus = GameStatus.Inactive;
+
             GameStatus isMate = MainClass.CurrentBoard.CheckForMate ();
             if (isMate != GameStatus.Active) {
                 MainClass.CurrentGameStatus = isMate;
