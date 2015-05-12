@@ -32,6 +32,9 @@ void TranspositionTables::initZobrist()
         zobrist[i] = r;
         //std::cout << zobrist[i] << std::endl;
     }
+    for (int i = 0; i < tab_size; i++) {
+        Table[i] = bad;
+    }
 }
 
 u64 TranspositionTables::getSquareHash(int pos, int code, int playerColor)

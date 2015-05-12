@@ -114,7 +114,6 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     int halfMoveNumber = gameBoard.halfMoveClock;
     int lastTo = gameBoard.getLastMove();
     bool canMove = false;
-    u64 bestMove;
 
     if (allowNullMove) {
         if (gameBoard.inCheck(((playerColor == 1) ? WHITE_CODE : BLACK_CODE)) == false) {
@@ -130,6 +129,8 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
     }
 
     TranspositionTables::setOpen(gameBoard.getZorHash());
+    u64 bestMove = 0;
+    int lowScore = -1000000;
 
     while (true) {
         u64 nextMove = possibleMoves.getNextMove();
@@ -147,6 +148,9 @@ int Search::AlphaBeta(Board& gameBoard, int alpha, int beta, int remainingDepth,
                 }
                 if (score > alpha){
                     alpha = score;
+                }
+                if (score > lowScore) {
+                    lowScore = score;
                     bestMove = nextMove;
                 }
             }
