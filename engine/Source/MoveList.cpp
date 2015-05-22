@@ -698,6 +698,9 @@ u64 MoveList::getNextMove()
 
 u64 MoveList::getMovN(int n)
 {
+    if (n >= moves.size()) {
+        return 0;
+    }
     return moves[n];
 }
 
