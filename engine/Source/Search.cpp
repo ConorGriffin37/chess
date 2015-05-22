@@ -29,6 +29,10 @@ pair<string, int> Search::RootAlphaBeta(Board gameBoard, int playerColor, int re
     }
     nodes++;
 
+    if (possibleMoves.getMovN(0) == 0) {
+        return std::make_pair("", 0);
+    }
+
     u64 curBestMove = possibleMoves.getMovN(0);
     int currMoveNumber = 0;
     int maxScore = NEGATIVE_INFINITY;
